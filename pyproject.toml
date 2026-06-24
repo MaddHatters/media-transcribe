@@ -1,0 +1,27 @@
+[project]
+name = "media-transcribe"
+version = "0.1.0"
+description = "Local, offline transcription of video folders with Whisper large-v3 (faster-whisper)."
+requires-python = ">=3.11"
+dependencies = [
+    "faster-whisper>=1.1.0",
+]
+
+[project.optional-dependencies]
+# Only needed on the Windows capture box: uv sync --extra capture
+capture = [
+    "playwright>=1.44",
+    "obsws-python>=1.7",
+]
+
+[dependency-groups]
+# Installed by default with `uv run`/`uv sync`.
+dev = [
+    "pytest>=8",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.uv]
+# Pin nothing exotic; CPU-only by default. See README for GPU/Mac notes.

@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+# never commit transcripts or media
+output/
+transcripts/
+*.mkv
+*.mp4
+*.srt
+*.vtt
+# capture secrets / state (Windows box)
+acquire/obs_config.toml
+acquire/.browser-profile/
+acquire/episodes.txt

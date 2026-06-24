@@ -1,0 +1,10 @@
+# Copy to obs_config.toml and fill in. obs_config.toml is gitignored.
+
+[obs]
+host = "localhost"     # the Windows box running OBS (localhost if script runs there)
+port = 4455            # OBS > Tools > WebSocket Server Settings
+password = ""          # from that same dialog
+
+[browser]
+channel = "msedge"     # msedge | chrome  (real browser = Widevine works)
+                       # use "chromium" only for non-DRM content (needs: playwright install)

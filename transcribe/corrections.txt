@@ -1,0 +1,24 @@
+# Per-course transcript corrections for the FIRE Investing Masterclass.
+#
+# Format:  wrong => CORRECT     (literal, case-insensitive, whole-word)
+#          re:REGEX => REPL     (raw regex, case-insensitive)
+# Re-apply to existing transcripts:  uv run transcribe/apply_corrections.py <folder>
+# Preview without writing:           ... --dry-run
+
+# --- High confidence: tickers Whisper consistently mis-spells ---
+d grow => DGRO
+S CHD => SCHD
+DJF => DGF
+
+# --- Course-specific shorthand (the instructor's coinage) ---
+# "DGF" is sometimes heard as the letters D-G-I-F / D-J-I-F. Catch the spaced and
+# joined variants first, before the bare DJI->DGI rule below consumes the "DJI".
+re:\bD[JG]I ?F\b => DGF
+# He says "DGI" (dividend growth investing); Whisper often writes "DJI".
+# Safe here because these episodes don't discuss the Dow or DJI (the drone maker);
+# remove this line if a future folder does.
+DJI => DGI
+
+# --- Lower confidence / context-dependent: left off by default ---
+# "VU" might be VUG or VOO depending on the slide — review manually:
+# VU => VUG
