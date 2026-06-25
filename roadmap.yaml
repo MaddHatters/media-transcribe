@@ -101,6 +101,10 @@ phases:
     name: Validate experts against the real portfolio
     status: planned
     depends_on: [4]
+    requires:
+      - "Statement ingestion (analysis/statement-ingestion.md): SEC EDGAR XBRL primary,
+         shared GAAP-tag normalizer + per-company overrides, sector metric profiles
+         (SaaS/bank/REIT/...). Data-bound -> finance-suite. Validate vs OCR'd statements."
     objectives:
       - Run the experts against tickers currently held in the portfolio.
       - Compare the experts' analysis to reality (fundamentals, performance, thesis).
