@@ -11,6 +11,14 @@ Usage:
 """
 from __future__ import annotations
 
+import os
+
+# OCR's small ONNX models don't scale past a few threads; onnxruntime otherwise
+# grabs every core and oversubscribes. Cap before importing onnxruntime-backed libs.
+# Override with OMP_NUM_THREADS in the environment if needed.
+os.environ.setdefault("OMP_NUM_THREADS", "6")
+os.environ.setdefault("OMP_WAIT_POLICY", "PASSIVE")
+
 import argparse
 import json
 import sys

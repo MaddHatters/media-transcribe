@@ -21,7 +21,7 @@ Bear argues avoid/sell from the *same* evidence, Judge weighs both → balanced 
 conviction that feeds position sizing). Evidence sub-experts:
 1. Financial-Statement Analyst 🟢
 2. Valuation 🟢
-3. Dividend Classifier (DGF/DGI/Income) 🟢
+3. Dividend Classifier (DGIF/DGI/Income) 🟢
 4. Management & Governance Rater 🟡 (signals only — no scoring rubric in the course)
 5. Moat / Competitive-Position 🟡 (margin/R&D/SG&A-vs-peers proxies)
 6. Market-Sizing TAM/SAM/SOM 🔴 (only TAM, qualitative; SAM/SOM not taught)

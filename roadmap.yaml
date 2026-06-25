@@ -56,15 +56,21 @@ phases:
 
   - id: 3
     name: OCR context capture
-    status: planned
+    status: done
+    completed: 2026-06-25
     depends_on: [2]
     objectives:
-      - Extract the frames flagged in analysis/ocr-candidates.md from the source videos.
-      - OCR them (tesseract local, or a vision model for charts/tables) to recover on-screen data.
-      - Merge recovered context back into the transcripts / mental model so no detail is missed.
+      - "DONE: local/free text OCR of all 18 videos (PyAV keyframes + RapidOCR/ONNX), ~2,900 slides."
+      - "DONE: reconciled recovered slide text vs the mental model — confirmed findings,
+         fixed corrections (DGF->DGIF, DG 200-day, NVDA option strike, Barber-O'Dean turnover),
+         recovered skipped numeric tables (full financial statements, pattern library, etc.)."
+      - "DEFERRED: diagram/chart *vision* pass (candlestick diagrams, semiconductor flowchart
+         hierarchy, emotion-cycle curve, hand-drawn pies) — text OCR gets labels, not shapes.
+         Plan: local vision-LLM POC on the M4 Mac mini (free + private; GPU/ANE makes it viable
+         there, vs CPU-only here)."
     outputs:
-      - "Per-episode slide-text alongside transcripts"
-      - "Updated mental model with previously-missing visual context"
+      - "Per-episode slide text at <videos>/ocr/<stem>/slides.{md,json} (gitignored)"
+      - "analysis/ocr-reconciliation.md — corrections + recovered reference data"
 
   - id: 4
     name: Build the experts

@@ -44,7 +44,7 @@ slides mostly read aloud).
 ### MC3 — Basics 102
 - **23:34 (P1) hand-drawn 8/10 pie** (25/20/40/10/5); 45:36 (P1) 6/10 & 4/10 hand-drawn pies
 - 26:23 (P2) ETF table w/ expense ratios; 31:20 (P1) "ETF ideas" master list
-- **36:25 (P1) DGF sector table** (tickers per sector, starred = not true DGF)
+- **36:25 (P1) DGIF sector table** (tickers per sector, starred = not true DGIF)
 - 41:42 / 43:31 (P2) growth + spec ticker/logo slides
 - **56:15 (P1) Top-100 ETFs by AUM table** (AUM + volume cols); 59:31 (P2) dividend tax-rate table
 - 01:06:41 (P1) ARK distributions table; 01:11:33 (P2) live WCLD limit-order ticket
@@ -115,7 +115,7 @@ slides mostly read aloud).
 
 ### MC15 — Portfolio Plans & Purchasing Steps
 - 01:40 (P2) investor.gov compounding ($10k+$1k/mo, 20yr, 12.5% → $1M+)
-- 17:03 (P2) megatrends slide; 21:09 / 21:46 (P2) 8/10 pie + DGF criteria slides; 28:46 / 29:05 (P2) 6/10 & 4/10 slides
+- 17:03 (P2) megatrends slide; 21:09 / 21:46 (P2) 8/10 pie + DGIF criteria slides; 28:46 / 29:05 (P2) 6/10 & 4/10 slides
 - 31:01 (P1) $5M end-game slide (re-shown); **32:31 (P1) semiconductor 4-pillar flowchart** ("not going to read all this")
 - 36:00 (P2) "Should I buy MSFT?" decision flowchart; 40:00 (P2) valuation-metrics master list; 42:12 (P2) PE/PEG/PS/PB explainer cards
 - **49:16 (P1) Microsoft $52.75B segment-revenue breakdown**; **52:01 (P1) Y Charts vs Fidelity 5-metric panel** (PEG 63.07 vs 2.27, PS 11.13/11.18, PE history to 2012)

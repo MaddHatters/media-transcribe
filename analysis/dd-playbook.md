@@ -65,13 +65,13 @@ DDM, sum-of-parts. **Never one metric; cross-check ≥3 sources** (Y Charts vs F
 own math — Y Charts showed PEG 63.07 vs Fidelity's correct 2.27). Qualified-dividend tax
 tiers 0/15/18.8/23.8% (+3.8% NII).
 
-## 3. Dividend Classifier (DGF / DGI / Income) 🟢
-- **DGF** (total growth) — all 5: yield ≤3% (best ~1–1.5%), payout ≤50% (pref ≤35%), ≥5 yr
+## 3. Dividend Classifier (DGIF / DGI / Income) 🟢
+- **DGIF** (total growth) — all 5: yield ≤3% (best ~1–1.5%), payout ≤50% (pref ≤35%), ≥5 yr
   div growth, ≥10% 5-yr div growth, ≥10% 10-yr annualized growth.
 - **DGI** (grow the dividend ≥ inflation, paid from profits not debt; for income/retirement).
 - **Income** — **yield >4% + high payout, OR any REIT**; avoid ≥6% yield.
 - **Overlap resolution:** investor classifies subjectively; "99% fit one bucket." Edge cases:
-  NVDA (~0.15% yield → DGF-vs-Growth), Disney (suspended → no longer DGF), AbbVie (borderline).
+  NVDA (~0.15% yield → DGIF-vs-Growth), Disney (suspended → no longer DGIF), AbbVie (borderline).
 - Growth sub-tiers: hyper (80–100% YoY) / growth / mature ("maturity = less risk/reward").
 
 ## 4. Management & Governance Rater 🟡

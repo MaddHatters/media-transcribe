@@ -16,17 +16,17 @@ wealth with growth while young, rotate into dividends to live off passive income
 
 ## 1. The portfolio system (the spine of the course)
 
-A **5-bucket portfolio** scored by a **1–10 risk dial**. Buckets: **ETFs / DGF /
+A **5-bucket portfolio** scored by a **1–10 risk dial**. Buckets: **ETFs / DGIF /
 Growth / Spec / Income** (+ Cash). Risk-tiered blueprints:
 
-| Blueprint | ETF | DGF | Growth | Spec | Income/Bonds | Cash |
+| Blueprint | ETF | DGIF | Growth | Spec | Income/Bonds | Cash |
 |---|---|---|---|---|---|---|
 | **8/10 aggressive** (flagship, young) | 25% | 20% | 40% | 10% | — | 5% |
 | **6/10 aggressive** | 35% | 30% | 20% | — | 10% bonds/other | 5% |
-| **4/10 early retirement** | 50% (incl. ~25% VYM) | 35% DGI/DGF/income blend | — | — | 15% bonds/cash/other (real estate) | — |
+| **4/10 early retirement** | 50% (incl. ~25% VYM) | 35% DGI/DGIF/income blend | — | — | 15% bonds/cash/other (real estate) | — |
 | **$5M end-game (FIRE)** | 40% ($2M) | 30% dividends ($1.5M) | 25% ($1.25M) | — | (in dividends) | 5% ($250K, +bonds) |
 
-**Per-bucket sizing rules (8/10):** DGF 10–25 names @ 1–2% each; Growth 10–25 names @
+**Per-bucket sizing rules (8/10):** DGIF 10–25 names @ 1–2% each; Growth 10–25 names @
 2–4% each; Spec 10–20 names @ ~$500–$1,000 ("10x or zero"); Cash in a liquid sweep.
 **Hard concentration cap: ≤5% in any one stock** (often 2–3%).
 
@@ -34,18 +34,18 @@ Growth / Spec / Income** (+ Cash). Risk-tiered blueprints:
 30% dividends (50 stocks × $30K, blended 4.2% → $63K/yr, mix monthly+quarterly payers,
 incl. preferreds); 25% growth ($1M mature + $250K hyper, run covered calls on it);
 5% cash/bonds. Total ≈ **$121K/yr (~2.5% yield) = ~$10,083/mo**, never reinvested,
-grows to outpace inflation. Transformation from 8/10: ETF↔Growth flip-flop, DGF+Spec
+grows to outpace inflation. Transformation from 8/10: ETF↔Growth flip-flop, DGIF+Spec
 merge into one dividend pool, spec disappears.
 
 **Lifecycle ("metamorphosis"):** a stock and the whole portfolio migrate **Spec →
-Hyper-growth → Growth → Mature growth → DGF → DGI → Income** over years; the risk dial
+Hyper-growth → Growth → Mature growth → DGIF → DGI → Income** over years; the risk dial
 falls as you approach the income end-game.
 
 ---
 
 ## 2. The dividend buckets (highest-value reusable rules)
 
-**DGF — "Dividend Growth for FIRE" (5 criteria, goal = total return):**
+**DGIF — "Dividend Growth Investing for FIRE" (canonical per OCR'd slides; transcripts show the contracted "DGF") (5 criteria, goal = total return):**
 1. Dividend yield **≤ 3%** (best are ~1–1.5%)
 2. Payout ratio **≤ 50%** (prefer **≤ 35%**)
 3. **≥ 5 years** of dividend growth
@@ -54,9 +54,9 @@ falls as you approach the income end-game.
 
 **DGI — "Dividend Growth Investing":** focus on *growth of the dividend* (≥ inflation),
 paid from current profits (not debt/accumulated capital); diversify industries; DRIP.
-**Income stock:** owned for yield (bond-like), high payout, doesn't fit DGF/DGI — rule:
+**Income stock:** owned for yield (bond-like), high payout, doesn't fit DGIF/DGI — rule:
 **yield > 4% + high payout, or any REIT**. **Avoid chasing yield: ≥ 6% is off-limits.**
-"Higher yield = higher risk." DGF examples: AAPL, V, MSFT, UNH, MCD, COST, HON, ROP, DE.
+"Higher yield = higher risk." DGIF examples: AAPL, V, MSFT, UNH, MCD, COST, HON, ROP, DE.
 
 ---
 
@@ -90,7 +90,7 @@ dive (estimates, patents, TAM); 10) risks (macro, industry, legal, ESG).
   standard interest-coverage ratio and is likely misspoken; quote-as-taught, **verify
   before encoding in an expert**); current ratio **< 1.5** / quick **< 1** = concern (but
   see addendum: <1 isn't always bad); **≥ 3 yrs** declining revenue = avoid; rising share
-  count (dilution); payout **> 90%** (REITs exempt; DGF ideal ~20%, ≤50% acceptable).
+  count (dilution); payout **> 90%** (REITs exempt; DGIF ideal ~20%, ≤50% acceptable).
 
 **Peter Lynch (MC5) — 6 categories:** slow growers (income, 3–15%), stalwarts (blue
 chips, 10–12% EPS growth, buy for 30–50%), **fast growers (favorite, 20–25%, seek
@@ -111,7 +111,8 @@ crypto/metaverse, clean energy. **"Semiconductors are the new oil"** (pick-and-s
 - **MAs:** SMA vs EMA (EMA = less lag, growth stocks "follow the EMA until they don't").
   Long-term investors use **50/100/200-day**; **200-day = most important support**
   ("self-fulfilling" via algos). High conviction → buy at 50/100; break of 200 → "load up";
-  expect a retest. Worked ex: Dollar General bought ~$194 near 200-day ~$195.
+  expect a retest. Worked ex: Dollar General bought ~$194 near the rising 200-day
+  (SMA200 ≈ $200.38, EMA200 ≈ $197.91); drawn support $192.44/$193.03.
 - **RSI** (Wilder, 0–100): **>70 overbought, <30 oversold**; ~90+ → watch for ~20%
   correction / trim. Use WITH MAs (MAs = trend, RSI = overbought/oversold).
 - **Candlesticks (MC10):** anatomy (body/wick, green=bullish/red=bearish); single
@@ -253,13 +254,13 @@ slow 3–15% (7–10% yield), stalwarts 10–12% EPS (ride 30–50%), fast 20–
 moat), turnarounds = "no growers"; "30 best days" stat ($341,722 vs $153,792); the
 influencer pantheon (Graham, Bogle, Kiyosaki, Wood, Najarians…).
 
-**Technical (MC6/10):** read RSI/MAs on the **1-day** chart (RSI is timeframe-dependent:
-CF 92/73/68 on 1mo/1wk/1day); **20-day SMA** = short-term support (Bollinger); **SMA for
+**Technical (MC6/10):** read RSI/MAs on the **1-day** chart (RSI is timeframe-dependent;
+OCR'd CF readings were 92.08 and ~68 — the exact 1mo/1wk/1day split is narration-only); **20-day SMA** = short-term support (Bollinger); **SMA for
 support/resistance, EMA for growth-stock trend**; **volume amplifies candle signals**;
 Fibonacci breakdown ≈ erase **~2/3** of the move; **pattern-vs-candle precedence** — a
 pattern isn't directional alone; read the candles at the apex (generalizes to all patterns).
 
-**DCA & buy (MC3/15/18):** **"core" = ETFs + DGF + highest-conviction growth at 3–5%**;
+**DCA & buy (MC3/15/18):** **"core" = ETFs + DGIF + highest-conviction growth at 3–5%**;
 mode→bucket mapping (**periodic → core/ETFs; FUWTALAS lot-allocation → fringe/individual**);
 lots = **20–25% each** (bull 2–3 lots / bear 10–30 lots); **DRIP is itself a micro-DCA** →
 yield-on-cost; accumulation phase = buy constantly, preservation (~$1M+) = selective;
@@ -278,7 +279,7 @@ Hard stats: 78% of best days are in bear markets / first 2 mo of bull; miss-best
 
 **Classifier edge cases (MC1/13/15):** **Income = yield >4% + high payout, OR any REIT**;
 **avoid ≥6% yield**; investor classifies subjectively ("99% fit one bucket"); edge cases —
-NVDA (~0.15% yield, DGF-vs-Growth call), Disney (suspended dividend → no longer DGF),
+NVDA (~0.15% yield, DGIF-vs-Growth call), Disney (suspended dividend → no longer DGIF),
 AbbVie (borderline, high payout). Growth sub-tiers: hyper (Snowflake/Datadog, 80–100% YoY) /
 growth (MercadoLibre) / mature (Amazon) — "maturity = less risk/reward."
 

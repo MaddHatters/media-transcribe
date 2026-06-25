@@ -31,10 +31,12 @@ Lot plan integrates with DCA (see [dd-playbook.md] DCA section): bull 2–3 lots
 
 ## Layer 2 — Priced test cases (regression fixtures)
 
-- **Dollar General (DG)** — DGF, yield 0.73%, ~$50B cap. 200-day ≈ **$195**; bought ~**$194**,
-  dipped below, **retested $192.44** (buyers), rose to **$203.41 (+2.5%)**. Exercises D2+D4+retest.
-- **Cloudflare (NET)** — growth. ~**$93**, parabolic at ATH, earnings in 2 days. 100-day SMA **$66** /
-  EMA **$68**; 50-day **$50–55**. RSI **92/73/68** on 1mo/1wk/1day. Trend line $58→$71. Exercises D8+D10.
+- **Dollar General (DG)** — DGIF, yield 0.73%, ~$50B cap. **SMA200 = 200.38 / EMA200 = 197.91**;
+  bought ~**$194** with drawn support **$192.44 / $193.03**; RSI(14) 49.84; price 203.41 (+2.5%).
+  Exercises D2+D4+retest. (Note: ~$194 was the buy price, near — not equal to — the 200-day.)
+- **Cloudflare (NET)** — growth. ~**$93**, parabolic at ATH, earnings in 2 days. EMA10 85.33 /
+  SMA200 50.50. RSI(14) **92.08** ("Sell") and **~68** ("Neutral") across timeframes (exact
+  1mo/1wk/1day split narration-only). Exercises D8+D10.
 - **JFrog** — trading channel, support **$59** / resistance **$70** (recent IPO, limited data).
 - **Salesforce** — touched 200-day with bad sentiment, took 1–2 yrs to recover (slow-mean-reversion case).
 - **MindMed** — sold on extreme RSI, kept rising (RSI can stay >90 for days/weeks; overbought ≠ immediate sell).
