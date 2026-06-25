@@ -58,22 +58,30 @@ def test_counts_are_reported(literal):
 
 
 # --------------------------------------------------------------------------- #
-# apply_rules — regex (the DGF variants)
+# apply_rules — DGIF variants (regex requires a space so it never touches the
+# already-correct "DGIF" — keeps corrections idempotent)
 # --------------------------------------------------------------------------- #
 @pytest.fixture
-def dgf(tmp_path):
-    return load_rules(write_rules(tmp_path, "re:\\bD[JG]I ?F\\b => DGF\n"))
+def dgif(tmp_path):
+    return load_rules(write_rules(tmp_path, "re:\\bD[JG]I F\\b => DGIF\nDJIF => DGIF\n"))
 
 
-@pytest.mark.parametrize("variant", ["DJI F", "DGI F", "DJIF", "DGIF"])
-def test_regex_catches_all_dgf_variants(dgf, variant):
-    out, _ = apply_rules(f"buy {variant} now", dgf)
-    assert out == "buy DGF now"
+@pytest.mark.parametrize("variant", ["DJI F", "DGI F", "DJIF"])
+def test_regex_catches_dgif_variants(dgif, variant):
+    out, _ = apply_rules(f"buy {variant} now", dgif)
+    assert out == "buy DGIF now"
 
 
-def test_regex_leaves_standalone_dgi_alone(dgf):
-    # "DGI" (dividend growth investing) must survive; only the F-variant is DGF
-    out, counts = apply_rules("DGI funds and DGI strategy", dgf)
+def test_correct_dgif_is_left_unchanged(dgif):
+    # the canonical spelling must NOT be re-matched (idempotency)
+    out, counts = apply_rules("buy DGIF now", dgif)
+    assert out == "buy DGIF now"
+    assert counts == {}
+
+
+def test_regex_leaves_standalone_dgi_alone(dgif):
+    # "DGI" (dividend growth investing) must survive; only the F-variant is DGIF
+    out, counts = apply_rules("DGI funds and DGI strategy", dgif)
     assert out == "DGI funds and DGI strategy"
     assert counts == {}
 
@@ -95,9 +103,9 @@ def test_real_dictionary_fixes_known_mangles():
     assert rules, "shipped corrections.txt should load rules"
     mangled = "switch d grow to S CHD; DJF and DJI F differ from DGI"
     out, _ = apply_rules(mangled, rules)
-    assert "DGRO" in out and "SCHD" in out and "DGF" in out
-    # the mangled spellings are gone
-    for bad in ("d grow", "S CHD", "DJF", "DJI F"):
+    assert "DGRO" in out and "SCHD" in out and "DGIF" in out
+    # the mangled spellings are gone (incl. the old "DGF" contraction)
+    for bad in ("d grow", "S CHD", "DJF", "DJI F", "DGF"):
         assert bad not in out
     # the legitimate, distinct term is preserved
     assert "DGI" in out

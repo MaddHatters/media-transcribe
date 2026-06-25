@@ -8,12 +8,16 @@
 # --- High confidence: tickers Whisper consistently mis-spells ---
 d grow => DGRO
 S CHD => SCHD
-DJF => DGF
 
-# --- Course-specific shorthand (the instructor's coinage) ---
-# "DGF" is sometimes heard as the letters D-G-I-F / D-J-I-F. Catch the spaced and
-# joined variants first, before the bare DJI->DGI rule below consumes the "DJI".
-re:\bD[JG]I ?F\b => DGF
+# --- DGIF: the instructor's coined bucket "Dividend Growth Investing for FIRE" ---
+# Slides confirm the canonical spelling is DGIF (four letters, D-G-I-F). Whisper hears it
+# as "DJI F" / "DGI F" / "DJIF" / "DJF"; an earlier version of this dict collapsed it to
+# "DGF", so we also convert any baked-in "DGF". The regex REQUIRES a space, so it does NOT
+# touch the already-correct "DGIF" (keeps corrections idempotent).
+re:\bD[JG]I F\b => DGIF
+DJIF => DGIF
+DJF => DGIF
+DGF => DGIF
 # He says "DGI" (dividend growth investing); Whisper often writes "DJI".
 # Safe here because these episodes don't discuss the Dow or DJI (the drone maker);
 # remove this line if a future folder does.
