@@ -79,7 +79,11 @@ phases:
     progress:
       - "Architecture chosen: deterministic core (tested Python) + LLM/agent wrapper."
       - "DONE: experts/dividend_classifier.py (DGIF/DGI/Income/Growth), 9 tests, verified on example tickers."
-      - "NEXT: Buy/Sell Point Engine (analysis/buy-sell-engine.md), Financial-Statement Analyst, Bull/Bear/Judge."
+      - "DONE: Buy/Sell Point Engine in finance-suite (branch feat/buy-sell-engine-primitives):
+         Fractals.get_levels (S/R+conviction), indicators (MA/RSI/Fib/air_pocket), engine.py
+         (build_buy_plan/build_sell_plan + house-shares). 24 tests. Air-pocket thresholds PROVISIONAL
+         pending chart-day-video calibration."
+      - "NEXT: Financial-Statement Analyst; Bull/Bear/Judge synthesis; agent/router layer (format TBD)."
     depends_on: [2, 3]
     objectives:
       - >

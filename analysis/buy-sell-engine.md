@@ -1,5 +1,11 @@
 # Buy/Sell Point Engine (hybrid deterministic + LLM)
 
+> **Status: deterministic core IMPLEMENTED** in finance-suite (branch
+> `feat/buy-sell-engine-primitives`): `stock_analyzer/tools/engine.py`
+> (`build_buy_plan`/`build_sell_plan`/`analyze_ticker`) over `Fractals.get_levels`,
+> `indicators` (MA/RSI/Fibonacci/`air_pocket`), and `house_shares_to_sell`. 24 tests.
+> Pending: LLM judgment layer, air-pocket threshold calibration (chart-day videos).
+
 Identifies entries and exits that fit the FUW methodology for a given ticker. It is a
 **composition**, not a new data source: it orchestrates the **Deterministic TA Engine**
 ([ta-determinism.md](ta-determinism.md)) for levels, the **DCA Planner** (FUWTALAS lot
