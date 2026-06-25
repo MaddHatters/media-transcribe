@@ -83,7 +83,9 @@ phases:
          Fractals.get_levels (S/R+conviction), indicators (MA/RSI/Fib/air_pocket), engine.py
          (build_buy_plan/build_sell_plan + house-shares). 24 tests. Air-pocket thresholds PROVISIONAL
          pending chart-day-video calibration."
-      - "NEXT: Financial-Statement Analyst; Bull/Bear/Judge synthesis; agent/router layer (format TBD)."
+      - "DONE: experts/financial_statement_analyst.py (ratio/threshold health scorecard),
+         validated against the OCR'd NVIDIA/Tesla/Wingstop statements. 37 tests total in media-transcribe."
+      - "NEXT: Bull/Bear/Judge + perspective personas (LLM synthesis layer); agent/router layer (format TBD)."
     depends_on: [2, 3]
     objectives:
       - >

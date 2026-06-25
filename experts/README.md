@@ -15,11 +15,16 @@ buy-level calculation is computed, not guessed.
   (bucket + reasons + flags + per-criterion pass/fail). Tested in
   `tests/test_dividend_classifier.py`.
 
+- **`financial_statement_analyst.py`** — DD evidence sub-expert. Computes the course's
+  ratios/thresholds across balance sheet / income statement / cash flow into a health
+  Scorecard (current/quick ratio, debt-to-equity >100% red flag, net tangible assets,
+  retained-earnings deficit, revenue-trend decline, FCF, payout >90%). Validated against the
+  OCR'd NVIDIA/Tesla/Wingstop statements. Tested in `tests/test_financial_statement_analyst.py`.
+
 ## Next (in priority order)
-- **Buy/Sell Point Engine** (`analysis/buy-sell-engine.md`) — deterministic levels (200-day,
-  Fibonacci, FUWTALAS lots, house-shares math) + LLM judgment (air pockets, support quality).
-- **Financial-Statement Analyst** — the ratio/threshold scorecard (uses OCR'd statements).
-- **Bull / Bear / Judge** synthesis personas over the DD evidence sub-experts.
+- **Buy/Sell Point Engine** — deterministic core DONE in finance-suite; pending the LLM judgment layer.
+- **Bull / Bear / Judge** + perspective personas (Retail / Institutional / Value: Lynch/Buffett/Munger)
+  over the DD evidence sub-experts.
 - Then the agent/router layer (format TBD: Claude Code subagents vs expertise.yaml).
 
 Run: `uv run pytest -q`
