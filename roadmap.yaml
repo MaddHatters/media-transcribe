@@ -1,0 +1,116 @@
+project: FIRE Investing Masterclass — Analysis & Expert System
+description: >
+  Turn the FIRE Investing Masterclass video library (and later, other Patreon
+  content) into a set of specialized, highly-accurate AI expert agents for stock
+  selection, evaluation, portfolio construction, and ongoing market monitoring.
+end_goal: >
+  Domain-specialized AI agents, each with a singular focus, that are very good
+  and very accurate at their specific area — composed together into a system that
+  can analyze tickers, build/maintain portfolios, and surface insights on a
+  schedule, while continually learning as more material is ingested.
+
+conventions:
+  status_values: [done, in_progress, planned, blocked]
+  transcripts_dir: "/mnt/secondary/FIRE Investing Masterclass/transcripts"
+  videos_dir: "/mnt/secondary/FIRE Investing Masterclass"
+  repo: "git@github.com:MaddHatters/media-transcribe.git"
+  analysis_dir: "analysis/"   # in-repo; mental model, OCR register, expert design
+
+phases:
+  - id: 1
+    name: Transcription foundation
+    status: done
+    completed: 2026-06-24
+    objectives:
+      - Build a local, private transcription pipeline (faster-whisper turbo, parallel workers).
+      - Per-course ticker/acronym correction dictionary, applied on write and re-runnable.
+      - Stand up the repo with tests and AGENTS.md guardrails; push to GitHub.
+      - Transcribe all 18 Masterclass videos to .txt + .srt.
+    outputs:
+      - "transcribe/ pipeline (transcribe.py, corrections.py, apply_corrections.py)"
+      - "acquire/ tooling for future capture (OBS automation, yt-dlp)"
+      - "18 transcripts (txt + srt) in transcripts_dir — 186k words"
+
+  - id: 2
+    name: Content analysis & mental model
+    status: done
+    started: 2026-06-25
+    completed: 2026-06-25
+    objectives:
+      - >
+        Extract the common themes/threads for picking & evaluating winning stocks:
+        selection criteria, evaluation metrics/thresholds, how-to-buy rules,
+        blueprint/portfolio-construction methodology, sell discipline.
+      - >
+        Build a structured mental model per domain (fundamentals, technicals,
+        portfolio construction, psychology, options, personal finance) to seed
+        the experts in Phase 4.
+      - >
+        Identify spots in the transcripts where a slide/chart/table/image is
+        referenced but not fully explained in speech. Document each as an OCR
+        candidate (episode + .srt timestamp + what's shown + why it matters).
+    outputs:
+      - "analysis/mental-model.md   — consolidated methodology & themes"
+      - "analysis/ocr-candidates.md — timestamped register of visuals needing OCR"
+      - "analysis/expert-domains.md — proposed expert specializations (feeds Phase 4)"
+
+  - id: 3
+    name: OCR context capture
+    status: planned
+    depends_on: [2]
+    objectives:
+      - Extract the frames flagged in analysis/ocr-candidates.md from the source videos.
+      - OCR them (tesseract local, or a vision model for charts/tables) to recover on-screen data.
+      - Merge recovered context back into the transcripts / mental model so no detail is missed.
+    outputs:
+      - "Per-episode slide-text alongside transcripts"
+      - "Updated mental model with previously-missing visual context"
+
+  - id: 4
+    name: Build the experts
+    status: planned
+    depends_on: [2, 3]
+    objectives:
+      - >
+        For each domain identified in Phase 2, build a specialized expert agent
+        (single focus, high accuracy) grounded in the mental model + OCR context.
+      - Define each expert's scope, inputs/outputs, methodology, and guardrails.
+      - Compose experts so a ticker/portfolio question routes to the right specialist(s).
+    open_questions:
+      - "Expert format: Claude Code subagents, an expertise.yaml system, or standalone prompts?"
+      - "Single composite analyst vs. a panel of specialists with a router?"
+
+  - id: 5
+    name: Validate experts against the real portfolio
+    status: planned
+    depends_on: [4]
+    objectives:
+      - Run the experts against tickers currently held in the portfolio.
+      - Compare the experts' analysis to reality (fundamentals, performance, thesis).
+      - Tune methodology/guardrails where the analysis diverges from observed outcomes.
+
+  - id: 6
+    name: Ingest the rest of the Masterclass library
+    status: planned
+    depends_on: [1]
+    objectives:
+      - Pull down remaining Masterclass videos not already on the drive.
+      - Transcribe them with the Phase 1 pipeline; fold into the mental model & experts.
+
+  - id: 7
+    name: Scheduled ingestion, alerts & continual learning
+    status: planned
+    depends_on: [4, 5, 6]
+    objectives:
+      - >
+        Pull down other Patreon content, plus recurring chart-day / Mon-Wed-Fri
+        videos, on a schedule.
+      - >
+        Transcribe + analyze automatically and surface alerts: specific
+        stock callouts and market insight — so watching the videos is optional.
+      - >
+        Keep the experts learning and improving as more material arrives, using a
+        reinforcement-style feedback loop (predictions vs. outcomes inform tuning).
+    open_questions:
+      - "Alert channel (email, push, dashboard)?"
+      - "What 'reward signal' grounds the reinforcement loop — realized returns, thesis accuracy?"
