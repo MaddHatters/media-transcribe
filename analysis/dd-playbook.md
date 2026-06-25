@@ -18,9 +18,28 @@ layer** → emits a scorecard + balanced recommendation. Enforces the course's g
 (conviction ends DD), **no single metric decides** ("tool in the toolbox"), **always read the
 footnotes**.
 
-## Synthesis layer — Bull, Bear & Judge
-The sub-experts (1–9) produce *evidence*, not a verdict. Three personas turn evidence into a
-well-rounded recommendation:
+## Synthesis layer — perspectives, Bull/Bear & Judge
+The sub-experts (1–9) produce *evidence*, not a verdict. The synthesis layer turns evidence
+into a well-rounded recommendation. All of these are **LLM personas** (judgment, not code):
+they consume the evidence + the mental model and reason in-character — they don't add data.
+
+### Perspective personas (lenses on the same evidence)
+Each renders a verdict (buy / pass / avoid) from its philosophy; differing verdicts are the point.
+- **Retail / FUW investor** 🟢 — the course's own lens: blueprint/bucket fit, DCA, dividends
+  (DGIF), conviction, SWAN, "invest in what you know," 6–12 yr horizon. Grounded in the whole course.
+- **Institutional investor** 🔴/🟡 — large-fund lens: liquidity, float/ownership, benchmark-relative
+  return, risk mandate & position limits, catalysts that move the name, quant factors. Course is thin
+  (MC16: sell-side agendas, front-running) → augment with standard institutional framing.
+- **Value-investor panel** — three named lenses:
+  - **Peter Lynch** 🟢 (MC5) — the 6 categories, growth-at-a-reasonable-price, PEG ≤ 1, "invest in
+    what you know," right 6/10, tenbaggers, the story.
+  - **Warren Buffett** 🟡 — durable moat, owner-earnings, quality management, margin of safety,
+    circle of competence, very long hold.
+  - **Charlie Munger** 🟡 — mental models / invert, "a wonderful business at a fair price," quality
+    over cheapness, patience, avoid unforced errors.
+
+### Bull / Bear / Judge
+Three personas turn evidence (+ where the perspective personas lean) into the recommendation:
 - **Bull persona** — builds the strongest good-faith BUY case from the same evidence: growth
   thesis, moat, TAM/runway, valuation upside, positive catalysts, where it fits a blueprint
   bucket. Must cite sub-expert findings (no hand-waving).

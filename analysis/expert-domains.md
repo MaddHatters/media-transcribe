@@ -15,10 +15,12 @@ fan out per the course's buy methodology: DD Lead → Valuation → TA Engine �
 Psychology check.
 
 ## Due-Diligence super-domain → see [dd-playbook.md](dd-playbook.md)
-A **DD Lead** orchestrates 9 evidence sub-experts, then a **Bull / Bear / Judge synthesis
-layer** turns the shared evidence into a well-rounded recommendation (Bull argues the buy case,
-Bear argues avoid/sell from the *same* evidence, Judge weighs both → balanced verdict +
-conviction that feeds position sizing). Evidence sub-experts:
+A **DD Lead** orchestrates 9 evidence sub-experts, then a **synthesis layer** turns the shared
+evidence into a well-rounded recommendation: **perspective personas** (Retail/FUW,
+Institutional, and a Value panel — Lynch / Buffett / Munger) each render a verdict from their
+philosophy, then **Bull / Bear / Judge** marshal the strongest buy/avoid cases and synthesize a
+balanced verdict + conviction (which feeds position sizing). All synthesis-layer voices are LLM
+personas. Evidence sub-experts:
 1. Financial-Statement Analyst 🟢
 2. Valuation 🟢
 3. Dividend Classifier (DGIF/DGI/Income) 🟢
