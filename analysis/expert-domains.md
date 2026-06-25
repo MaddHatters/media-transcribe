@@ -38,6 +38,11 @@ conviction that feeds position sizing). Evidence sub-experts:
 rules + 5 priced test cases now; the ~8 discretionary judgment calls (triangle-apex direction,
 candlestick thresholds, trend-line drawing) are formalization targets we define ourselves.
 
+**Buy/Sell Point Engine** 🟢/🔴 → see [buy-sell-engine.md](buy-sell-engine.md). Hybrid
+composition of the TA Engine + DCA Planner + Sell-Discipline: buy at/below the 200-day via
+FUWTALAS lots at Fib/support (avoiding air pockets), sell at levels and take profits to
+"house shares." Deterministic levels/lot/profit math; LLM judgment for air pockets & support quality.
+
 **DCA Planner** 🟢 — periodic vs FUWTALAS lot-allocation; mode→bucket mapping; 20–25%/lot
 (bull 2–3 / bear 10–30); DRIP-as-DCA; accumulation vs preservation; goal pipeline (≤12% return
 assumption). Grounds: MC3/13/15/18.

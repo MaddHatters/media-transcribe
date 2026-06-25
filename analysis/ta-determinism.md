@@ -59,6 +59,11 @@ we invent (then validate against Layer 2 + new cases):
 6. **RSI divergences & failure swings** — named, never defined.
 7. **"Which MA it bottoms at"** / "EMA until it doesn't" — demand-dependent, qualitative.
 8. **Whether a 200-day break has a fundamental reason** — requires fundamental input (route to DD).
+9. **Air pockets** (🆕 user-added, not in the course) — is there real support *beneath* a
+   candidate entry, or a void (gap / thin zone / no prior pivot) it can fall through? *Define:*
+   "no prior pivot/volume node within X% below entry, or an unfilled gap beneath." Until defined,
+   treat as an LLM judgment. Consumed by the Buy/Sell Point Engine — see
+   [buy-sell-engine.md](buy-sell-engine.md).
 
 ## Recommended build
 A pure-function engine: inputs = OHLCV history + bucket + conviction flag; outputs = MA
