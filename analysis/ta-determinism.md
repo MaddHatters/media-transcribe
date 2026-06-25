@@ -59,10 +59,11 @@ we invent (then validate against Layer 2 + new cases):
 6. **RSI divergences & failure swings** — named, never defined.
 7. **"Which MA it bottoms at"** / "EMA until it doesn't" — demand-dependent, qualitative.
 8. **Whether a 200-day break has a fundamental reason** — requires fundamental input (route to DD).
-9. **Air pockets** (🆕 user-added, not in the course) — is there real support *beneath* a
-   candidate entry, or a void (gap / thin zone / no prior pivot) it can fall through? *Define:*
-   "no prior pivot/volume node within X% below entry, or an unfilled gap beneath." Until defined,
-   treat as an LLM judgment. Consumed by the Buy/Sell Point Engine — see
+9. **Air pockets** (🆕 not in the course — 0 hits; from chart-day videos / general TA) — now
+   given a **provisional deterministic** definition: *parabolic rip way above the 200-day* =
+   extended ≥30% above the 200-day MA AND ripped ≥15% above the 50-day MA. Implemented in
+   finance-suite `indicators.py::air_pocket()`. ⚠ thresholds pending chart-day-video calibration;
+   the "air" is the gap from the overextended price down to the 200-day. See
    [buy-sell-engine.md](buy-sell-engine.md).
 
 ## Recommended build

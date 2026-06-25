@@ -26,6 +26,22 @@ arithmetic; an **LLM judgment layer** handles the fuzzy calls the course leaves 
 - **Conviction → which MA to buy at** (200-day default; 50/100-day if high conviction).
 - **"Parabolic / frothy"** trim judgment beyond the RSI≥90 flag.
 
+## Reuse from finance-suite (don't rebuild)
+The data-bound primitives already exist in the **finance-suite** repo:
+- **Support/resistance:** `data-analysis/stock_analyzer` → `tools/levels/fractals.py` (`Fractals`).
+  Fractal pivots clustered into levels with a **conviction** score (# touches) + estimated
+  volatility, off Alpaca bars. *Improve:* it currently only plots/prints — expose
+  `get_levels(ticker, days) -> List[Level]` so it returns data. Conviction powers air-pocket
+  detection (no conviction-scored support within X% beneath entry).
+- **House shares:** `portfolio-api/.../services/cost_basis.py::shares_to_house_shares(
+  cost_invested, proceeds, open_shares, current_price)` → shares to sell to reach house shares
+  (0 if already there, capped at holding). Reuse as-is. Plus `PositionCostBasis.is_house_shares`,
+  `.cost_recovered_pct`, `.net_invested`.
+- **Market data + cost basis:** Alpaca via `stock_analyzer` data providers; positions/cost basis
+  via `portfolio-db`/`portfolio-api`.
+- **To add (not present):** 50/100/200-day MAs, RSI, Fibonacci — trivial with pandas on the
+  same bars.
+
 ## Buy logic (entries that fit the methodology)
 1. **Gate:** fits the blueprint bucket + story intact (DD)? If not → no buy.
 2. **Prefer at/below the 200-day MA** (primary support); 50/100-day for high conviction.
@@ -47,6 +63,11 @@ arithmetic; an **LLM judgment layer** handles the fuzzy calls the course leaves 
 
 ## Provenance flags (course-grounded vs added)
 - 🟢 200-day/RSI/Fibonacci/support, FUWTALAS lots, house shares — **course-grounded**.
-- 🆕 **"Avoid air pockets"** — *user-added refinement, not in the transcripts.* Needs a formal
-  definition before it's deterministic, e.g. "no prior pivot/volume node within X% below the
-  entry, or an unfilled gap beneath" → treat as an LLM judgment until defined and back-tested.
+- 🆕 **"Avoid air pockets"** — *not in the masterclass (0 hits in transcripts/slides);* from the
+  chart-day videos / general TA. **Candidate deterministic definition:** a *parabolic rip way
+  above the 200-day MA* — operationalized as **extended ≥30% above the 200-day AND ripped ≥15%
+  above the 50-day** (a steady riser hugs the 50-day; a parabolic rip detaches from it — this
+  avoids the false-positive that RSI-alone gives). Implemented (provisional) in finance-suite
+  `stock_analyzer/tools/indicators.py::air_pocket()`. ⚠ **Thresholds need calibration against the
+  chart-day videos** (the authoritative source) — and the classic TA "air pocket" is the sharp
+  *drop* itself; ours is the *setup* that precedes it (the actionable framing for "don't buy in").
