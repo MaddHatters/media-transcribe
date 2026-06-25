@@ -74,7 +74,12 @@ phases:
 
   - id: 4
     name: Build the experts
-    status: planned
+    status: in_progress
+    started: 2026-06-25
+    progress:
+      - "Architecture chosen: deterministic core (tested Python) + LLM/agent wrapper."
+      - "DONE: experts/dividend_classifier.py (DGIF/DGI/Income/Growth), 9 tests, verified on example tickers."
+      - "NEXT: Buy/Sell Point Engine (analysis/buy-sell-engine.md), Financial-Statement Analyst, Bull/Bear/Judge."
     depends_on: [2, 3]
     objectives:
       - >
