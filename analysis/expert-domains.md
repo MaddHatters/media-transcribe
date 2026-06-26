@@ -30,6 +30,8 @@ personas. Evidence sub-experts:
 7. Risk Assessor 🟡 (category checklist, no severity scale)
 8. Market-Sentiment & Analyst-Ratings 🔴/🟡 (rating ladder exists; sentiment is narrative-only)
 9. Idea Generation / Screening 🟡 (portfolio-gap funnel + one balance-sheet screen + Finviz)
+10. Asset-Play / Hidden-Value Investigator 🟡 (backlog — Lynch asset plays: undervalued/hidden
+    assets not in the share price; P/B<1, NAV/sum-of-parts > market cap; read the footnotes)
 
 ## Standalone experts
 

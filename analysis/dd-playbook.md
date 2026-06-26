@@ -133,6 +133,18 @@ RSI from the TA engine). What exists:
 - *Augment:* if you want quantified sentiment (put/call, social, Fear&Greed value), bring it —
   the course only teaches "discount the noise."
 
+## 10. Asset-Play / Hidden-Value Investigator 🟡 (backlog, non-critical — its own agent)
+Lynch's 6th category (MC5): a company holding assets **not properly valued in the share price**
+→ the stock is worth more than the market reflects (the Pebble Beach gravel pit — bought for
+$72M, sold one gravel pit for $30M). Also MC7's "undervalued assets" strong-balance-sheet signal.
+- **Looks for:** real estate / land carried at historical cost vs market; natural resources /
+  reserves; stakes in other companies; cash + securities exceeding market cap; NOLs (tax assets);
+  understated brand/IP; hidden subsidiaries.
+- **Quant handles:** P/B < 1, market cap < tangible book, sum-of-parts / NAV > market cap.
+- **Method:** **read the footnotes** (the course's mantra), compare market cap to adjusted
+  book / sum-of-parts, lean on local/industry edge. Mostly qualitative — flag candidates for review.
+- Status: low priority; a separate investigator agent, surfaced when P/B or NAV gaps look interesting.
+
 ## 9. Idea Generation / Screening 🟡
 Phase-1 funnel: **portfolio-gap analysis** (which bucket/sector am I light in?) → secular trend →
 "use what you know" → best-of-breed-few-own → news catalyst. One concrete screen (MC7): **high
