@@ -88,6 +88,10 @@ phases:
       - "DONE: Financial-Statement Analyst + sector profiles wired (suppress D/E for banks,
          REIT payout-exempt); statement ingestion in finance-suite (EDGAR+yfinance+reconcile,
          10-Q, GICS->profile)."
+      - "DONE: experts/statement_adapter.py — ingestion->FSA bridge: maps finance-suite's
+         canonical FinancialStatements onto FSA inputs (assembles revenue_history across years,
+         splices net_income into cash flow), selects the sector profile via the
+         gics_to_profile/profile_spec contract. Duck-typed, no cross-repo import. 45 tests total."
       - "NEXT: Bull/Bear/Judge + perspective personas (LLM synthesis layer); agent/router layer (format TBD)."
     depends_on: [2, 3]
     objectives:
