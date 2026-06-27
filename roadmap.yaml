@@ -85,6 +85,9 @@ phases:
          pending chart-day-video calibration."
       - "DONE: experts/financial_statement_analyst.py (ratio/threshold health scorecard),
          validated against the OCR'd NVIDIA/Tesla/Wingstop statements. 37 tests total in media-transcribe."
+      - "DONE: Financial-Statement Analyst + sector profiles wired (suppress D/E for banks,
+         REIT payout-exempt); statement ingestion in finance-suite (EDGAR+yfinance+reconcile,
+         10-Q, GICS->profile)."
       - "NEXT: Bull/Bear/Judge + perspective personas (LLM synthesis layer); agent/router layer (format TBD)."
     depends_on: [2, 3]
     objectives:
@@ -135,3 +138,26 @@ phases:
     open_questions:
       - "Alert channel (email, push, dashboard)?"
       - "What 'reward signal' grounds the reinforcement loop — realized returns, thesis accuracy?"
+
+  - id: 8
+    name: Consolidate & modularize shared functionality
+    status: planned
+    depends_on: [4, 5]
+    objectives:
+      - >
+        Functionality is currently spread across repos with some duplication. Final pass:
+        extract clean, shareable modules with well-defined contracts instead of scattered,
+        disparate code. Decide the home for each concern and remove the duplication.
+    consolidation_candidates:
+      - "Canonical financial-statement schema is DUPLICATED: experts/financial_statement_analyst
+         dataclasses (media-transcribe) vs financials/models (finance-suite). -> one shared package."
+      - "Profile contract: FSA Profile (media-transcribe) vs financials.profile_spec (finance-suite)
+         — align on one shared spec."
+      - "Methodology-pure experts (dividend_classifier, FSA) live in media-transcribe; data-bound
+         ones (Buy/Sell engine, statement ingestion) in finance-suite. Decide: shared 'experts'
+         package, or consolidate data-bound experts into finance-suite, with the knowledge/methodology
+         (analysis/, mental model, OCR) staying in media-transcribe."
+      - "Repeated cross-repo tension throughout Phase 4 — needs explicit package boundaries +
+         shared contracts (schemas, interfaces) so modules compose without copy/paste."
+    open_questions:
+      - "Shared code as a published package, a monorepo, or a git submodule / path dependency?"
