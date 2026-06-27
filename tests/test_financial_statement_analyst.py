@@ -68,6 +68,17 @@ def test_strong_balance_sheet_zero_debt():
     assert sc.red_flags == 0
 
 
+def test_clean_company_summary_counts_passed_checks_not_just_strengths():
+    # NVDA-like: every ratio clean but no STRONG check -> must not read "0 strength(s)".
+    bs = BalanceSheet(current_assets=417, current_liabilities=100, inventory=50,
+                      total_liabilities=53, shareholders_equity=100, goodwill=0, retained_earnings=200)
+    sc = analyze(balance_sheet=bs)
+    assert sc.red_flags == 0 and sc.concerns == 0
+    assert sc.passed >= 3
+    assert sc.summary.startswith("strong") and "0 strength" not in sc.summary
+    assert f"{sc.passed} check(s) passed" in sc.summary
+
+
 def test_three_year_revenue_decline_red_flag():
     inc = IncomeStatement(revenue=80, gross_profit=20, net_income=5,
                           revenue_history=[100, 90, 80])

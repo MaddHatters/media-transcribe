@@ -108,12 +108,19 @@ class Scorecard:
         return self._count(Status.STRONG)
 
     @property
+    def passed(self) -> int:
+        """Checks that cleared their threshold (PASS or STRONG) — what a clean run earned."""
+        return self._count(Status.PASS) + self._count(Status.STRONG)
+
+    @property
     def summary(self) -> str:
+        # Count *passed* checks, not only STRONG ones — otherwise a fortress balance sheet
+        # with every ratio clean reads as "strong — 0 strengths", which is self-contradictory.
         if self.red_flags:
             return f"weak — {self.red_flags} red flag(s), {self.concerns} concern(s)"
         if self.concerns:
-            return f"mixed — {self.concerns} concern(s), {self.strengths} strength(s)"
-        return f"strong — {self.strengths} strength(s), no red flags"
+            return f"mixed — {self.concerns} concern(s), {self.passed} check(s) passed"
+        return f"strong — {self.passed} check(s) passed, no red flags"
 
     def __str__(self) -> str:
         lines = [f"Scorecard [{self.profile}]: {self.summary}"]
@@ -167,7 +174,8 @@ def analyze_balance_sheet(bs: BalanceSheet, sc: Scorecard, profile: Profile = GE
 
     if bs.retained_earnings is not None and bs.retained_earnings < 0:
         sc.checks.append(Check("retained_earnings", Status.CONCERN,
-                               "deficit (accumulated losses) — weak-balance-sheet signal"))
+                               "negative — accumulated deficit, or capital returned via buybacks/"
+                               "dividends (e.g. AAPL); weak-balance-sheet signal, verify the cause"))
 
     if bs.long_term_debt is not None and bs.long_term_debt == 0:
         sc.checks.append(Check("long_term_debt", Status.STRONG, "zero long-term debt"))
