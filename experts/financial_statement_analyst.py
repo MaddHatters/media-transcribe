@@ -28,6 +28,27 @@ class Status(Enum):
     RED_FLAG = "red_flag"
 
 
+@dataclass(frozen=True)
+class Profile:
+    """Sector metric profile — which checks to suppress and whether payout is exempt.
+
+    Built from finance-suite's ``financials.profile_spec`` (the caller passes the spec,
+    keeping this module free of any cross-repo import). E.g. banks suppress debt-to-equity
+    and the liquidity ratios; REITs are exempt from the >90% payout red flag.
+    """
+    name: str = "general"
+    suppress: frozenset[str] = frozenset()
+    payout_exempt: bool = False
+
+    @classmethod
+    def from_spec(cls, name: str, spec: dict) -> "Profile":
+        return cls(name=name, suppress=frozenset(spec.get("suppress", ())),
+                   payout_exempt=bool(spec.get("payout_exempt", False)))
+
+
+GENERAL_PROFILE = Profile()
+
+
 @dataclass
 class BalanceSheet:
     current_assets: float | None = None
@@ -68,6 +89,8 @@ class Check:
 class Scorecard:
     ratios: dict[str, float] = field(default_factory=dict)
     checks: list[Check] = field(default_factory=list)
+    profile: str = "general"
+    suppressed: list[str] = field(default_factory=list)   # checks skipped for this sector
 
     def _count(self, status: Status) -> int:
         return sum(1 for c in self.checks if c.status is status)
@@ -93,9 +116,11 @@ class Scorecard:
         return f"strong — {self.strengths} strength(s), no red flags"
 
     def __str__(self) -> str:
-        lines = [f"Scorecard: {self.summary}"]
+        lines = [f"Scorecard [{self.profile}]: {self.summary}"]
         for c in self.checks:
             lines.append(f"  [{c.status.value:8}] {c.name}: {c.detail}")
+        if self.suppressed:
+            lines.append(f"  (suppressed for {self.profile}: {', '.join(self.suppressed)})")
         return "\n".join(lines)
 
 
@@ -105,17 +130,18 @@ def _ratio(numerator, denominator):
     return numerator / denominator
 
 
-def analyze_balance_sheet(bs: BalanceSheet, sc: Scorecard) -> None:
-    current_ratio = _ratio(bs.current_assets, bs.current_liabilities)
-    if current_ratio is not None:
-        sc.ratios["current_ratio"] = round(current_ratio, 2)
-        if current_ratio < CURRENT_RATIO_CONCERN:
-            note = " (< 1.0 — though giants with credit access can run lower)" if current_ratio < 1.0 else ""
-            sc.checks.append(Check("current_ratio", Status.CONCERN, f"{current_ratio:.2f} < 1.5{note}"))
-        else:
-            sc.checks.append(Check("current_ratio", Status.PASS, f"{current_ratio:.2f}"))
+def analyze_balance_sheet(bs: BalanceSheet, sc: Scorecard, profile: Profile = GENERAL_PROFILE) -> None:
+    if "current_ratio" not in profile.suppress:
+        current_ratio = _ratio(bs.current_assets, bs.current_liabilities)
+        if current_ratio is not None:
+            sc.ratios["current_ratio"] = round(current_ratio, 2)
+            if current_ratio < CURRENT_RATIO_CONCERN:
+                note = " (< 1.0 — though giants with credit access can run lower)" if current_ratio < 1.0 else ""
+                sc.checks.append(Check("current_ratio", Status.CONCERN, f"{current_ratio:.2f} < 1.5{note}"))
+            else:
+                sc.checks.append(Check("current_ratio", Status.PASS, f"{current_ratio:.2f}"))
 
-    if bs.current_assets is not None and bs.inventory is not None:
+    if "quick_ratio" not in profile.suppress and bs.current_assets is not None and bs.inventory is not None:
         quick = _ratio(bs.current_assets - bs.inventory, bs.current_liabilities)
         if quick is not None:
             sc.ratios["quick_ratio"] = round(quick, 2)
@@ -124,7 +150,7 @@ def analyze_balance_sheet(bs: BalanceSheet, sc: Scorecard) -> None:
 
     if bs.shareholders_equity is not None and bs.shareholders_equity <= 0:
         sc.checks.append(Check("equity", Status.RED_FLAG, "negative shareholders' equity"))
-    else:
+    elif "debt_to_equity" not in profile.suppress:
         dte = _ratio(bs.total_liabilities, bs.shareholders_equity)
         if dte is not None:
             sc.ratios["debt_to_equity"] = round(dte, 2)
@@ -147,7 +173,7 @@ def analyze_balance_sheet(bs: BalanceSheet, sc: Scorecard) -> None:
         sc.checks.append(Check("long_term_debt", Status.STRONG, "zero long-term debt"))
 
 
-def analyze_income_statement(inc: IncomeStatement, sc: Scorecard) -> None:
+def analyze_income_statement(inc: IncomeStatement, sc: Scorecard, profile: Profile = GENERAL_PROFILE) -> None:
     gross_margin = _ratio(inc.gross_profit, inc.revenue)
     if gross_margin is not None:
         sc.ratios["gross_margin"] = round(gross_margin * 100, 1)
@@ -167,7 +193,7 @@ def analyze_income_statement(inc: IncomeStatement, sc: Scorecard) -> None:
             sc.checks.append(Check("revenue_trend", Status.PASS, "no sustained revenue decline"))
 
 
-def analyze_cash_flow(cf: CashFlow, sc: Scorecard) -> None:
+def analyze_cash_flow(cf: CashFlow, sc: Scorecard, profile: Profile = GENERAL_PROFILE) -> None:
     if cf.operating_cash_flow is not None:
         if cf.operating_cash_flow < 0:
             sc.checks.append(Check("operating_cash_flow", Status.CONCERN, "negative operating cash flow"))
@@ -182,19 +208,29 @@ def analyze_cash_flow(cf: CashFlow, sc: Scorecard) -> None:
     if payout is not None and payout > 0:
         sc.ratios["payout_ratio"] = round(payout * 100, 1)
         if payout > PAYOUT_RED:
-            sc.checks.append(Check("payout_ratio", Status.RED_FLAG,
-                                   f"{payout * 100:.0f}% > 90% (REITs exempt; or a special dividend — investigate)"))
+            if profile.payout_exempt:
+                sc.checks.append(Check("payout_ratio", Status.PASS,
+                                       f"{payout * 100:.0f}% — REIT, payout exempt from the >90% flag"))
+            else:
+                sc.checks.append(Check("payout_ratio", Status.RED_FLAG,
+                                       f"{payout * 100:.0f}% > 90% (or a special dividend — investigate)"))
 
 
 def analyze(balance_sheet: BalanceSheet | None = None,
             income_statement: IncomeStatement | None = None,
-            cash_flow: CashFlow | None = None) -> Scorecard:
-    """Score whichever statements are provided into one health scorecard."""
-    sc = Scorecard()
+            cash_flow: CashFlow | None = None,
+            profile: Profile = GENERAL_PROFILE) -> Scorecard:
+    """Score whichever statements are provided into one health scorecard.
+
+    Pass a sector ``profile`` (built from finance-suite's profile_spec) to suppress
+    checks that don't apply to the company type (e.g. a bank's debt-to-equity) and to
+    exempt REIT payout from the >90% flag.
+    """
+    sc = Scorecard(profile=profile.name, suppressed=sorted(profile.suppress))
     if balance_sheet is not None:
-        analyze_balance_sheet(balance_sheet, sc)
+        analyze_balance_sheet(balance_sheet, sc, profile)
     if income_statement is not None:
-        analyze_income_statement(income_statement, sc)
+        analyze_income_statement(income_statement, sc, profile)
     if cash_flow is not None:
-        analyze_cash_flow(cash_flow, sc)
+        analyze_cash_flow(cash_flow, sc, profile)
     return sc

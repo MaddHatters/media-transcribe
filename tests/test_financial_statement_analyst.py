@@ -4,7 +4,7 @@ Real cases use the statements OCR recovered in Phase 3 (analysis/ocr-reconciliat
 NVIDIA income statement, Tesla 2020 balance sheet, Wingstop 2020 cash flow.
 """
 from financial_statement_analyst import (
-    BalanceSheet, CashFlow, IncomeStatement, Status, analyze,
+    BalanceSheet, CashFlow, IncomeStatement, Profile, Status, analyze,
 )
 
 
@@ -78,3 +78,29 @@ def test_three_year_revenue_decline_red_flag():
 def test_empty_profile_is_clean():
     sc = analyze()
     assert sc.checks == [] and sc.summary.startswith("strong")
+
+
+# --- sector profiles ---------------------------------------------------------- #
+def test_financial_profile_suppresses_debt_and_liquidity():
+    # bank-like: D/E = 9, current ratio 0.5 — would red-flag/concern under the general profile
+    bank = BalanceSheet(current_assets=100, current_liabilities=200, inventory=0,
+                        total_liabilities=900, shareholders_equity=100)
+    fin = Profile.from_spec("financial", {"suppress": {"debt_to_equity", "current_ratio", "quick_ratio"}})
+    sc = analyze(balance_sheet=bank, profile=fin)
+    names = {c.name for c in sc.checks}
+    assert "debt_to_equity" not in names and "current_ratio" not in names
+    assert "debt_to_equity" in sc.suppressed and sc.profile == "financial"
+
+    # general profile still flags it
+    general = analyze(balance_sheet=bank)
+    assert any(c.name == "debt_to_equity" and c.status is Status.RED_FLAG for c in general.checks)
+
+
+def test_reit_payout_exempt():
+    cf = CashFlow(operating_cash_flow=100, dividends_paid=95, net_income=50)   # payout 190%
+    reit = Profile.from_spec("reit", {"payout_exempt": True})
+    payout = next(c for c in analyze(cash_flow=cf, profile=reit).checks if c.name == "payout_ratio")
+    assert payout.status is Status.PASS                       # exempt, not a red flag
+
+    general = next(c for c in analyze(cash_flow=cf).checks if c.name == "payout_ratio")
+    assert general.status is Status.RED_FLAG                  # flagged under general profile
