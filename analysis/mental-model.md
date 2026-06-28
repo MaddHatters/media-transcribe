@@ -85,12 +85,18 @@ dive (estimates, patents, TAM); 10) risks (macro, industry, legal, ESG).
   diluted. Earnings can be smoothed — distrust vs cash.
 - **Cash flow** (OCF / CFI / CFF): operating cash flow is "renewable" and hardest to
   fake; **FCF = OCF − replacement CapEx** (don't subtract growth CapEx).
-- **Red-flag thresholds (MC9):** debt-to-equity **> 100%** = red flag; **interest-coverage
-  concern** — taught as *net interest ÷ operating earnings < 5* (⚠ this is inverted vs the
-  standard interest-coverage ratio and is likely misspoken; quote-as-taught, **verify
-  before encoding in an expert**); current ratio **< 1.5** / quick **< 1** = concern (but
-  see addendum: <1 isn't always bad); **≥ 3 yrs** declining revenue = avoid; rising share
-  count (dilution); payout **> 90%** (REITs exempt; DGIF ideal ~20%, ≤50% acceptable).
+- **Red-flag thresholds (MC9 "Top 10 Red Flags" slide):** #1 **rising debt-to-equity**,
+  red flag if **> 100%** — verified against transcript+slide: it is about *debt* the company
+  "is absorbing more of than it can handle", i.e. **interest-bearing debt ÷ equity**, NOT
+  total liabilities ÷ equity. (Total-liabilities ÷ equity is effectively the *separate* red
+  flag #8, "consistently higher liabilities than assets" = negative equity, #2.) Using total
+  liabilities false-flags deferred-revenue/lease-heavy but debt-light firms — confirmed on
+  the live portfolio: ABNB total-liab/eq 1.53 but debt/eq 0.24, CELH ~0 debt; AVGO/AAPL
+  flag correctly on real debt. **interest-coverage concern** — taught as *net interest ÷
+  operating earnings < 5* (⚠ inverted vs the standard ratio and likely misspoken;
+  quote-as-taught, **verify before encoding**); current ratio **< 1.5** / quick **< 1** =
+  concern (but see addendum: <1 isn't always bad); **≥ 3 yrs** declining revenue = avoid;
+  rising share count (dilution); payout **> 90%** (REITs exempt; DGIF ideal ~20%, ≤50% ok).
 
 **Peter Lynch (MC5) — 6 categories:** slow growers (income, 3–15%), stalwarts (blue
 chips, 10–12% EPS growth, buy for 30–50%), **fast growers (favorite, 20–25%, seek

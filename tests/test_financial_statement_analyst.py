@@ -30,9 +30,12 @@ def test_tesla_2020_balance_sheet_mixed():
     sc = analyze(balance_sheet=bs)
     assert sc.ratios["current_ratio"] == 1.88           # healthy liquidity
     assert sc.ratios["quick_ratio"] == 1.59
-    assert sc.ratios["debt_to_equity"] == 1.28
-    # D/E > 100% is a red flag; accumulated deficit is a concern -> "mixed/weak"
-    assert "debt_to_equity" in _names(sc, Status.RED_FLAG)
+    # debt-to-equity is interest-bearing DEBT / equity (9556/22225 = 0.43), NOT total
+    # liabilities / equity (1.28). Tesla 2020 was lease/payable-heavy but not debt-heavy,
+    # so it must NOT trip the leverage red flag — the accumulated deficit is the real concern.
+    assert sc.ratios["debt_to_equity"] == 0.43
+    assert "debt_to_equity" not in _names(sc, Status.RED_FLAG)
+    assert "debt_to_equity" in _names(sc, Status.PASS)
     assert "retained_earnings" in _names(sc, Status.CONCERN)
     assert sc.ratios["net_tangible_assets"] == 22018     # positive (equity - goodwill)
 
@@ -71,7 +74,8 @@ def test_strong_balance_sheet_zero_debt():
 def test_clean_company_summary_counts_passed_checks_not_just_strengths():
     # NVDA-like: every ratio clean but no STRONG check -> must not read "0 strength(s)".
     bs = BalanceSheet(current_assets=417, current_liabilities=100, inventory=50,
-                      total_liabilities=53, shareholders_equity=100, goodwill=0, retained_earnings=200)
+                      total_liabilities=53, shareholders_equity=100, goodwill=0,
+                      long_term_debt=0, retained_earnings=200)
     sc = analyze(balance_sheet=bs)
     assert sc.red_flags == 0 and sc.concerns == 0
     assert sc.passed >= 3
@@ -93,9 +97,9 @@ def test_empty_profile_is_clean():
 
 # --- sector profiles ---------------------------------------------------------- #
 def test_financial_profile_suppresses_debt_and_liquidity():
-    # bank-like: D/E = 9, current ratio 0.5 — would red-flag/concern under the general profile
+    # bank-like: debt/equity = 9, current ratio 0.5 — would red-flag/concern under the general profile
     bank = BalanceSheet(current_assets=100, current_liabilities=200, inventory=0,
-                        total_liabilities=900, shareholders_equity=100)
+                        total_liabilities=900, shareholders_equity=100, long_term_debt=900)
     fin = Profile.from_spec("financial", {"suppress": {"debt_to_equity", "current_ratio", "quick_ratio"}})
     sc = analyze(balance_sheet=bank, profile=fin)
     names = {c.name for c in sc.checks}

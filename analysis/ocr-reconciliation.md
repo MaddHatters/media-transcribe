@@ -99,3 +99,20 @@ arrows lost to OCR — vision-pass target.)
 - **Top-100 ETFs by AUM (MC3):** SPY $325.5B, IVV $238B, VTI $192B, VOO $172B, QQQ $147.7B …
 - **Asset-class returns (MC1):** Ibbotson 1926–2017 — small 12.1%, large 10.2%, govt bonds 5.5%,
   T-bills 3.4%, inflation 2.9%; Visual Capitalist 2010–19 table (US small cap 11.87% top).
+
+### Methodology correction — debt-to-equity means DEBT, not total liabilities (MC7/MC9)
+Verified from the MC9 "Top 10 Red Flags" slide + transcript (and MC7's green flags):
+- **#1 Rising debt-to-equity** — "a company is absorbing more **debt** than it can handle.
+  If the debt-to-equity ratio is over 100%, it's a red flag." → numerator is **interest-bearing
+  debt**, not total liabilities.
+- **#8 Consistently higher liabilities than assets** ("over-leveraged") and **#2 Negative
+  equity** are *separate* flags — that is the total-liabilities-vs-assets concept.
+- MC7 green flag: **"Low or Zero Long-Term Debt."**
+
+The FSA originally computed D/E as total liabilities ÷ equity, conflating #1 with #8 and
+false-flagging deferred-revenue/lease-heavy but debt-light businesses. Fixed to interest-bearing
+debt (long-term + short-term/current debt) ÷ equity. Live-portfolio validation (FY2023):
+ABNB total-liab/eq 1.53 → debt/eq **0.24** (false flag removed); CELH ~0 debt (removed);
+AVGO **1.63** and AAPL **1.69** still flag on real debt (true positives); Tesla 2020 **0.43**.
+Ingestion gained a `short_term_debt` field; `long_term_debt` tag list broadened to include
+`LongTermDebtAndCapitalLeaseObligations` (AVGO) to fix fragmented EDGAR debt tags.

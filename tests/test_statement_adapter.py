@@ -59,12 +59,12 @@ def test_tesla_balance_sheet_matches_direct_fsa():
     st = _statements(balance={
         "current_assets": 26717, "current_liabilities": 14248, "inventory": 4101,
         "total_assets": 52148, "total_liabilities": 28418, "shareholders_equity": 22225,
-        "goodwill": 207, "long_term_debt": 9556, "retained_earnings": -5399,
+        "goodwill": 207, "long_term_debt": 9556, "short_term_debt": None, "retained_earnings": -5399,
     })
     sc = analyze_financials(st)
     assert sc.ratios["current_ratio"] == 1.88
-    assert sc.ratios["debt_to_equity"] == 1.28
-    assert "debt_to_equity" in _names(sc, Status.RED_FLAG)
+    assert sc.ratios["debt_to_equity"] == 0.43          # interest-bearing debt/equity, not total-liab/equity
+    assert "debt_to_equity" not in _names(sc, Status.RED_FLAG)
     assert "retained_earnings" in _names(sc, Status.CONCERN)
 
 
@@ -72,7 +72,7 @@ def test_tesla_balance_sheet_matches_direct_fsa():
 def test_financial_profile_suppresses_bank_debt():
     bank = _statements(balance={
         "current_assets": 100, "current_liabilities": 200, "inventory": 0,
-        "total_liabilities": 900, "shareholders_equity": 100,
+        "total_liabilities": 900, "shareholders_equity": 100, "long_term_debt": 900,
     })
     spec = {"suppress": {"debt_to_equity", "current_ratio", "quick_ratio"}, "payout_exempt": False}
     sc = analyze_financials(bank, profile_name="financial", profile_spec=spec)

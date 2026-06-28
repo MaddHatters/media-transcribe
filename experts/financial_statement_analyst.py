@@ -16,7 +16,11 @@ from enum import Enum
 # Thresholds as taught.
 CURRENT_RATIO_CONCERN = 1.5     # < 1.5 = concern (and < 1.0 is weaker still, though not always bad)
 QUICK_RATIO_CONCERN = 1.0       # < 1.0 = concern
-DEBT_TO_EQUITY_RED = 1.0        # > 100% = red flag (debt-to-equity = total liabilities / equity)
+DEBT_TO_EQUITY_RED = 1.0        # > 100% = red flag. Debt-to-equity here = interest-bearing DEBT /
+                                # equity (MC9 red flag #1: "absorbing more debt than it can handle").
+                                # NOT total liabilities/equity — that conflates it with red flag #8
+                                # ("liabilities > assets"), false-flagging deferred-revenue/lease-heavy
+                                # but debt-light businesses (ABNB, CELH). See analysis/ocr-reconciliation.md.
 PAYOUT_RED = 0.90               # dividends / net income > 90% = red flag (REITs exempt)
 DECLINING_YEARS_RED = 3         # >= 3 consecutive declining revenue years = avoid
 
@@ -57,7 +61,8 @@ class BalanceSheet:
     total_liabilities: float | None = None
     shareholders_equity: float | None = None
     goodwill: float | None = None
-    long_term_debt: float | None = None
+    long_term_debt: float | None = None       # interest-bearing, noncurrent
+    short_term_debt: float | None = None      # current portion of debt / short-term borrowings
     retained_earnings: float | None = None
     cash_and_st_investments: float | None = None
 
@@ -155,16 +160,24 @@ def analyze_balance_sheet(bs: BalanceSheet, sc: Scorecard, profile: Profile = GE
             status = Status.CONCERN if quick < QUICK_RATIO_CONCERN else Status.PASS
             sc.checks.append(Check("quick_ratio", status, f"{quick:.2f}"))
 
+    # Red flag #2/#8: negative equity (= total liabilities exceed total assets, "over-leveraged").
     if bs.shareholders_equity is not None and bs.shareholders_equity <= 0:
         sc.checks.append(Check("equity", Status.RED_FLAG, "negative shareholders' equity"))
+    # Red flag #1: debt-to-equity from interest-bearing DEBT (not total liabilities). Computed only
+    # when at least one debt component resolves; absent debt tags -> can't compute (honest), no flag.
     elif "debt_to_equity" not in profile.suppress:
-        dte = _ratio(bs.total_liabilities, bs.shareholders_equity)
-        if dte is not None:
-            sc.ratios["debt_to_equity"] = round(dte, 2)
-            if dte > DEBT_TO_EQUITY_RED:
-                sc.checks.append(Check("debt_to_equity", Status.RED_FLAG, f"{dte:.2f} > 1.0 (>100%)"))
-            else:
-                sc.checks.append(Check("debt_to_equity", Status.PASS, f"{dte:.2f}"))
+        debt_parts = [d for d in (bs.long_term_debt, bs.short_term_debt) if d is not None]
+        if debt_parts:
+            total_debt = sum(debt_parts)
+            dte = _ratio(total_debt, bs.shareholders_equity)
+            if dte is not None:
+                sc.ratios["debt_to_equity"] = round(dte, 2)
+                if dte > DEBT_TO_EQUITY_RED:
+                    sc.checks.append(Check("debt_to_equity", Status.RED_FLAG,
+                                           f"{dte:.2f} > 1.0 (>100%) — interest-bearing debt/equity"))
+                else:
+                    sc.checks.append(Check("debt_to_equity", Status.PASS,
+                                           f"{dte:.2f} (interest-bearing debt/equity)"))
 
     if bs.shareholders_equity is not None and bs.goodwill is not None:
         nta = bs.shareholders_equity - bs.goodwill

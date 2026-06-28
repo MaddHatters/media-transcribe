@@ -44,6 +44,7 @@ def _balance_sheet(statements: Any) -> BalanceSheet:
         shareholders_equity=_get(bs, "shareholders_equity"),
         goodwill=_get(bs, "goodwill"),
         long_term_debt=_get(bs, "long_term_debt"),
+        short_term_debt=_get(bs, "short_term_debt"),
         retained_earnings=_get(bs, "retained_earnings"),
         cash_and_st_investments=_get(bs, "cash_and_st_investments"),
     )
