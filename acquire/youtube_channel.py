@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
-"""Watch a YouTube channel and save transcripts for its new videos.
+"""Save transcripts for a YouTube channel's videos — recent uploads or a date range.
 
-Polls a channel's public RSS feed (no API key; the ~15 most recent uploads),
-skips any video already recorded in a seen-file, and saves a timestamped
-transcript for each new one via youtube_transcript.save_transcript.
+Two sources of candidate videos, both skipping anything already in a seen-file
+and saving via youtube_transcript.save_transcript:
 
-Run it on a schedule (e.g. a systemd user timer) to catch uploads as they land.
-For a full back-catalogue rather than just recent uploads, enumerate the channel
-with `uvx yt-dlp --flat-playlist` instead — the RSS feed only carries ~15.
+- Default: the channel's public RSS feed (no API key; the ~15 most recent
+  uploads). Meant for a scheduled poll (systemd user timer) to catch new uploads.
+- With --since / --until / --all: the full upload history via
+  `uvx yt-dlp --flat-playlist` (with approximate upload dates), for backfilling
+  a historical range. Throttled with --sleep between videos.
 
 Usage:
     uv run acquire/youtube_channel.py https://www.youtube.com/@SomeChannel --dest transcripts
     uv run acquire/youtube_channel.py UC_x5XG1OV2P6uZZ5FSM9Ttw --dest transcripts
-    uv run acquire/youtube_channel.py <channel> --seen state/seen.txt --limit 5 --dry-run
+    uv run acquire/youtube_channel.py <channel> --since 2025-01-01 --sleep 2  # backfill
+    uv run acquire/youtube_channel.py <channel> --since 2025-01-01 --dry-run
 """
 from __future__ import annotations
 
@@ -20,6 +22,7 @@ import argparse
 import re
 import subprocess
 import sys
+import time
 import urllib.request
 import xml.etree.ElementTree as ElementTree
 from pathlib import Path
@@ -103,6 +106,66 @@ def fetch_channel_feed(channel_id: str) -> list[ChannelVideo]:
     return parse_channel_feed(_http_get(url))
 
 
+def parse_uploads_output(text: str) -> list[ChannelVideo]:
+    """Parse yt-dlp `--print "date\\tid\\ttitle"` lines into videos (newest first)."""
+    videos: list[ChannelVideo] = []
+    for line in text.splitlines():
+        if not line.strip():
+            continue
+        parts = line.split("\t", 2)
+        if len(parts) < 2:
+            continue
+        upload_date, video_id = parts[0], parts[1]
+        title = parts[2] if len(parts) > 2 else ""
+        videos.append(ChannelVideo(video_id=video_id, title=title, published=upload_date))
+    return videos
+
+
+def fetch_channel_uploads(channel_id: str) -> list[ChannelVideo]:
+    """Full upload history via yt-dlp flat-playlist, with approximate dates.
+
+    Unlike the RSS feed (~15 recent), this lists every upload. Dates come from
+    the channel page's "X ago" labels — good to the day for recent videos,
+    coarser for old ones — which is enough for date-range filtering.
+    """
+    url = f"https://www.youtube.com/channel/{channel_id}/videos"
+    result = subprocess.run(
+        [
+            "uvx", "yt-dlp", "--flat-playlist",
+            "--extractor-args", "youtubetab:approximate_date",
+            "--print", "%(upload_date)s\t%(id)s\t%(title)s",  # real tab: Python escapes it
+            "--no-warnings",
+            url,
+        ],
+        check=True, capture_output=True, text=True,
+    )
+    return parse_uploads_output(result.stdout)
+
+
+def normalize_date(value: str) -> str:
+    """'2025-01-01' or '20250101' -> '20250101' (8 digits, for YYYYMMDD compare)."""
+    digits = re.sub(r"\D", "", value)
+    if len(digits) != 8:
+        raise ValueError(f"Expected a date like YYYY-MM-DD, got: {value!r}")
+    return digits
+
+
+def filter_by_date(videos: list[ChannelVideo], since: str | None,
+                   until: str | None) -> list[ChannelVideo]:
+    """Keep videos whose (normalized YYYYMMDD) upload date is within [since, until]."""
+    kept: list[ChannelVideo] = []
+    for video in videos:
+        date = video.published
+        if not (date and date.isdigit() and len(date) == 8):
+            continue  # undated — can't place it in the range, so leave it out
+        if since and date < since:
+            continue
+        if until and date > until:
+            continue
+        kept.append(video)
+    return kept
+
+
 def load_seen(path: Path) -> set[str]:
     if not path.exists():
         return set()
@@ -131,11 +194,33 @@ def build_argument_parser() -> argparse.ArgumentParser:
                         help="caption language code to fetch (default: en)")
     parser.add_argument("--limit", type=int, default=None,
                         help="max new videos to process this run (oldest first)")
+    parser.add_argument("--since", default=None,
+                        help="only videos on/after this date (YYYY-MM-DD); "
+                             "uses the full upload history, not just the RSS feed")
+    parser.add_argument("--until", default=None,
+                        help="only videos on/before this date (YYYY-MM-DD)")
+    parser.add_argument("--all", action="store_true",
+                        help="consider the full upload history even without a date range")
+    parser.add_argument("--sleep", type=float, default=2.0,
+                        help="seconds to wait between videos, to throttle yt-dlp (default: 2.0)")
     parser.add_argument("--keep-vtt", action="store_true",
                         help="keep raw .vtt files alongside transcripts")
     parser.add_argument("--dry-run", action="store_true",
                         help="list new videos without fetching transcripts")
     return parser
+
+
+def gather_candidate_videos(channel_id: str, since: str | None, until: str | None,
+                            use_full_history: bool) -> list[ChannelVideo]:
+    """Return channel videos to consider: RSS-recent, or full history + date filter."""
+    if not (use_full_history or since or until):
+        return fetch_channel_feed(channel_id)
+    videos = fetch_channel_uploads(channel_id)
+    if since or until:
+        videos = filter_by_date(videos,
+                                normalize_date(since) if since else None,
+                                normalize_date(until) if until else None)
+    return videos
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -144,24 +229,24 @@ def main(argv: list[str] | None = None) -> int:
     seen_path = args.seen or default_seen_path(args.dest, channel_id)
     seen = load_seen(seen_path)
 
-    feed = fetch_channel_feed(channel_id)
-    # RSS is newest-first; process oldest-first so transcripts land chronologically.
-    new_videos = [video for video in reversed(feed) if video.video_id not in seen]
+    candidates = gather_candidate_videos(channel_id, args.since, args.until, args.all)
+    # Sources list newest-first; process oldest-first so transcripts land chronologically.
+    new_videos = [video for video in reversed(candidates) if video.video_id not in seen]
     if args.limit is not None:
         new_videos = new_videos[:args.limit]
 
     if not new_videos:
-        print(f"{channel_id}: no new videos ({len(feed)} in feed, all seen)")
+        print(f"{channel_id}: no new videos ({len(candidates)} considered, all seen)")
         return 0
 
     print(f"{channel_id}: {len(new_videos)} new video(s)")
     if args.dry_run:
         for video in new_videos:
-            print(f"  would fetch {video.video_id}  {video.title}")
+            print(f"  would fetch {video.published} {video.video_id}  {video.title}")
         return 0
 
     failures = 0
-    for video in new_videos:
+    for index, video in enumerate(new_videos):
         try:
             out_path, line_count = youtube_transcript.save_transcript(
                 video.video_id, args.dest, args.lang, args.keep_vtt)
@@ -175,8 +260,13 @@ def main(argv: list[str] | None = None) -> int:
                   file=sys.stderr)
             failures += 1
             continue
+        finally:
+            # Throttle between videos regardless of outcome (skip after the last).
+            if index < len(new_videos) - 1:
+                time.sleep(args.sleep)
         append_seen(seen_path, video.video_id)
-        print(f"  {video.video_id}: {line_count} lines -> {out_path.parent.relative_to(args.dest)}/")
+        print(f"  [{index + 1}/{len(new_videos)}] {video.video_id}: "
+              f"{line_count} lines -> {out_path.parent.relative_to(args.dest)}/")
 
     if failures:
         raise SystemExit(f"{failures} video(s) failed; see messages above")

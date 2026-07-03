@@ -61,6 +61,55 @@ def test_channel_page_url(value, expected):
     assert ytc._channel_page_url(value) == expected
 
 
+def test_parse_uploads_output():
+    text = ("20260702\tAAAAAAAAAAA\tNewest Video\n"
+            "20250115\tBBBBBBBBBBB\tOlder Video\n"
+            "\n"  # blank line ignored
+            "NA\tCCCCCCCCCCC\tUndated Video\n")
+    videos = ytc.parse_uploads_output(text)
+    assert [v.video_id for v in videos] == ["AAAAAAAAAAA", "BBBBBBBBBBB", "CCCCCCCCCCC"]
+    assert videos[0].published == "20260702"
+    assert videos[0].title == "Newest Video"
+
+
+def test_parse_uploads_output_keeps_tabs_in_title():
+    # Title with an embedded tab stays intact (split has maxsplit=2).
+    videos = ytc.parse_uploads_output("20260101\tAAAAAAAAAAA\tA\tB")
+    assert videos[0].title == "A\tB"
+
+
+@pytest.mark.parametrize("value, expected", [
+    ("2025-01-01", "20250101"),
+    ("20250101", "20250101"),
+    ("2026/07/03", "20260703"),
+])
+def test_normalize_date(value, expected):
+    assert ytc.normalize_date(value) == expected
+
+
+@pytest.mark.parametrize("bad", ["2025-1-1", "not-a-date", "20250101999", ""])
+def test_normalize_date_rejects_bad(bad):
+    with pytest.raises(ValueError):
+        ytc.normalize_date(bad)
+
+
+def _vid(video_id, date):
+    return ytc.ChannelVideo(video_id=video_id, title=video_id, published=date)
+
+
+def test_filter_by_date_since_and_until():
+    videos = [_vid("a", "20241231"), _vid("b", "20250101"),
+              _vid("c", "20260702"), _vid("d", "20270101")]
+    kept = ytc.filter_by_date(videos, since="20250101", until="20261231")
+    assert [v.video_id for v in kept] == ["b", "c"]
+
+
+def test_filter_by_date_drops_undated():
+    videos = [_vid("a", "20250601"), _vid("b", "NA"), _vid("c", "")]
+    kept = ytc.filter_by_date(videos, since="20250101", until=None)
+    assert [v.video_id for v in kept] == ["a"]
+
+
 def test_default_seen_path():
     assert ytc.default_seen_path(Path("out"), CHANNEL_ID) == Path(f"out/.seen-{CHANNEL_ID}.txt")
 
