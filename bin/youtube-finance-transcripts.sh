@@ -5,7 +5,7 @@
 set -euo pipefail
 
 REPO_DIR="/home/tuna/repos/media-transcribe"
-DEST="/mnt/secondary/youtube/finance"
+DEST="/mnt/secondary/media/youtube"
 CHANNEL_ID="UCqqHGGPbhISeKkpEx8676sw"
 LOG_FILE="${REPO_DIR}/logs/youtube-finance-transcripts.log"
 

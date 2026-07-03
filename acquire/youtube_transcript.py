@@ -120,6 +120,15 @@ def sanitize_filename(name: str) -> str:
     return cleaned or "transcript"
 
 
+def video_output_dir(dest: Path, channel: str, title: str, video_id: str) -> Path:
+    """Per-video folder ``<dest>/<channel>/<title> [<id>]``.
+
+    The video id keeps the folder unique — a channel often reuses a title across
+    uploads, which would otherwise collide.
+    """
+    return dest / sanitize_filename(channel) / f"{sanitize_filename(title)} [{video_id}]"
+
+
 def _pick_vtt(workdir: Path, video_id: str, lang: str) -> Path:
     """Return the best subtitle file yt-dlp wrote, preferring the requested lang."""
     candidates = sorted(workdir.glob(f"{video_id}*.vtt"))
@@ -134,10 +143,10 @@ def _pick_vtt(workdir: Path, video_id: str, lang: str) -> Path:
     return candidates[0]
 
 
-def fetch_captions(video_id: str, lang: str, workdir: Path) -> tuple[Path, str]:
+def fetch_captions(video_id: str, lang: str, workdir: Path) -> tuple[Path, str, str]:
     """Download captions + metadata for one video into workdir via yt-dlp.
 
-    Returns the (vtt_path, title). Lets yt-dlp failures propagate.
+    Returns (vtt_path, title, channel). Lets yt-dlp failures propagate.
     """
     url = f"https://www.youtube.com/watch?v={video_id}"
     subprocess.run(
@@ -156,32 +165,40 @@ def fetch_captions(video_id: str, lang: str, workdir: Path) -> tuple[Path, str]:
         check=True,
     )
     info_path = workdir / f"{video_id}.info.json"
-    title = video_id
+    title, channel = video_id, "unknown channel"
     if info_path.exists():
-        title = json.loads(info_path.read_text(encoding="utf-8")).get("title", video_id)
-    return _pick_vtt(workdir, video_id, lang), title
+        info = json.loads(info_path.read_text(encoding="utf-8"))
+        title = info.get("title") or video_id
+        channel = info.get("channel") or info.get("uploader") or channel
+    return _pick_vtt(workdir, video_id, lang), title, channel
 
 
 def save_transcript(video_id: str, dest: Path, lang: str = "en",
                     keep_vtt: bool = False) -> tuple[Path, int]:
-    """Fetch one video's captions and write a timestamped .txt into dest.
+    """Fetch one video's captions and write ``transcript.txt`` into its folder.
 
-    Returns (output_path, line_count). Raises FileNotFoundError when the video
-    has no captions in the requested language, and propagates yt-dlp failures.
+    Output lands in ``<dest>/<channel>/<title> [<id>]/transcript.txt`` (with
+    ``--keep-vtt``, the raw .vtt and .info.json are kept there too). Returns
+    (output_path, line_count). Raises FileNotFoundError when the video has no
+    captions in the requested language, and propagates yt-dlp failures.
     """
-    dest.mkdir(parents=True, exist_ok=True)
-    workdir = dest if keep_vtt else Path(tempfile.mkdtemp())
+    workdir = Path(tempfile.mkdtemp())
     try:
-        vtt_path, title = fetch_captions(video_id, lang, workdir)
+        vtt_path, title, channel = fetch_captions(video_id, lang, workdir)
         cues = parse_vtt(vtt_path.read_text(encoding="utf-8"))
-        out_path = dest / f"{sanitize_filename(title)} [{video_id}].txt"
+        out_dir = video_output_dir(dest, channel, title, video_id)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        out_path = out_dir / "transcript.txt"
         out_path.write_text(render_transcript(cues) + "\n", encoding="utf-8")
+        if keep_vtt:
+            for extra in (vtt_path, workdir / f"{video_id}.info.json"):
+                if extra.exists():
+                    extra.replace(out_dir / extra.name)
         return out_path, len(cues)
     finally:
-        if not keep_vtt:
-            for leftover in workdir.glob("*"):
-                leftover.unlink()
-            workdir.rmdir()
+        for leftover in workdir.glob("*"):
+            leftover.unlink()
+        workdir.rmdir()
 
 
 def build_argument_parser() -> argparse.ArgumentParser:

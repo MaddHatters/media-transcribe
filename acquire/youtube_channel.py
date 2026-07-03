@@ -176,7 +176,7 @@ def main(argv: list[str] | None = None) -> int:
             failures += 1
             continue
         append_seen(seen_path, video.video_id)
-        print(f"  {video.video_id}: {line_count} lines -> {out_path.name}")
+        print(f"  {video.video_id}: {line_count} lines -> {out_path.parent.relative_to(args.dest)}/")
 
     if failures:
         raise SystemExit(f"{failures} video(s) failed; see messages above")

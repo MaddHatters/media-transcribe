@@ -67,10 +67,17 @@ To minimize footprint, fetch one at a time and add `--sleep-requests`/`--limit-r
 ## YouTube — captions shortcut (`youtube_transcript.py`)
 
 When a YouTube video already has captions, skip Whisper entirely and pull them
-directly. One `.txt` per video, one `[M:SS] text` line per cue.
+directly. One `[M:SS] text` line per cue, written to a per-video folder:
+
+```
+<dest>/<channel>/<title> [<video_id>]/transcript.txt
+```
+
+The video id keeps folders unique (channels reuse titles across uploads).
+`--keep-vtt` also drops the raw `.vtt` + `.info.json` in that folder.
 
 ```bash
-uv run acquire/youtube_transcript.py "https://www.youtube.com/watch?v=<id>" --dest transcripts
+uv run acquire/youtube_transcript.py "https://www.youtube.com/watch?v=<id>" --dest /mnt/secondary/media/youtube
 ```
 
 Uses `uvx yt-dlp` (no new dependency, no API key). This is the **fast** path — it

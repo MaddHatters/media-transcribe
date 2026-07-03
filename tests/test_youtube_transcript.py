@@ -1,4 +1,6 @@
 """Tests for youtube_transcript.py pure helpers (no network / no yt-dlp)."""
+from pathlib import Path
+
 import pytest
 
 import youtube_transcript as yt
@@ -86,6 +88,25 @@ def test_parse_vtt_collapses_rolling_auto_captions():
 def test_render_transcript():
     cues = [(0.0, "first line"), (65.0, "second line")]
     assert yt.render_transcript(cues) == "[0:00] first line\n[1:05] second line"
+
+
+def test_video_output_dir_layout():
+    out = yt.video_output_dir(Path("/media/youtube"), "Mr. FIRED Up Wealth",
+                              "5 BEST Stocks to BUY Now", "abc12345678")
+    assert out == Path("/media/youtube/Mr. FIRED Up Wealth/5 BEST Stocks to BUY Now [abc12345678]")
+
+
+def test_video_output_dir_disambiguates_duplicate_titles():
+    # Same channel + title, different ids must not collide.
+    dest, channel, title = Path("/m"), "Chan", "Same Title"
+    first = yt.video_output_dir(dest, channel, title, "aaaaaaaaaaa")
+    second = yt.video_output_dir(dest, channel, title, "bbbbbbbbbbb")
+    assert first != second
+
+
+def test_video_output_dir_sanitizes_channel_and_title():
+    out = yt.video_output_dir(Path("/m"), "Bad/Chan", "Ti:tle?", "id123456789")
+    assert out == Path("/m/Bad_Chan/Ti_tle [id123456789]")
 
 
 @pytest.mark.parametrize("name, expected", [
