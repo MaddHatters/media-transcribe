@@ -10,11 +10,11 @@
 #
 # Examples:
 #   # one post, audio only (smallest/fastest for transcripts):
-#   ./fetch_patreon.sh firefox "/mnt/secondary/FIRE Investing Masterclass" \
+#   ./fetch_patreon.sh firefox "/mnt/secondary/media/patreon/FIRE Investing Masterclass" \
 #       "https://www.patreon.com/posts/68412694"
 #
 #   # a whole collection:
-#   ./fetch_patreon.sh firefox "/mnt/secondary/FIRE Investing Masterclass" \
+#   ./fetch_patreon.sh firefox "/mnt/secondary/media/patreon/FIRE Investing Masterclass" \
 #       "https://www.patreon.com/collection/31667"
 set -euo pipefail
 

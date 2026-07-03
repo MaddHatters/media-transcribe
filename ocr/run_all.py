@@ -6,7 +6,7 @@ dedupe near-identical frames by perceptual hash, OCR the unique ones with RapidO
 Writes <video dir>/ocr/<stem>/slides.json (+ slides.md) per episode. Resumable.
 
 Usage:
-  uv run ocr/run_all.py "/mnt/secondary/FIRE Investing Masterclass"
+  uv run ocr/run_all.py "/mnt/secondary/media/patreon/FIRE Investing Masterclass"
   uv run ocr/run_all.py "<folder>" --only "Masterclass 7"
 """
 from __future__ import annotations

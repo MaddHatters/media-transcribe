@@ -3,7 +3,7 @@
 
 Lets you tune corrections.txt and re-fix transcripts without re-transcribing.
 
-    uv run transcribe/apply_corrections.py "/mnt/secondary/FIRE Investing Masterclass/transcripts"
+    uv run transcribe/apply_corrections.py "/mnt/secondary/media/patreon/FIRE Investing Masterclass/transcripts"
     uv run transcribe/apply_corrections.py "<folder>" --dry-run   # preview counts only
 """
 from __future__ import annotations

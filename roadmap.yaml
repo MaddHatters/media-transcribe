@@ -11,8 +11,8 @@ end_goal: >
 
 conventions:
   status_values: [done, in_progress, planned, blocked]
-  transcripts_dir: "/mnt/secondary/FIRE Investing Masterclass/transcripts"
-  videos_dir: "/mnt/secondary/FIRE Investing Masterclass"
+  transcripts_dir: "/mnt/secondary/media/patreon/FIRE Investing Masterclass/transcripts"
+  videos_dir: "/mnt/secondary/media/patreon/FIRE Investing Masterclass"
   repo: "git@github.com:MaddHatters/media-transcribe.git"
   analysis_dir: "analysis/"   # in-repo; mental model, OCR register, expert design
 

@@ -9,7 +9,7 @@ Free, private, no API key; weights download once (~1.5 GB) and are cached.
 ```bash
 uv sync
 # recommended: turbo model, 4 videos in parallel
-uv run transcribe/transcribe.py "/mnt/secondary/FIRE Investing Masterclass" \
+uv run transcribe/transcribe.py "/mnt/secondary/media/patreon/FIRE Investing Masterclass" \
     --model large-v3-turbo --workers 4 --cpu-threads 4
 ```
 

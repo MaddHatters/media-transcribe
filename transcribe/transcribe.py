@@ -12,7 +12,7 @@ it is much faster to run several videos at once with few threads each. Use
 --workers for that (default 4 workers x 4 threads = 16 cores).
 
 Usage:
-    uv run transcribe.py "/mnt/secondary/FIRE Investing Masterclass"
+    uv run transcribe.py "/mnt/secondary/media/patreon/FIRE Investing Masterclass"
     uv run transcribe.py "<folder>" --only "Masterclass 13"     # one file
     uv run transcribe.py "<folder>" --workers 4 --cpu-threads 4 # parallel
     uv run transcribe.py "<folder>" --model large-v3-turbo      # ~4x faster

@@ -26,7 +26,7 @@ acquire/      get the source media          ->   transcribe/   media -> transcri
 
 ```bash
 uv sync
-uv run transcribe/transcribe.py "/mnt/secondary/FIRE Investing Masterclass" \
+uv run transcribe/transcribe.py "/mnt/secondary/media/patreon/FIRE Investing Masterclass" \
     --model large-v3-turbo --workers 4 --cpu-threads 4
 ```
 

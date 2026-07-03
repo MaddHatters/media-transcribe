@@ -54,7 +54,7 @@ Uses your logged-in browser cookies. Personal use, your own paid content.
 
 ```bash
 # audio only (smallest/fastest for transcripts):
-AUDIO=1 ./patreon_download.sh firefox "/mnt/secondary/FIRE Investing Masterclass" \
+AUDIO=1 ./patreon_download.sh firefox "/mnt/secondary/media/patreon/FIRE Investing Masterclass" \
     "https://www.patreon.com/posts/68412694"
 ```
 

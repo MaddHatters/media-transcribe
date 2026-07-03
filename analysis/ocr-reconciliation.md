@@ -3,7 +3,7 @@
 Result of OCR'ing all 18 episodes (2,900+ slides, local/free) and diffing the recovered
 slide text against the transcript-based mental model. **Outcome: findings overwhelmingly
 confirmed; a handful of corrections; large amounts of skipped numeric data recovered.**
-The full per-episode slide text lives at `/mnt/secondary/FIRE Investing
+The full per-episode slide text lives at `/mnt/secondary/media/patreon/FIRE Investing
 Masterclass/ocr/<stem>/slides.{md,json}` (gitignored). This doc captures the corrections
 and the highest-value recovered tables; bulk statements stay in `slides.md`.
 
