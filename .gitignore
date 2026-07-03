@@ -13,3 +13,4 @@ transcripts/
 acquire/obs_config.toml
 acquire/.browser-profile/
 acquire/episodes.txt
+logs/

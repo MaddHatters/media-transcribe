@@ -61,3 +61,35 @@ AUDIO=1 ./patreon_download.sh firefox "/mnt/secondary/FIRE Investing Masterclass
 Firefox cookies are the most reliable; recent Chrome/Edge encrypt cookies in a
 way that often breaks `--cookies-from-browser` (export a `cookies.txt` instead).
 To minimize footprint, fetch one at a time and add `--sleep-requests`/`--limit-rate`.
+
+---
+
+## YouTube — captions shortcut (`youtube_transcript.py`)
+
+When a YouTube video already has captions, skip Whisper entirely and pull them
+directly. One `.txt` per video, one `[M:SS] text` line per cue.
+
+```bash
+uv run acquire/youtube_transcript.py "https://www.youtube.com/watch?v=<id>" --dest transcripts
+```
+
+Uses `uvx yt-dlp` (no new dependency, no API key). This is the **fast** path — it
+trades quality for speed: YouTube captions are unpunctuated and skip this repo's
+finance vocab + ticker corrections. For best quality, download the audio and run
+`transcribe.py` instead.
+
+### Watch a channel for new videos (`youtube_channel.py`)
+
+Poll a channel's public RSS feed and save a transcript for each video not seen
+before. Point it at a channel id, URL, or `@handle`:
+
+```bash
+uv run acquire/youtube_channel.py "https://www.youtube.com/@SomeChannel" --dest transcripts
+```
+
+Processed video ids are recorded in `<dest>/.seen-<channel_id>.txt`, so re-runs
+only fetch new uploads — run it on a schedule (a systemd user timer) to catch
+them as they land. `--dry-run` lists new videos without fetching; `--limit N`
+caps a run (oldest first, handy for draining a backlog). The RSS feed only
+carries the ~15 most recent uploads; for a full back-catalogue, enumerate with
+`uvx yt-dlp --flat-playlist <channel>/videos` and feed ids to `youtube_transcript.py`.
