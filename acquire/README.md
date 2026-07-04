@@ -70,11 +70,18 @@ When a YouTube video already has captions, skip Whisper entirely and pull them
 directly. One `[M:SS] text` line per cue, written to a per-video folder:
 
 ```
-<dest>/<channel>/<title> [<video_id>]/transcript.txt
+<dest>/<channel>/
+  index.jsonl                         # one row per video, sorted by publish date
+  <title> [<video_id>]/
+    transcript.txt                    # [M:SS] text
+    metadata.json                     # video_id, title, channel, upload_date, url, ...
 ```
 
-The video id keeps folders unique (channels reuse titles across uploads).
-`--keep-vtt` also drops the raw `.vtt` + `.info.json` in that folder.
+`metadata.json` records the video's **actual publish date** (`upload_date` +
+unix `timestamp`) — needed to know *when* something was said (e.g. when a stock
+call was made). `index.jsonl` is a rebuilt-from-metadata roll-up of the whole
+channel for quick querying. The video id keeps folders unique (channels reuse
+titles across uploads); `--keep-vtt` also drops the raw `.vtt` + `.info.json`.
 
 ```bash
 uv run acquire/youtube_transcript.py "https://www.youtube.com/watch?v=<id>" --dest /mnt/secondary/media/youtube
