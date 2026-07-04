@@ -14,6 +14,16 @@ export PATH="${HOME}/.local/bin:/usr/local/bin:/usr/bin:/bin"
 
 cd "${REPO_DIR}"
 
+# Guard against a missing mount: if /mnt/secondary isn't mounted (e.g. the NTFS
+# drive failed to come up), the DEST path is just an empty dir on the root disk.
+# Fail loudly rather than silently writing transcripts to the wrong place.
+MOUNT_ROOT="/mnt/secondary"
+if ! mountpoint -q "${MOUNT_ROOT}"; then
+    echo "$(date -Iseconds) ${MOUNT_ROOT} not mounted; aborting (would write to root fs)" \
+        | tee -a "${LOG_FILE}" >&2
+    exit 1
+fi
+
 {
     echo
     echo "=== $(date -Iseconds) ==="
