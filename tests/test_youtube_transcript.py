@@ -90,6 +90,52 @@ def test_render_transcript():
     assert yt.render_transcript(cues) == "[0:00] first line\n[1:05] second line"
 
 
+@pytest.mark.parametrize("raw, expected", [
+    ("20260702", "2026-07-02"),
+    ("20250101", "2025-01-01"),
+    (None, ""),
+    ("", ""),
+    ("NA", ""),
+    ("2026-07-02", ""),  # already formatted / not 8 digits -> treated as unknown
+])
+def test_format_upload_date(raw, expected):
+    assert yt.format_upload_date(raw) == expected
+
+
+def test_metadata_from_info_extracts_publish_date():
+    info = {"title": "Best Stocks", "channel": "Mr. FIRED Up Wealth",
+            "upload_date": "20260702", "timestamp": 1783033200}
+    meta = yt.metadata_from_info("N8fzEctLPbE", info)
+    assert meta.upload_date == "2026-07-02"
+    assert meta.timestamp == 1783033200
+    assert meta.channel == "Mr. FIRED Up Wealth"
+    assert meta.url == "https://www.youtube.com/watch?v=N8fzEctLPbE"
+
+
+def test_metadata_from_info_falls_back_when_empty():
+    meta = yt.metadata_from_info("abc12345678", {})
+    assert meta.title == "abc12345678"
+    assert meta.channel == "unknown channel"
+    assert meta.upload_date == ""
+    assert meta.timestamp is None
+
+
+def test_write_metadata_and_channel_index_roundtrip(tmp_path):
+    import json
+    channel_dir = tmp_path / "Chan"
+    # Two videos, written out of date order; index must sort by publish date.
+    for vid, date in [("bbbbbbbbbbb", "20260201"), ("aaaaaaaaaaa", "20250101")]:
+        out_dir = channel_dir / f"vid [{vid}]"
+        out_dir.mkdir(parents=True)
+        meta = yt.VideoMetadata(vid, "T", "Chan", yt.format_upload_date(date), 1, "u")
+        yt.write_metadata(out_dir, meta, transcript_lines=5)
+    index_path = yt.write_channel_index(channel_dir)
+    rows = [json.loads(line) for line in index_path.read_text().splitlines()]
+    assert [r["video_id"] for r in rows] == ["aaaaaaaaaaa", "bbbbbbbbbbb"]  # date-sorted
+    assert rows[0]["upload_date"] == "2025-01-01"
+    assert rows[0]["transcript_lines"] == 5
+
+
 def test_video_output_dir_layout():
     out = yt.video_output_dir(Path("/media/youtube"), "Mr. FIRED Up Wealth",
                               "5 BEST Stocks to BUY Now", "abc12345678")

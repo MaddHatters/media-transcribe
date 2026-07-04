@@ -26,7 +26,23 @@ import re
 import subprocess
 import sys
 import tempfile
+from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
 from pathlib import Path
+
+INDEX_FILENAME = "index.jsonl"
+METADATA_FILENAME = "metadata.json"
+
+
+@dataclass
+class VideoMetadata:
+    """The facts we persist about a video — notably its real publish date."""
+    video_id: str
+    title: str
+    channel: str
+    upload_date: str        # "YYYY-MM-DD" (publish date), or "" if unknown
+    timestamp: int | None   # unix seconds at publish, or None
+    url: str
 
 # A YouTube video id is exactly 11 URL-safe base64 chars.
 _VIDEO_ID_RE = re.compile(r"^[A-Za-z0-9_-]{11}$")
@@ -143,10 +159,48 @@ def _pick_vtt(workdir: Path, video_id: str, lang: str) -> Path:
     return candidates[0]
 
 
-def fetch_captions(video_id: str, lang: str, workdir: Path) -> tuple[Path, str, str]:
+def format_upload_date(raw: str | None) -> str:
+    """yt-dlp's 'YYYYMMDD' upload_date -> 'YYYY-MM-DD' (or '' if missing/odd)."""
+    if raw and raw.isdigit() and len(raw) == 8:
+        return f"{raw[0:4]}-{raw[4:6]}-{raw[6:8]}"
+    return ""
+
+
+def metadata_from_info(video_id: str, info: dict) -> VideoMetadata:
+    """Build VideoMetadata from a yt-dlp info.json dict (accurate publish date)."""
+    timestamp = info.get("timestamp")
+    return VideoMetadata(
+        video_id=video_id,
+        title=info.get("title") or video_id,
+        channel=info.get("channel") or info.get("uploader") or "unknown channel",
+        upload_date=format_upload_date(info.get("upload_date")),
+        timestamp=int(timestamp) if isinstance(timestamp, (int, float)) else None,
+        url=f"https://www.youtube.com/watch?v={video_id}",
+    )
+
+
+def write_channel_index(channel_dir: Path) -> Path:
+    """(Re)build ``<channel_dir>/index.jsonl`` from every video's metadata.json.
+
+    One JSON object per line, sorted by publish date — a queryable record of
+    what was published when. Rebuilt from the per-video files, so it never
+    accumulates duplicates.
+    """
+    rows = []
+    for meta_path in channel_dir.glob(f"*/{METADATA_FILENAME}"):
+        rows.append(json.loads(meta_path.read_text(encoding="utf-8")))
+    rows.sort(key=lambda row: (row.get("upload_date") or "", row.get("video_id") or ""))
+    index_path = channel_dir / INDEX_FILENAME
+    with index_path.open("w", encoding="utf-8") as handle:
+        for row in rows:
+            handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+    return index_path
+
+
+def fetch_captions(video_id: str, lang: str, workdir: Path) -> tuple[Path, VideoMetadata]:
     """Download captions + metadata for one video into workdir via yt-dlp.
 
-    Returns (vtt_path, title, channel). Lets yt-dlp failures propagate.
+    Returns (vtt_path, VideoMetadata). Lets yt-dlp failures propagate.
     """
     url = f"https://www.youtube.com/watch?v={video_id}"
     subprocess.run(
@@ -165,31 +219,29 @@ def fetch_captions(video_id: str, lang: str, workdir: Path) -> tuple[Path, str, 
         check=True,
     )
     info_path = workdir / f"{video_id}.info.json"
-    title, channel = video_id, "unknown channel"
-    if info_path.exists():
-        info = json.loads(info_path.read_text(encoding="utf-8"))
-        title = info.get("title") or video_id
-        channel = info.get("channel") or info.get("uploader") or channel
-    return _pick_vtt(workdir, video_id, lang), title, channel
+    info = json.loads(info_path.read_text(encoding="utf-8")) if info_path.exists() else {}
+    return _pick_vtt(workdir, video_id, lang), metadata_from_info(video_id, info)
 
 
 def save_transcript(video_id: str, dest: Path, lang: str = "en",
                     keep_vtt: bool = False) -> tuple[Path, int]:
     """Fetch one video's captions and write ``transcript.txt`` into its folder.
 
-    Output lands in ``<dest>/<channel>/<title> [<id>]/transcript.txt`` (with
-    ``--keep-vtt``, the raw .vtt and .info.json are kept there too). Returns
+    Output lands in ``<dest>/<channel>/<title> [<id>]/`` as ``transcript.txt``
+    plus ``metadata.json`` (video id, title, channel, publish date, url). With
+    ``--keep-vtt``, the raw .vtt and .info.json are kept there too. Returns
     (output_path, line_count). Raises FileNotFoundError when the video has no
     captions in the requested language, and propagates yt-dlp failures.
     """
     workdir = Path(tempfile.mkdtemp())
     try:
-        vtt_path, title, channel = fetch_captions(video_id, lang, workdir)
+        vtt_path, meta = fetch_captions(video_id, lang, workdir)
         cues = parse_vtt(vtt_path.read_text(encoding="utf-8"))
-        out_dir = video_output_dir(dest, channel, title, video_id)
+        out_dir = video_output_dir(dest, meta.channel, meta.title, video_id)
         out_dir.mkdir(parents=True, exist_ok=True)
         out_path = out_dir / "transcript.txt"
         out_path.write_text(render_transcript(cues) + "\n", encoding="utf-8")
+        write_metadata(out_dir, meta, transcript_lines=len(cues))
         if keep_vtt:
             for extra in (vtt_path, workdir / f"{video_id}.info.json"):
                 if extra.exists():
@@ -199,6 +251,17 @@ def save_transcript(video_id: str, dest: Path, lang: str = "en",
         for leftover in workdir.glob("*"):
             leftover.unlink()
         workdir.rmdir()
+
+
+def write_metadata(out_dir: Path, meta: VideoMetadata, transcript_lines: int,
+                   fetched_at: str | None = None) -> Path:
+    """Write ``metadata.json`` for one video into its folder; return the path."""
+    record = asdict(meta)
+    record["transcript_lines"] = transcript_lines
+    record["fetched_at"] = fetched_at or datetime.now(timezone.utc).isoformat(timespec="seconds")
+    path = out_dir / METADATA_FILENAME
+    path.write_text(json.dumps(record, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return path
 
 
 def build_argument_parser() -> argparse.ArgumentParser:
@@ -221,6 +284,7 @@ def main(argv: list[str] | None = None) -> int:
     except subprocess.CalledProcessError as error:
         print(f"yt-dlp failed for {video_id}: exit {error.returncode}", file=sys.stderr)
         raise
+    write_channel_index(out_path.parent.parent)
     print(f"Wrote {line_count} lines -> {out_path}")
     return 0
 

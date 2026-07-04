@@ -246,6 +246,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     failures = 0
+    channel_dirs: set[Path] = set()
     for index, video in enumerate(new_videos):
         try:
             out_path, line_count = youtube_transcript.save_transcript(
@@ -265,8 +266,13 @@ def main(argv: list[str] | None = None) -> int:
             if index < len(new_videos) - 1:
                 time.sleep(args.sleep)
         append_seen(seen_path, video.video_id)
+        channel_dirs.add(out_path.parent.parent)
         print(f"  [{index + 1}/{len(new_videos)}] {video.video_id}: "
               f"{line_count} lines -> {out_path.parent.relative_to(args.dest)}/")
+
+    # Rebuild the per-channel index.jsonl (publish date -> video) from metadata.
+    for channel_dir in sorted(channel_dirs):
+        youtube_transcript.write_channel_index(channel_dir)
 
     if failures:
         raise SystemExit(f"{failures} video(s) failed; see messages above")
