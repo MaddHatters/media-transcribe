@@ -98,7 +98,7 @@ Poll a channel's public RSS feed and save a transcript for each video not seen
 before. Point it at a channel id, URL, or `@handle`:
 
 ```bash
-uv run acquire/youtube_channel.py "https://www.youtube.com/@SomeChannel" --dest transcripts
+uv run acquire/youtube_channel.py "https://www.youtube.com/@SomeChannel" --dest /mnt/secondary/media/youtube
 ```
 
 Processed video ids are recorded in `<dest>/.seen-<channel_id>.txt`, so re-runs
