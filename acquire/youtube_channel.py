@@ -23,6 +23,7 @@ import re
 import subprocess
 import sys
 import time
+import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ElementTree
 from pathlib import Path
@@ -34,6 +35,9 @@ _CHANNEL_ID_RE = re.compile(r"UC[A-Za-z0-9_-]{22}")
 _ATOM = "{http://www.w3.org/2005/Atom}"
 _YT = "{http://www.youtube.com/xml/schemas/2015}"
 _USER_AGENT = "Mozilla/5.0 (media-transcribe youtube_channel)"
+# How many recent uploads the yt-dlp fallback considers when the RSS feed is down,
+# chosen to match the ~15 entries YouTube's feed returns (avoids a full backfill).
+RSS_RECENT_LIMIT = 15
 
 
 class ChannelVideo(NamedTuple):
@@ -212,9 +216,23 @@ def build_argument_parser() -> argparse.ArgumentParser:
 
 def gather_candidate_videos(channel_id: str, since: str | None, until: str | None,
                             use_full_history: bool) -> list[ChannelVideo]:
-    """Return channel videos to consider: RSS-recent, or full history + date filter."""
+    """Return channel videos to consider: RSS-recent, or full history + date filter.
+
+    The RSS feed is the cheap default, but YouTube's feeds/videos.xml endpoint can
+    go down (e.g. channel-wide 404s) while the channel itself is fine. When the
+    feed fetch fails, fall back to the yt-dlp uploads listing so the daily poll
+    keeps finding new videos instead of erroring out.
+    """
     if not (use_full_history or since or until):
-        return fetch_channel_feed(channel_id)
+        try:
+            return fetch_channel_feed(channel_id)
+        except urllib.error.URLError as error:  # HTTPError (feed 404/5xx) or network
+            # Mirror the RSS feed's "recent only" size so a feed outage doesn't
+            # turn the daily poll into a full-history backfill of the channel's
+            # older tail (uploads are newest-first, so take the newest slice).
+            print(f"RSS feed unavailable ({error}); falling back to the newest "
+                  f"{RSS_RECENT_LIMIT} yt-dlp uploads", file=sys.stderr)
+            return fetch_channel_uploads(channel_id)[:RSS_RECENT_LIMIT]
     videos = fetch_channel_uploads(channel_id)
     if since or until:
         videos = filter_by_date(videos,

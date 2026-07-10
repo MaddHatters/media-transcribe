@@ -1,4 +1,5 @@
 """Tests for youtube_channel.py pure helpers (no network)."""
+import urllib.error
 from pathlib import Path
 
 import pytest
@@ -37,6 +38,45 @@ def test_parse_channel_feed_empty():
     empty = ('<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" '
              'xmlns="http://www.w3.org/2005/Atom"></feed>')
     assert ytc.parse_channel_feed(empty) == []
+
+
+def test_gather_uses_feed_by_default(monkeypatch):
+    """The cheap default path reads the RSS feed and does not touch yt-dlp."""
+    feed = ytc.parse_channel_feed(SAMPLE_FEED)
+    monkeypatch.setattr(ytc, "fetch_channel_feed", lambda cid: feed)
+    monkeypatch.setattr(ytc, "fetch_channel_uploads",
+                        lambda cid: pytest.fail("uploads should not run when feed works"))
+    got = ytc.gather_candidate_videos(CHANNEL_ID, None, None, use_full_history=False)
+    assert [v.video_id for v in got] == ["AAAAAAAAAAA", "BBBBBBBBBBB"]
+
+
+def test_gather_falls_back_to_ytdlp_when_feed_404s(monkeypatch):
+    """A dead RSS feed (404) must fall back to the yt-dlp uploads listing."""
+    import urllib.error
+
+    def boom(cid):
+        raise urllib.error.HTTPError(
+            "https://www.youtube.com/feeds/videos.xml", 404, "Not Found", {}, None)
+
+    uploads = ytc.parse_channel_feed(SAMPLE_FEED)
+    monkeypatch.setattr(ytc, "fetch_channel_feed", boom)
+    monkeypatch.setattr(ytc, "fetch_channel_uploads", lambda cid: uploads)
+    got = ytc.gather_candidate_videos(CHANNEL_ID, None, None, use_full_history=False)
+    assert [v.video_id for v in got] == ["AAAAAAAAAAA", "BBBBBBBBBBB"]
+
+
+def test_fallback_caps_at_recent_limit_not_full_history(monkeypatch):
+    """A feed outage must not turn the daily poll into a full-history backfill."""
+    def boom(cid):
+        raise urllib.error.HTTPError("u", 404, "Not Found", {}, None)
+
+    # Simulate a channel with a long tail: far more uploads than the feed size.
+    long_tail = [ytc.ChannelVideo(f"vid{i:04d}", f"t{i}", "") for i in range(200)]
+    monkeypatch.setattr(ytc, "fetch_channel_feed", boom)
+    monkeypatch.setattr(ytc, "fetch_channel_uploads", lambda cid: long_tail)
+    got = ytc.gather_candidate_videos(CHANNEL_ID, None, None, use_full_history=False)
+    assert len(got) == ytc.RSS_RECENT_LIMIT
+    assert got[0].video_id == "vid0000"  # newest-first slice preserved
 
 
 @pytest.mark.parametrize("value, expected", [
