@@ -34,16 +34,29 @@ class PipelineResult:
 
 
 class Pipeline:
-    def __init__(self, source, engine, output_dir: Path | None = None):
+    def __init__(self, source, engine, output_dir: Path | None = None,
+                 enable_breaks: bool = False, preflight=None):
         self._source = source
         self._engine = engine
         self._output_dir = output_dir or Path(".")
+        self._enable_breaks = enable_breaks
+        self._preflight = preflight
 
     def _validate_steps(self, steps: list[str]) -> list[str]:
         for s in steps:
             if s not in STEPS:
                 raise ValueError(f"Unknown step: {s}. Valid: {STEPS}")
         return steps
+
+    def _health_check(self) -> None:
+        if not self._preflight:
+            return
+        chrome_ok = self._preflight._ensure_chrome()
+        if not chrome_ok:
+            log.warning("[health] Chrome CDP lost — attempting recovery")
+        obs_ok = self._preflight._ensure_obs()
+        if not obs_ok:
+            log.warning("[health] OBS WebSocket lost — attempting recovery")
 
     async def run(
         self,
@@ -57,7 +70,7 @@ class Pipeline:
         active_steps = self._validate_steps(steps) if steps else STEPS
         results: list[PipelineResult] = []
 
-        for post in queue:
+        for i, post in enumerate(queue):
             try:
                 result = await self._process_one(post, active_steps)
                 results.append(result)
@@ -68,6 +81,12 @@ class Pipeline:
                     post_title=getattr(post, 'title', ''),
                     steps_failed={"pipeline": str(exc)},
                 ))
+
+            if "record" in active_steps and i < len(queue) - 1:
+                self._health_check()
+                if self._enable_breaks:
+                    from src.capture.batch import human_break
+                    await asyncio.to_thread(human_break, i + 1, len(queue))
 
         return results
 
@@ -90,12 +109,25 @@ class Pipeline:
 
     async def _step_record(self, post, result: PipelineResult) -> None:
         from src.capture.recorder import Recorder
+        from src.capture.window import focus_chrome
+        from src.capture.batch import mark_seen
         from src.cdp import CDPClient
+        from src.config import IS_WINDOWS
+
+        if IS_WINDOWS:
+            focus_chrome()
+            await asyncio.sleep(1)
+
         recorder = Recorder(self._engine)
         async with CDPClient() as cdp:
             rec = await recorder.record_one(cdp, post.url, post.filename)
             if rec.ok:
-                result.output_paths["recording"] = rec.output_path or ""
+                if rec.output_path and hasattr(self._engine, 'move_to_backup'):
+                    moved = self._engine.move_to_backup(rec.output_path, post.filename)
+                    result.output_paths["recording"] = moved or rec.output_path
+                else:
+                    result.output_paths["recording"] = rec.output_path or ""
+                mark_seen(post.url)
             else:
                 raise RuntimeError(rec.error or "Recording failed")
 
@@ -117,7 +149,8 @@ class Pipeline:
             log.warning("No recording path — skipping transcribe")
             return
         runner = WhisperRunner()
-        out_dir = Path(recording).parent / "transcripts"
+        out_dir = self._output_dir / "transcripts"
+        out_dir.mkdir(parents=True, exist_ok=True)
         txt, srt = runner.transcribe_file(Path(recording), out_dir)
         result.output_paths["transcript_txt"] = str(txt)
         result.output_paths["transcript_srt"] = str(srt)
@@ -129,9 +162,16 @@ class Pipeline:
         if not srt_path or not txt_path:
             log.warning("No transcript paths — skipping correct")
             return
-        corrections_file = Path("transcribe/corrections.txt")
-        if not corrections_file.exists():
+
+        corrections_file = None
+        for candidate in [Path("corrections.txt"), Path("transcribe/corrections.txt")]:
+            if candidate.exists():
+                corrections_file = candidate
+                break
+        if not corrections_file:
+            log.warning("No corrections file found — skipping")
             return
+
         rules = load_rules(corrections_file)
         if not rules:
             return

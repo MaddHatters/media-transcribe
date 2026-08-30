@@ -111,6 +111,14 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("pipeline", help="Run the full pipeline")
     p.add_argument("--queue", required=True, help="Queue JSON file")
     p.add_argument("--steps", default=None, help="Comma-separated step names")
+    p.add_argument("--output-dir", default=None,
+        help="Output directory for recordings (default: D:\\MasterClass Video Backup)")
+    p.add_argument("--no-shuffle", action="store_true",
+        help="Process queue in original order")
+    p.add_argument("--no-breaks", action="store_true",
+        help="Skip human-like breaks between videos")
+    p.add_argument("--skip-preflight", action="store_true",
+        help="Skip preflight validation checks")
     p.add_argument("--foreground", action="store_true",
                    help="Run in foreground instead of backgrounding (default: background)")
 
@@ -218,14 +226,65 @@ def main() -> int:
     elif args.command == "pipeline":
         import asyncio
         from src.pipeline.runner import Pipeline
-        from src.capture.batch import load_queue
+        from src.capture.batch import load_queue, filter_unseen, mild_shuffle
         from src.sources.base import Post
+        from src.config import BACKUP_DIR
+
         queue_data = load_queue(Path(args.queue))
+        steps = [s.replace("-", "_") for s in args.steps.split(",")] if args.steps else None
+        has_record = not steps or "record" in steps
+
+        skipped_seen = 0
+        if has_record:
+            queue_data, skipped_seen = filter_unseen(queue_data)
+            if skipped_seen:
+                print(f"Skipping {skipped_seen} already-recorded URL(s)")
+            if not args.no_shuffle and len(queue_data) > 1:
+                queue_data = mild_shuffle(queue_data)
+
+        if not queue_data:
+            print("No entries to process.")
+            return 0
+
         posts = [Post(url=e["url"], title=e.get("title", e["filename"]),
                       filename=e["filename"]) for e in queue_data]
-        steps = args.steps.split(",") if args.steps else None
-        pipeline = Pipeline(source=None, engine=None)
-        asyncio.run(pipeline.run(posts, steps=steps))
+
+        engine = None
+        source = None
+        if has_record:
+            from src.engines.obs_engine import OBSEngine
+            from src.sources.patreon import PatreonSource
+            engine = OBSEngine()
+            source = PatreonSource()
+
+        output_dir = Path(args.output_dir) if args.output_dir else BACKUP_DIR
+
+        pf = None
+        if has_record and not args.skip_preflight:
+            from src.capture.preflight import Preflight
+            pf = Preflight()
+            ok, gates = pf.run_all()
+            if not ok:
+                print("Preflight failed — aborting")
+                return 1
+
+        pipeline = Pipeline(
+            source=source, engine=engine, output_dir=output_dir,
+            enable_breaks=has_record and not args.no_breaks,
+            preflight=pf,
+        )
+        results = asyncio.run(pipeline.run(posts, steps=steps))
+
+        ok_count = sum(1 for r in results if not r.steps_failed)
+        fail_count = len(results) - ok_count
+        print(f"\nResults: {ok_count}/{len(results)} succeeded")
+        if skipped_seen:
+            print(f"Skipped: {skipped_seen} (already recorded)")
+        if fail_count:
+            for r in results:
+                if r.steps_failed:
+                    print(f"  FAILED: {r.post_title} — {r.steps_failed}")
+        return 1 if fail_count else 0
 
     elif args.command == "transfer-transcripts":
         from src.transfer.sync import TransferClient

@@ -2,75 +2,164 @@
 
 ## Context
 Local, private pipeline that turns a library of videos into transcripts (+ optional
-slide OCR). Two stages on two machines: **acquire** (capture/download the media) and
-**transcribe** (Whisper on the CPU). Everything runs offline — no API keys, no uploads.
+slide OCR). Everything runs offline — no API keys, no uploads.
+
+## Architecture
+
+**Two machines, one pipeline:**
+
+| Machine | Role | What lives there |
+|---------|------|-----------------|
+| **devbox-01** (localhost) | Development, storage, orchestration | Source repo at `/home/tuna/repos/media-transcribe/` |
+| **obs-machine** (Windows) | Runtime — recording, transcription (GPU), analysis | Deployed project at `C:\Users\Matt\transcribe\` |
+
+**The repo is separate from where it runs.** Code is developed on devbox-01, deployed to the obs-machine via SCP, and executed there via `cli.py`.
+
+### Deployment
+
+```bash
+# Deploy from devbox-01 to obs-machine:
+cd /home/tuna/repos/media-transcribe
+scp -r src/ cli.py corrections.txt finance_vocab.txt Matt@100.66.194.100:"C:/Users/Matt/transcribe/"
+```
+
+### Execution
+
+**All operations go through `cli.py`** — the single entry point on the obs-machine. Never invoke scripts in `src/` directly.
+
+```bash
+# Long-running commands (auto-background over SSH):
+ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py record --queue queue.json"
+ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py transcribe <folder> --only <name>"
+ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py analyze <folder> --single <file>"
+ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py pipeline --queue queue.json"
+
+# Short commands (inline):
+ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py preflight"
+ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py correct <transcripts-folder>"
+ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py find-gaps <transcripts-folder>"
+ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py screenshot"
+
+# Force foreground (debugging only):
+uv run cli.py transcribe ... --foreground
+```
+
+Long-running commands auto-detach when run via SSH. Output goes to log files in `C:\Users\Matt\agent-control\logs\`.
 
 ## Infrastructure
 
-Full machine registry is maintained at the orchestrator repo:
-`/home/tuna/repos/multi-agent-orchestration/app_docs/infrastructure-registry.md`
+### obs-machine
+- **Tailscale IP**: 100.66.194.100 (unattended mode)
+- **LAN IP**: 192.168.222.87 (1 Gbps ethernet)
+- **SSH**: `ssh Matt@100.66.194.100` (default shell is PowerShell, use `;` not `&&`)
+- **RDP**: `DESKTOP-44D8KSU`
+- **Wake-on-LAN**: `wakeonlan D8:50:E6:4D:30:A2`
+- **HDMI dongle**: installed (allows monitor off during recording)
 
-### Machines used by media-transcribe
+### obs-machine runtime paths
+- **Pipeline project**: `C:\Users\Matt\transcribe\` (cli.py + src/)
+- **Chrome profile**: `C:\Users\Matt\agent-control\chrome-profile\`
+- **Recordings output**: `D:\MasterClass Video Backup\`
+- **Transcripts output**: `D:\MasterClass Video Backup\transcripts\`
+- **Logs**: `C:\Users\Matt\agent-control\logs\`
+- **Queue files**: `C:\Users\Matt\agent-control\state\record_queue.json`
+- **Seen URLs**: `C:\Users\Matt\agent-control\state\seen_urls.txt`
 
-| Machine | Purpose | Access |
-|---------|---------|--------|
-| **devbox-01** (localhost) | Orchestrator scripts, transcription (whisper), storage | Local |
-| **obs-machine** (Windows) | OBS recording, Chrome CDP automation, Patreon capture, whisper (GPU: GTX 1060 6GB) | `ssh Matt@100.66.194.100` |
+### obs-machine capabilities
+- **CPU**: Intel Core i7-4770, 4 cores / 8 threads
+- **GPU**: NVIDIA GTX 1060 6 GB VRAM (CUDA 12.6)
+- **Whisper**: GPU-accelerated, `large-v3-turbo` model fits in VRAM
+- **OBS**: WebSocket on localhost:4455
+- **Chrome**: CDP on localhost:9222
+- **Python**: Use `py -3` (3.12). Never `python` (3.8.2, too old).
 
-### obs-machine key paths
-- Agent control: `C:\Users\Matt\agent-control\`
-- Chrome profile: `C:\Users\Matt\agent-control\chrome-profile\`
-- Scripts: `C:\Users\Matt\agent-control\scripts\`
-- Recordings: `C:\Users\Matt\Videos\`
-- Masterclass backups: `D:\MasterClass Video Backup\`
-- ffmpeg/ffprobe: `C:\Users\Matt\AppData\Local\Microsoft\WinGet\Links\`
-- Whisper: GPU-accelerated via CUDA (GTX 1060 6 GB). `large-v3-turbo` fits in 6 GB VRAM — proven with TAC course transcription. Use `--model large-v3-turbo` for best results.
-- OBS WebSocket: localhost:4455 (password in obs_record.py)
-- Chrome CDP: localhost:9222
-
-### devbox-01 key paths
-- Media-transcribe repo: `/home/tuna/repos/media-transcribe/`
-- Patreon recordings storage: `/mnt/secondary/media/patreon/FIRE Investing Masterclass/`
+### devbox-01 paths
+- Source repo: `/home/tuna/repos/media-transcribe/`
+- Patreon recordings: `/mnt/secondary/media/patreon/FIRE Investing Masterclass/`
+- Existing transcripts: `/mnt/secondary/media/patreon/FIRE Investing Masterclass/transcripts/`
+- YouTube videos: `/mnt/secondary/media/youtube/Mr. FIRED Up Wealth/`
 - Catalog data: `data/` (in repo)
 
-## Tooling
-- Python 3.11+
-- uv — package & runtime management
-- faster-whisper (CTranslate2) — transcription, CPU-only here
-- pytest — tests
-- Optional `[capture]` extra (Windows box only): playwright, obsws-python
-- yt-dlp — run via `uvx yt-dlp` (not a core dep)
-- Always use `uv` over `pip`, `poetry`, or raw `python`.
+## Pipeline
 
-## Key Commands
-- `uv run pytest` - Run tests (run before committing)
-- `uv sync` - Install core deps; add `--extra capture` on the capture box
-- `uv run transcribe/transcribe.py "<folder>" --model large-v3-turbo --workers 4 --cpu-threads 4` - Transcribe
-- `uv run transcribe/apply_corrections.py "<transcripts>" --dry-run` - Preview ticker fixes
-- `uv run acquire/obs_capture.py --test "<url>" --no-obs` - Verify playback without recording
+### Steps + data dependencies
+```
+record         → video.mp4           requires: queue entry (url + filename)
+analyze        → quality_report      requires: video.mp4
+transcribe     → .txt + .srt         requires: video.mp4
+correct        → .txt + .srt (fixed) requires: .txt + .srt
+find-gaps      → visual_gaps.yaml    requires: .srt
+extract-frames → screenshots/*.jpg   requires: visual_gaps.yaml + video.mp4
+ocr            → slides/*.md         requires: screenshots/*.jpg
+```
+
+Each step checks if its input files exist. Resume is free — re-run the same command and it skips completed files.
+
+### Player auto-detection
+The recorder detects the video player type with a single DOM query:
+- **Mux** (newer Patreon, 2024+): native `<video>` or `<mux-player>`
+- **Vimeo** (older Patreon, 2020-2024): `<iframe src*="vimeo">`
+- **HTML5**: fallback for plain `<video>` elements
+
+### Preflight (7 self-healing gates)
+1. Chrome CDP → auto-launch
+2. OBS WebSocket → auto-launch
+3. Patreon session → auto-login via Windows Credential Manager (`patreon_02_ai`)
+4. Disk space ≥ 5GB
+5. Test recording video (blackdetect)
+6. Test recording audio (silencedetect)
+7. Resolution (1920x1080)
+
+### Critical settings
+- **OBS Desktop Audio**: Must be `default` (not a specific device ID)
+- **OBS Window Capture**: Must target Chrome window
+- **Screensaver/lock**: Disabled (registry + powercfg)
+- **Patreon creds**: Windows Credential Manager `patreon_02_ai`
+
+### Queue file format
+```json
+[
+  {"url": "https://www.patreon.com/posts/119811238", "filename": "Masterclass 19 - Munger Mental Models"}
+]
+```
 
 ## Project Structure
-- `acquire/` - Get the media: `obs_capture.py` (OBS+browser), `patreon_download.sh` (yt-dlp)
-- `transcribe/` - Media → transcripts: `transcribe.py`, `corrections.py`, `apply_corrections.py`, `*.txt` dicts
-- `tests/` - Unit tests (run with `uv run pytest`)
+```
+src/
+├── config.py           ← constants (paths, credentials, OBS config)
+├── cdp.py              ← Chrome DevTools Protocol client
+├── players/            ← mux.py, vimeo.py, html5.py, detector.py
+├── sources/            ← patreon.py, youtube.py
+├── engines/            ← obs_engine.py, ytdlp_engine.py, null_engine.py
+├── capture/            ← recorder.py, batch.py, preflight.py, window.py
+├── transcribe/         ← whisper_runner.py, corrections.py, visual_gaps.py
+├── analyze/            ← quality.py, frames.py, ocr.py
+├── pipeline/           ← runner.py (end-to-end orchestration)
+└── transfer/           ← sync.py (SCP between machines)
+cli.py                  ← single entry point
+```
+
+## Tooling
+- Python 3.11+ (devbox-01), 3.12 (obs-machine via `py -3`)
+- uv — package & runtime management
+- faster-whisper (CTranslate2) — transcription
+- pytest — tests (`uv run pytest`)
+- obsws-python — OBS control (capture box only)
+- websockets — CDP communication (capture box only)
+- yt-dlp — YouTube downloads (`uvx yt-dlp`)
+
+## Key Commands
+- `uv run pytest` — Run tests (303 tests, run before committing)
+- `uv sync` — Install deps; add `--extra capture` on the obs-machine
 
 ## Development Guidelines
 1. Write tests first (TDD); validate every change with `uv run pytest`.
-2. Keep scripts runnable standalone via `uv run <script>` — match the existing argparse style.
-3. Keep functions small and single-purpose; match surrounding naming and comment density.
-4. Core stays CPU-only and dependency-light. Capture-only deps live in the `[capture]` extra, imported lazily.
+2. Keep functions small and single-purpose.
+3. All capture/transcribe operations go through `cli.py` — no standalone script invocation.
+4. Core stays CPU-compatible. GPU/Windows-only deps imported lazily.
+5. Never upload, redistribute, or add a cloud step for media content.
+6. Do NOT commit media, transcripts, `obs_config.toml`, cookies, or `.browser-profile/`.
+7. Correction rules must be idempotent — preview with `--dry-run`.
 
 ## Authentication
-
 Credential and account details are documented in [`app_docs/auth.md`](app_docs/auth.md).
-
-## Important Notes
-- IMPORTANT: This processes **paywalled, personal** course content. Never upload, redistribute, or
-  add a cloud/third-party step without an explicit request. Media stays local.
-- IMPORTANT: Do NOT commit unless explicitly asked. Never commit media, transcripts, `obs_config.toml`,
-  cookies, or `.browser-profile/` — they are gitignored; keep them that way.
-- Correction rules (`corrections.txt`) are per-course and whole-word. They must be **idempotent** —
-  preview with `--dry-run` before writing, and never map a correct term onto another correct term.
-- Transcription is CPU-only: prefer many parallel `--workers` over more `--cpu-threads` per worker;
-  `large-v3-turbo` is the default model (≈ large-v3 quality on English, ~2× faster).
-- Never silently swallow errors. If you catch one, log it and re-raise.
