@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Unified CLI for the media-transcribe pipeline.
 
+Long-running commands (record, transcribe, analyze, pipeline) run in the
+background by default — the process detaches and output goes to a log file.
+Use --foreground to run in the terminal instead.
+
 Usage:
     uv run cli.py transcribe <folder> [--only "name"] [--model large-v3-turbo]
     uv run cli.py analyze <folder> [--single "file.mp4"]
@@ -16,8 +20,38 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import os
+import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
+
+LONG_RUNNING_COMMANDS = {"record", "transcribe", "analyze", "pipeline"}
+
+
+def background_relaunch(args: argparse.Namespace, log_dir: Path) -> int:
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_file = log_dir / f"{args.command}_{timestamp}.log"
+    log_dir.mkdir(parents=True, exist_ok=True)
+
+    child_cmd = [sys.executable] + sys.argv + ["--foreground"]
+    fh = open(log_file, "w")  # noqa: SIM115
+
+    kwargs: dict = {"stdout": fh, "stderr": fh}
+    if sys.platform == "win32":
+        kwargs["creationflags"] = (
+            subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS
+        )
+    else:
+        kwargs["start_new_session"] = True
+
+    proc = subprocess.Popen(child_cmd, **kwargs)
+
+    print(f"PID:     {proc.pid}")
+    print(f"Log:     {log_file}")
+    print(f"Command: {' '.join(child_cmd)}")
+    print(f"Tail:    tail -f {log_file}")
+    return proc.pid
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -36,12 +70,16 @@ def build_parser() -> argparse.ArgumentParser:
     t.add_argument("--workers", type=int, default=1)
     t.add_argument("--cpu-threads", type=int, default=4)
     t.add_argument("--corrections", default="transcribe/corrections.txt")
+    t.add_argument("--foreground", action="store_true",
+                   help="Run in foreground instead of backgrounding (default: background)")
 
     # --- analyze ---
     a = sub.add_parser("analyze", help="Analyze video quality")
     a.add_argument("folder", help="Folder containing video files")
     a.add_argument("--single", default=None, help="Analyze only this file")
     a.add_argument("--output", default=None, help="Output JSON path")
+    a.add_argument("--foreground", action="store_true",
+                   help="Run in foreground instead of backgrounding (default: background)")
 
     # --- correct ---
     c = sub.add_parser("correct", help="Apply corrections to transcripts")
@@ -66,11 +104,15 @@ def build_parser() -> argparse.ArgumentParser:
     # --- record ---
     r = sub.add_parser("record", help="Record videos from a queue")
     r.add_argument("--queue", required=True, help="Queue JSON file")
+    r.add_argument("--foreground", action="store_true",
+                   help="Run in foreground instead of backgrounding (default: background)")
 
     # --- pipeline ---
     p = sub.add_parser("pipeline", help="Run the full pipeline")
     p.add_argument("--queue", required=True, help="Queue JSON file")
     p.add_argument("--steps", default=None, help="Comma-separated step names")
+    p.add_argument("--foreground", action="store_true",
+                   help="Run in foreground instead of backgrounding (default: background)")
 
     # --- transfer-transcripts ---
     tt = sub.add_parser("transfer-transcripts", help="Sync transcripts from obs-machine")
@@ -87,6 +129,12 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
+
+    if args.command in LONG_RUNNING_COMMANDS and not getattr(args, "foreground", False):
+        from src.config import IS_WINDOWS, LOGS_DIR
+        log_dir = LOGS_DIR if IS_WINDOWS else Path("/tmp")
+        background_relaunch(args, log_dir)
+        return 0
 
     if args.command == "transcribe":
         from src.transcribe.whisper_runner import WhisperRunner
