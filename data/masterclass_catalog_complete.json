@@ -1,0 +1,31 @@
+{
+  "creator": "Mr. FIRED Up Wealth",
+  "creator_url": "https://www.patreon.com/cw/firedupwealth",
+  "cataloged_at": "2026-08-25T23:15:00+00:00",
+  "search_url_pattern": "https://www.patreon.com/cw/firedupwealth/posts?filters[search_query]=<term>",
+  "total_posts": 22,
+  "posts": [
+    {"volume": 1, "title": "Masterclass 1 - Stock Market Investing - History & Intro", "url": "https://www.patreon.com/posts/44189029", "player": "vimeo", "recorded": true, "quality": "has_issues"},
+    {"volume": 2, "title": "Masterclass 2 - Basics of Investing 101", "url": "https://www.patreon.com/posts/44718095", "player": "vimeo", "recorded": true, "quality": "trimmed"},
+    {"volume": 3, "title": "Masterclass 3 - Basics of Investing 102", "url": "https://www.patreon.com/posts/45227040", "player": "vimeo", "recorded": true, "quality": "re_record"},
+    {"volume": 4, "title": "Masterclass 4 - Basics of Investing 103", "url": "https://www.patreon.com/posts/46059231", "player": "vimeo", "recorded": true, "quality": "trimmed"},
+    {"volume": 5, "title": "Masterclass 5 - Peter Lynch Principles for Success", "url": "https://www.patreon.com/posts/46668501", "player": "vimeo", "recorded": true, "quality": "clean"},
+    {"volume": 6, "title": "Masterclass 6 - Intro to Technical Analysis", "url": "https://www.patreon.com/posts/47433932", "player": "vimeo", "recorded": true, "quality": "has_issues"},
+    {"volume": 7, "title": "Masterclass 7 - Balance Sheet Deep Dive", "url": "https://www.patreon.com/posts/48136150", "player": "vimeo", "recorded": true, "quality": "re_record"},
+    {"volume": 8, "title": "Masterclass 8 - Psychology & Discipline", "url": "https://www.patreon.com/posts/49298157", "player": "vimeo", "recorded": true, "quality": "clean"},
+    {"volume": 9, "title": "Masterclass 9 - Income Statement & Cash Flow Statement", "url": "https://www.patreon.com/posts/50456936", "player": "vimeo", "recorded": true, "quality": "re_record"},
+    {"volume": 10, "title": "Masterclass 10 - Technical Analysis II - Charts & Patterns", "url": "https://www.patreon.com/posts/masterclass-ii-51614100", "player": "mux", "recorded": true, "quality": "re_record"},
+    {"volume": 11, "title": "Masterclass 11 - Intro to Options", "url": "https://www.patreon.com/posts/masterclass-to-52636999", "player": "mux", "recorded": true, "quality": "re_record"},
+    {"volume": 12, "title": "Masterclass 12 - Personal Finance", "url": "https://www.patreon.com/posts/masterclass-12-53838252", "player": "mux", "recorded": true, "quality": "re_record"},
+    {"volume": 13, "title": "Masterclass 13 - Passive Income Portfolios", "url": "https://www.patreon.com/posts/masterclass-13-68412694", "player": "mux", "recorded": true, "quality": "clean"},
+    {"volume": 14, "title": "Masterclass 14 - When to Sell Stocks", "url": "https://www.patreon.com/posts/masterclass-when-88307141", "player": "mux", "recorded": true, "quality": "clean"},
+    {"volume": 15, "title": "Masterclass 15 - Portfolio Plans & Purchasing Steps for Success", "url": "https://www.patreon.com/posts/masterclass-for-89945787", "player": "mux", "recorded": true, "quality": "re_record"},
+    {"volume": 16, "title": "Masterclass 16 - Tips & Tools For Long-Term Investing Success", "url": "https://www.patreon.com/posts/masterclass-20-91863778", "player": "mux", "recorded": true, "quality": "clean"},
+    {"volume": 17, "title": "Masterclass 17 - 12 Common Mistakes & Pitfalls to Avoid", "url": "https://www.patreon.com/posts/masterclass-to-93791031", "player": "mux", "recorded": true, "quality": "clean"},
+    {"volume": 18, "title": "Masterclass 18 - Playing to Win, DCA, & Goals", "url": "https://www.patreon.com/posts/masterclass-to-95470803", "player": "mux", "recorded": true, "quality": "clean"},
+    {"volume": 19, "title": "Masterclass 19 - Munger Mental Models", "url": "https://www.patreon.com/posts/119811238", "player": "mux", "recorded": true, "quality": "clean"},
+    {"volume": 20, "title": "Masterclass 20 - The Art of Company Research", "url": "https://www.patreon.com/posts/123426645", "player": "mux", "recorded": false, "quality": null},
+    {"volume": 21, "title": "Masterclass 21 - How Much Money Do You Really Need to Retire", "url": "https://www.patreon.com/posts/130462838", "player": "mux", "recorded": false, "quality": null},
+    {"volume": 22, "title": "Masterclass 22 - Dividend Investing", "url": "https://www.patreon.com/posts/132053893", "player": "mux", "recorded": false, "quality": null}
+  ]
+}

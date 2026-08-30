@@ -9,6 +9,7 @@ description = "Local, offline transcription of video folders with Whisper large-
 requires-python = ">=3.11"
 dependencies = [
     "faster-whisper>=1.1.0",
+    "pyyaml>=6.0.3",
 ]
 
 [project.optional-dependencies]

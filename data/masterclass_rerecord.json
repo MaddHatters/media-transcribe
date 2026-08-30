@@ -1,0 +1,15 @@
+{
+  "need_rerecord": [
+    {"number": 3, "title": "Masterclass 3 - Basics of Investing 102", "reason": "164s bitrate drop at 29% (middle)"},
+    {"number": 7, "title": "Masterclass 7 - Balance Sheet Deep Dive", "reason": "302s + 274s + 215s bitrate drops at 39-62% (middle)"},
+    {"number": 9, "title": "Masterclass 9 - Income Statement & Cash Flow Statement", "reason": "232s + 213s + 203s drops at 3-30% (throughout early half)"},
+    {"number": 10, "title": "Masterclass 10 - Technical Analysis II - Charts & Patterns", "reason": "290s + 115s drops at 72-78% (middle)"},
+    {"number": 11, "title": "Masterclass 11 - Intro to Options", "reason": "Multiple 28-42s drops at 49-68% (middle)"}
+  ],
+  "trimmed": [
+    {"number": 2, "title": "Masterclass 2 - Basics of Investing 101", "trimmed_to_seconds": 2805},
+    {"number": 4, "title": "Masterclass 4 - Basics of Investing 103", "trimmed_to_seconds": 3530},
+    {"number": 12, "title": "Masterclass 12 - Personal Finance", "trimmed_to_seconds": 2015},
+    {"number": 15, "title": "Masterclass 15 - Portfolio Plans & Purchasing Steps for Success", "trimmed_to_seconds": 3440}
+  ]
+}
