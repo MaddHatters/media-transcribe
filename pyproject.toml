@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "media-transcribe"
 version = "0.1.0"
@@ -12,6 +16,7 @@ dependencies = [
 capture = [
     "playwright>=1.44",
     "obsws-python>=1.7",
+    "websockets>=12",
 ]
 # Local, free slide OCR (no cloud): uv sync --extra ocr
 ocr = [
@@ -25,10 +30,15 @@ ocr = [
 # Installed by default with `uv run`/`uv sync`.
 dev = [
     "pytest>=8",
+    "pytest-asyncio>=0.23",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
 
 [tool.uv]
 # Pin nothing exotic; CPU-only by default. See README for GPU/Mac notes.

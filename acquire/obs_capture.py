@@ -1,29 +1,15 @@
 #!/usr/bin/env python3
-"""Automated OBS capture of Patreon (Vimeo-embedded) videos on Windows.
+"""Patreon video capture via Playwright + OBS.
 
-Drives a *real* browser (Edge/Chrome, so Widevine works and playback looks like
-genuine viewing) to play each episode at 1x, while controlling OBS over
-obs-websocket to record one file per episode. Capture is real-time, so a full
-collection is an unattended overnight run.
+Supported players:
+  - Vimeo (HLS.js) embedded in Patreon posts via <iframe> (older content, ~2020-2024).
+  - Native HTML5 <video> / Mux <mux-player> (newer Patreon content, 2024+).
 
-Pairs with ../transcribe/transcribe.py: copy the recordings to the transcription
-box and run the transcriber over them.
-
-Setup (Windows, once):
-    1. OBS 28+  ->  Tools > WebSocket Server Settings > enable, note port/password.
-       Set OBS recording format to mkv and pick a recording folder.
-    2. uv sync --extra capture          # installs playwright + obsws-python
-    3. uv run playwright install         # browser binaries (only if using --browser chromium)
-    4. Copy obs_config.example.toml -> obs_config.toml and fill in the password.
-    5. uv run acquire/obs_capture.py --login      # log into Patreon once (persisted)
-
-Run:
-    # one episode, no OBS, just verify playback works:
-    uv run acquire/obs_capture.py --test "https://www.patreon.com/posts/68412694" --no-obs
-    # one episode end-to-end:
-    uv run acquire/obs_capture.py --test "https://www.patreon.com/posts/68412694"
-    # a whole list:
-    uv run acquire/obs_capture.py --urls-file episodes.txt
+Browser control: Playwright (persistent browser context) — real user gestures,
+    satisfies autoplay/HLS policies. Preferred for Patreon.
+Recording: OBS WebSocket API (start/stop/status).
+Login: --login flag opens browser for manual Patreon login (persisted in .browser-profile/).
+       Or use sync_patreon_session.py to copy cookies from a CDP Chrome session.
 """
 from __future__ import annotations
 
@@ -35,6 +21,15 @@ from pathlib import Path
 
 VIMEO_SDK = "https://player.vimeo.com/api/player.js"
 PROFILE_DIR = Path(__file__).parent / ".browser-profile"   # persisted login
+
+# JS snippet: given a player element handle (could be <video>, <mux-player>,
+# or a wrapper div), resolve the underlying <video> element.  Used with
+# element.evaluate("el => ...") which Playwright auto-pierces shadow DOM for.
+_RESOLVE_VIDEO = (
+    "el.tagName === 'VIDEO' ? el"
+    " : (el.shadowRoot?.querySelector('video')"
+    " || el.querySelector('video') || el)"
+)
 
 
 # --------------------------------------------------------------------------- #
@@ -77,7 +72,6 @@ class Recorder:
     def start(self, name: str) -> None:
         if not self.enabled:
             return
-        # name the next file via OBS filename formatting, then record
         self.client.set_profile_parameter("Output", "FilenameFormatting", name)
         self.client.start_record()
         print(f"  [obs] recording -> {name}")
@@ -92,18 +86,48 @@ class Recorder:
 
 
 # --------------------------------------------------------------------------- #
-# browser / Vimeo playback
+# player detection
 # --------------------------------------------------------------------------- #
-def find_vimeo_iframe(page) -> bool:
+def find_player(page) -> tuple[str, object] | None:
+    """Detect the video player and return ``(type, element_handle)``.
+
+    Returns:
+      - ``("vimeo", <iframe element>)`` for Vimeo embeds.
+      - ``("native", <mux-player or video element>)`` for native players.
+      - ``None`` if no player is found within 30 seconds.
+
+    The returned element handle is the best click-target for the player.
+    Playwright's ``query_selector`` pierces Shadow DOM automatically.
+    """
     try:
-        page.wait_for_selector("iframe[src*='vimeo']", timeout=30_000)
-        return True
+        page.wait_for_selector(
+            "iframe[src*='vimeo'], mux-player, video", timeout=30_000,
+        )
     except Exception:
-        return False
+        return None
+
+    iframe = page.query_selector("iframe[src*='vimeo']")
+    if iframe:
+        return ("vimeo", iframe)
+
+    # Prefer mux-player (the outer custom element) as click target —
+    # its built-in UI handles play/pause/fullscreen via standard shortcuts.
+    mux = page.query_selector("mux-player")
+    if mux:
+        return ("native", mux)
+
+    video = page.query_selector("video")
+    if video:
+        return ("native", video)
+
+    return None
 
 
-def start_playback(page) -> float:
-    """Begin playback (unmuted) and return the video duration in seconds."""
+# --------------------------------------------------------------------------- #
+# Vimeo playback (older Patreon content)
+# --------------------------------------------------------------------------- #
+def start_vimeo_playback(page) -> float:
+    """Begin Vimeo iframe playback (unmuted) and return duration in seconds."""
     page.add_script_tag(url=VIMEO_SDK)
     page.evaluate(
         """() => {
@@ -113,26 +137,141 @@ def start_playback(page) -> float:
             window.__p.on('ended', () => { window.__ended = true; });
         }"""
     )
-    # a real click provides the user-gesture browsers require to play with sound
     page.click("iframe[src*='vimeo']")
     page.evaluate("() => window.__p.setVolume(1.0)")
     page.evaluate("() => window.__p.play()")
-    # fill the screen so OBS display-capture gets clean, full-resolution slides
     try:
-        page.evaluate("() => document.querySelector(\"iframe[src*='vimeo']\").requestFullscreen()")
+        page.evaluate(
+            """() => document.querySelector("iframe[src*='vimeo']").requestFullscreen()"""
+        )
     except Exception:
         pass
     return float(page.evaluate("() => window.__p.getDuration()"))
 
 
-def wait_until_done(page, duration: float, poll: float = 5.0) -> None:
+# --------------------------------------------------------------------------- #
+# Native / Mux playback — interact like a real user
+# --------------------------------------------------------------------------- #
+def start_native_playback(page, player_el) -> float:
+    """Begin native video playback and return duration in seconds.
+
+    Interacts with the player like a real user would:
+      1. Scroll into view so the player initialises.
+      2. Click the player to start playback (real Playwright click).
+      3. Press ``f`` for fullscreen (standard video-player shortcut).
+
+    Uses ``element.evaluate("el => ...")`` for property access — Playwright
+    passes the element handle directly, so Shadow DOM is never an issue.
+    """
+    # --- Register ended listener ---
+    player_el.evaluate(
+        f"el => {{"
+        f"  const v = {_RESOLVE_VIDEO};"
+        f"  window.__ended = false;"
+        f"  v.addEventListener('ended', () => {{ window.__ended = true; }});"
+        f"}}"
+    )
+
+    # --- Scroll into view ---
+    # Patreon lazy-inits its HLS player via Intersection Observer; the JS
+    # polyfill won't run until the element is visible in the viewport.
+    player_el.scroll_into_view_if_needed()
+    page.wait_for_timeout(2000)
+
+    # --- Wait for readyState >= 1 (metadata loaded) ---
+    # Chrome can't play .m3u8 natively; the site's JS must set up a
+    # MediaSource and feed it segments.  readyState stays 0 until that
+    # happens.  We poll via the element handle (shadow-DOM-safe).
+    print("  [native] waiting for player to load...", flush=True)
+    ready = False
+    for i in range(30):
+        rs = player_el.evaluate(
+            f"el => {{ const v = {_RESOLVE_VIDEO}; return v.readyState; }}"
+        )
+        if rs >= 1:
+            print(f"  [native] ready (readyState={rs})", flush=True)
+            ready = True
+            break
+        if i > 0 and i % 5 == 0:
+            ns = player_el.evaluate(
+                f"el => {{ const v = {_RESOLVE_VIDEO}; return v.networkState; }}"
+            )
+            print(f"  [native] ... readyState={rs}, networkState={ns} ({i}s)",
+                  flush=True)
+        page.wait_for_timeout(1000)
+
+    if not ready:
+        print("  [warn] player not ready after 30 s — clicking anyway", flush=True)
+
+    # --- Click to play ---
+    player_el.click()
+    page.wait_for_timeout(3000)
+
+    # Check if playing; if still paused, try Space then another click
+    paused = player_el.evaluate(
+        f"el => {{ const v = {_RESOLVE_VIDEO}; return v.paused; }}"
+    )
+    if paused:
+        print("  [native] paused after click — pressing Space", flush=True)
+        player_el.focus()
+        page.keyboard.press("Space")
+        page.wait_for_timeout(1000)
+        paused = player_el.evaluate(
+            f"el => {{ const v = {_RESOLVE_VIDEO}; return v.paused; }}"
+        )
+    if paused:
+        print("  [native] still paused — trying second click", flush=True)
+        player_el.click()
+        page.wait_for_timeout(2000)
+
+    # --- Unmute ---
+    player_el.evaluate(
+        f"el => {{ const v = {_RESOLVE_VIDEO}; v.volume = 1.0; v.muted = false; }}"
+    )
+
+    # --- Fullscreen via 'f' shortcut ---
+    player_el.focus()
+    page.keyboard.press("f")
+    page.wait_for_timeout(1000)
+
+    # --- Get duration ---
+    duration = 0.0
+    for _ in range(10):
+        d = player_el.evaluate(
+            f"el => {{ const v = {_RESOLVE_VIDEO};"
+            f" return (v && isFinite(v.duration)) ? v.duration : 0; }}"
+        )
+        if d and float(d) > 0:
+            duration = float(d)
+            break
+        page.wait_for_timeout(2000)
+
+    return duration
+
+
+# --------------------------------------------------------------------------- #
+# unified wait-until-done
+# --------------------------------------------------------------------------- #
+def wait_until_done(
+    page, duration: float, player_type: str, player_el=None,
+    poll: float = 5.0,
+) -> None:
     """Poll playback position until the video ends, with a stall watchdog."""
-    deadline = time.monotonic() + duration * 1.3 + 120     # generous hard cap
+    deadline = time.monotonic() + duration * 1.3 + 120  # generous hard cap
     last_t, last_change = -1.0, time.monotonic()
+
     while time.monotonic() < deadline:
         if page.evaluate("() => window.__ended"):
             return
-        t = float(page.evaluate("() => window.__p.getCurrentTime()"))
+
+        # Get current playback position
+        if player_type == "vimeo":
+            t = float(page.evaluate("() => window.__p.getCurrentTime()"))
+        else:
+            t = float(player_el.evaluate(
+                f"el => {{ const v = {_RESOLVE_VIDEO}; return v.currentTime; }}"
+            ))
+
         if duration and t >= duration - 1.5:
             return
         if abs(t - last_t) > 0.1:
@@ -187,16 +326,24 @@ def capture(urls: list[str], cfg: dict, use_obs: bool) -> None:
         page = ctx.pages[0] if ctx.pages else ctx.new_page()
         for i, url in enumerate(urls, 1):
             print(f"\n[{i}/{len(urls)}] {url}")
-            page.goto(url, wait_until="domcontentloaded")
-            if not find_vimeo_iframe(page):
-                print("  [skip] no Vimeo player found (access? not a video post?)")
+            page.goto(url, wait_until="networkidle")
+
+            found = find_player(page)
+            if not found:
+                print("  [skip] no video player found (access? not a video post?)")
                 continue
+
+            player_type, player_el = found
+            print(f"  player: {player_type}")
             name = safe_name(episode_title(page, url))
             try:
-                duration = start_playback(page)
+                if player_type == "vimeo":
+                    duration = start_vimeo_playback(page)
+                else:
+                    duration = start_native_playback(page, player_el)
                 print(f"  duration {duration/60:.1f} min")
                 rec.start(name)
-                wait_until_done(page, duration)
+                wait_until_done(page, duration, player_type, player_el)
             finally:
                 print()
                 rec.stop()

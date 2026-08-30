@@ -5,6 +5,34 @@ Local, private pipeline that turns a library of videos into transcripts (+ optio
 slide OCR). Two stages on two machines: **acquire** (capture/download the media) and
 **transcribe** (Whisper on the CPU). Everything runs offline — no API keys, no uploads.
 
+## Infrastructure
+
+Full machine registry is maintained at the orchestrator repo:
+`/home/tuna/repos/multi-agent-orchestration/app_docs/infrastructure-registry.md`
+
+### Machines used by media-transcribe
+
+| Machine | Purpose | Access |
+|---------|---------|--------|
+| **devbox-01** (localhost) | Orchestrator scripts, transcription (whisper), storage | Local |
+| **obs-machine** (Windows) | OBS recording, Chrome CDP automation, Patreon capture, whisper (GPU: GTX 1060 6GB) | `ssh Matt@100.66.194.100` |
+
+### obs-machine key paths
+- Agent control: `C:\Users\Matt\agent-control\`
+- Chrome profile: `C:\Users\Matt\agent-control\chrome-profile\`
+- Scripts: `C:\Users\Matt\agent-control\scripts\`
+- Recordings: `C:\Users\Matt\Videos\`
+- Masterclass backups: `D:\MasterClass Video Backup\`
+- ffmpeg/ffprobe: `C:\Users\Matt\AppData\Local\Microsoft\WinGet\Links\`
+- Whisper: GPU-accelerated via CUDA (GTX 1060 6 GB). `large-v3-turbo` fits in 6 GB VRAM — proven with TAC course transcription. Use `--model large-v3-turbo` for best results.
+- OBS WebSocket: localhost:4455 (password in obs_record.py)
+- Chrome CDP: localhost:9222
+
+### devbox-01 key paths
+- Media-transcribe repo: `/home/tuna/repos/media-transcribe/`
+- Patreon recordings storage: `/mnt/secondary/media/patreon/FIRE Investing Masterclass/`
+- Catalog data: `data/` (in repo)
+
 ## Tooling
 - Python 3.11+
 - uv — package & runtime management
@@ -32,6 +60,10 @@ slide OCR). Two stages on two machines: **acquire** (capture/download the media)
 3. Keep functions small and single-purpose; match surrounding naming and comment density.
 4. Core stays CPU-only and dependency-light. Capture-only deps live in the `[capture]` extra, imported lazily.
 
+## Authentication
+
+Credential and account details are documented in [`app_docs/auth.md`](app_docs/auth.md).
+
 ## Important Notes
 - IMPORTANT: This processes **paywalled, personal** course content. Never upload, redistribute, or
   add a cloud/third-party step without an explicit request. Media stays local.
@@ -42,4 +74,3 @@ slide OCR). Two stages on two machines: **acquire** (capture/download the media)
 - Transcription is CPU-only: prefer many parallel `--workers` over more `--cpu-threads` per worker;
   `large-v3-turbo` is the default model (≈ large-v3 quality on English, ~2× faster).
 - Never silently swallow errors. If you catch one, log it and re-raise.
-- Keep this file concise. DO NOT bloat it with implementation details.
