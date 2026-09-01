@@ -207,15 +207,21 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("release-info", help="Show version, commit, and deploy status")
 
     # --- discover ---
-    d = sub.add_parser("discover", help="Discover and catalog Patreon content")
+    d = sub.add_parser("discover", help="Discover content from Patreon")
     d.add_argument("--full-catalog", action="store_true",
-        help="Scroll to load all posts (use for initial catalog build)")
-    d.add_argument("--output", default=None,
-        help="Catalog output path (default: data/patreon_catalog.json)")
+        help="Fetch all posts (paginate through entire history)")
+    d.add_argument("--video-only", action="store_true", default=True,
+        help="Only discover video posts (default: True)")
+    d.add_argument("--all-types", action="store_true",
+        help="Discover all post types, not just video")
+    d.add_argument("--output", default="data/patreon_catalog.json",
+        help="Catalog output path")
+    d.add_argument("--queue-new", default=None,
+        help="Write new (unrecorded) video posts to a queue file")
     d.add_argument("--force", action="store_true",
         help="Ignore cooldown timer")
-    d.add_argument("--queue-new", default=None,
-        help="Generate queue file for new video posts at this path")
+    d.add_argument("--campaign-id", default="5008493",
+        help="Patreon campaign ID (default: Mr. FIRED Up Wealth)")
 
     # --- watch ---
     w = sub.add_parser("watch", help="Autonomous content discovery + recording loop")
@@ -485,51 +491,77 @@ def main() -> int:
             return 1
 
     elif args.command == "discover":
-        import asyncio
-        from src.sources.discovery import PatreonDiscovery
-        from src.config import LOCAL_DATA
+        import json as json_mod
+        from src.sources.discovery import PatreonDiscovery, DiscoveredPost, MAX_PAGES
 
-        disc = PatreonDiscovery()
-        if not args.force and not disc.check_cooldown():
-            print("Discovery skipped (cooldown active). Use --force to override.")
-            return 0
+        discovery = PatreonDiscovery(campaign_id=args.campaign_id)
 
-        async def _run_discovery():
-            from src.cdp import CDPClient
-            from src.sources.patreon import PatreonSource
-
-            async with CDPClient() as cdp:
-                source = PatreonSource()
-                if not await source.authenticate(cdp):
-                    print("Patreon authentication failed")
-                    return 1
-
-                posts = await disc.discover(cdp, full_catalog=args.full_catalog)
-
-                catalog_path = Path(args.output) if args.output else LOCAL_DATA / "patreon_catalog.json"
-                new_posts, all_posts = disc.diff_catalog(posts, catalog_path)
-                disc.save_catalog(all_posts, catalog_path)
-
-                video_count = sum(1 for p in all_posts if p.has_video)
-                print("Discovery complete:")
-                print(f"  Total posts found: {len(all_posts)}")
-                print(f"  With video: {video_count}")
-                print(f"  New since last check: {len(new_posts)}")
-                if new_posts:
-                    print("  New posts:")
-                    for p in new_posts:
-                        vflag = "(video)" if p.has_video else "(text)"
-                        print(f"    - {p.published_at[:10]}: {p.title} {vflag}")
-                print(f"  Catalog saved to: {catalog_path}")
-
-                if args.queue_new and new_posts:
-                    queue_path = Path(args.queue_new)
-                    count = disc.generate_queue(new_posts, queue_path)
-                    print(f"  Queue file: {queue_path} ({count} video(s))")
-
+        if args.full_catalog and not args.force:
+            state_dir = Path("data")
+            if not discovery.check_cooldown(state_dir):
+                print("Cooldown active. Use --force to override.")
                 return 0
 
-        return asyncio.run(_run_discovery())
+        media_type = None if args.all_types else "video"
+        max_pages = MAX_PAGES if args.full_catalog else 1
+
+        label = "all" if args.full_catalog else "latest"
+        type_label = media_type or "all"
+        print(f"Discovering {label} {type_label} posts...")
+        posts = discovery.fetch_posts(media_type=media_type, max_pages=max_pages)
+
+        catalog_path = Path(args.output)
+        new_posts = discovery.diff_catalog(posts, catalog_path)
+
+        if catalog_path.exists():
+            existing = json_mod.loads(catalog_path.read_text(encoding="utf-8"))
+            existing_by_id = {p["post_id"]: p for p in existing.get("posts", [])}
+            from dataclasses import asdict
+            discovered_by_id = {p.post_id: p for p in posts}
+            all_posts = list(discovered_by_id.values())
+            valid_fields = {f.name for f in DiscoveredPost.__dataclass_fields__.values()}
+            for pid, pdata in existing_by_id.items():
+                if pid not in discovered_by_id and pdata is not None:
+                    filtered = {k: v for k, v in pdata.items() if k in valid_fields}
+                    filtered.setdefault("post_id", pid)
+                    filtered.setdefault("url", f"https://www.patreon.com/posts/{pid}")
+                    filtered.setdefault("title", "")
+                    filtered.setdefault("created_at", "")
+                    filtered.setdefault("post_type", "")
+                    filtered.setdefault("has_video", False)
+                    all_posts.append(DiscoveredPost(**filtered))
+        else:
+            all_posts = posts
+
+        discovery.save_catalog(all_posts, catalog_path)
+
+        if args.full_catalog:
+            discovery.update_cooldown(Path("data"))
+
+        video_count = sum(1 for p in posts if p.has_video)
+        print(f"\nDiscovery complete:")
+        print(f"  Total found: {len(posts)}")
+        print(f"  Video posts: {video_count}")
+        print(f"  New: {len(new_posts)}")
+        if new_posts:
+            print(f"\n  New posts:")
+            for p in new_posts[:10]:
+                print(f"    {p.created_at[:10]}  {p.title[:70]}")
+
+        if args.queue_new and new_posts:
+            video_posts = [p for p in new_posts if p.has_video]
+            bad = '<>:"/\\|?*'
+            queue = []
+            for p in video_posts:
+                cleaned = "".join("_" if c in bad else c for c in p.title).strip()
+                filename = cleaned if cleaned.strip("_ ") else "episode"
+                queue.append({"url": p.url, "filename": filename})
+            Path(args.queue_new).parent.mkdir(parents=True, exist_ok=True)
+            Path(args.queue_new).write_text(
+                json_mod.dumps(queue, indent=2), encoding="utf-8")
+            print(f"\n  Queue written: {len(queue)} videos to {args.queue_new}")
+
+        return 0
 
     elif args.command == "watch":
         if args.status:

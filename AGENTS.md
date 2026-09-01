@@ -176,30 +176,22 @@ The recorder detects the video player type with a single DOM query:
 
 ### Content Discovery
 
-Discover and catalog Patreon content via CDP network interception:
+Discover uses Patreon's public JSON API (no auth needed). Runs on devbox-01.
 
 ```bash
-# Check for new posts (default — first page only):
+# Check for new video posts (1 API request, no cooldown):
 uv run cli.py discover
 
-# Build initial full catalog (scrolls to load all posts):
-uv run cli.py discover --full-catalog --output data/patreon_catalog.json
+# Full catalog of all ~2000 posts (paginated, cooldown enforced):
+uv run cli.py discover --full-catalog
 
-# Force discovery (ignore 12-hour cooldown):
-uv run cli.py discover --force
-
-# Discover and generate queue for new videos:
+# Discover and create a recording queue:
 uv run cli.py discover --queue-new data/new_queue.json
-# Then record:
-uv run cli.py pipeline --queue data/new_queue.json
-```
 
-**Safety guarantees:**
-- 12-hour cooldown between discovery runs (override with `--force`)
-- Max 5 page loads per session
-- Random 2–5 second delays between scrolls
-- No direct HTTP requests — all data from browser's own API calls via CDP
-- Every page load logged with timestamp for audit
+# Then record on obs-machine:
+scp data/new_queue.json Matt@100.66.194.100:C:/Users/Matt/transcribe/
+ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py pipeline --queue new_queue.json"
+```
 
 **Catalog location:** `data/patreon_catalog.json` (default)
 
