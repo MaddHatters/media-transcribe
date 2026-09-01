@@ -135,8 +135,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="Skip human-like breaks between videos")
     p.add_argument("--skip-preflight", action="store_true",
         help="Skip preflight validation checks")
+    p.add_argument("--test-mode", action="store_true",
+        help="Use local test video instead of Patreon (no network access needed)")
     p.add_argument("--foreground", action="store_true",
                    help="Run in foreground instead of backgrounding (default: background)")
+
+    # --- generate-test-video ---
+    gtv = sub.add_parser("generate-test-video", help="Generate test video for --test-mode")
+    gtv.add_argument("--duration", type=int, default=60, help="Duration in seconds")
 
     # --- transfer-transcripts ---
     tt = sub.add_parser("transfer-transcripts", help="Sync transcripts from obs-machine")
@@ -282,6 +288,9 @@ def main() -> int:
             print("No entries to process.")
             return 0
 
+        if args.test_mode:
+            print("*** TEST MODE — using local test video ***")
+
         posts = [Post(url=e["url"], title=e.get("title", e["filename"]),
                       filename=e["filename"]) for e in queue_data]
 
@@ -289,9 +298,13 @@ def main() -> int:
         source = None
         if has_record:
             from src.engines.obs_engine import OBSEngine
-            from src.sources.patreon import PatreonSource
             engine = OBSEngine()
-            source = PatreonSource()
+            if args.test_mode:
+                from src.sources.test_source import TestSource
+                source = TestSource()
+            else:
+                from src.sources.patreon import PatreonSource
+                source = PatreonSource()
 
         output_dir = Path(args.output_dir) if args.output_dir else BACKUP_DIR
 
@@ -308,7 +321,7 @@ def main() -> int:
         pf = None
         if has_record and not args.skip_preflight:
             from src.capture.preflight import Preflight
-            pf = Preflight()
+            pf = Preflight(skip_patreon=args.test_mode)
             ok, gates = pf.run_all()
             if not ok:
                 print("Preflight failed — aborting")
@@ -331,6 +344,13 @@ def main() -> int:
                 if r.steps_failed:
                     print(f"  FAILED: {r.post_title} — {r.steps_failed}")
         return 1 if fail_count else 0
+
+    elif args.command == "generate-test-video":
+        from test_assets.generate_test_video import generate
+        out = Path("test_assets/test_video.mp4")
+        out.parent.mkdir(exist_ok=True)
+        generate(out, duration=args.duration)
+        return 0
 
     elif args.command == "transfer-transcripts":
         from src.transfer.sync import TransferClient

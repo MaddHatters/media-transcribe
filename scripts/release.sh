@@ -79,6 +79,7 @@ echo -e "\n${BOLD}==> Deploying to obs-machine${RESET}"
 
 scp -r src/ cli.py pyproject.toml launch_chrome.bat \
     transcribe/corrections.txt transcribe/finance_vocab.txt \
+    test_assets/ \
     "$REMOTE:$REMOTE_DIR/"
 ok "Files copied"
 
@@ -124,3 +125,6 @@ echo "  Time:     $TIMESTAMP"
 echo ""
 echo "To run pipeline:"
 echo "  ssh $REMOTE \"cd C:\\Users\\Matt\\transcribe; uv run cli.py pipeline --queue <file>\""
+echo ""
+echo "To set up test mode (first time):"
+echo "  ssh $REMOTE \"cd $REMOTE_DIR; uv run cli.py generate-test-video\""

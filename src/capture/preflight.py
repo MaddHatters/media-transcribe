@@ -36,8 +36,9 @@ class GateResult:
 
 
 class Preflight:
-    def __init__(self, cdp_url: str = CDP_URL):
+    def __init__(self, cdp_url: str = CDP_URL, skip_patreon: bool = False):
         self._cdp_url = cdp_url
+        self._skip_patreon = skip_patreon
 
     def run_all(self) -> tuple[bool, list[GateResult]]:
         gates: list[GateResult] = []
@@ -53,7 +54,9 @@ class Preflight:
         if not obs_ok:
             all_ok = False
 
-        if chrome_ok:
+        if self._skip_patreon:
+            gates.append(GateResult("Patreon session", True, "skipped (test mode)"))
+        elif chrome_ok:
             patreon_ok = self._check_patreon_session()
             gates.append(GateResult("Patreon session", patreon_ok))
             if not patreon_ok:
