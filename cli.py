@@ -12,8 +12,8 @@ Usage:
     uv run cli.py find-gaps <transcripts-folder> [--output gaps.yaml]
     uv run cli.py extract-frames --gaps gaps.yaml --videos <folder> --out <folder>
     uv run cli.py preflight
-    uv run cli.py record --queue data/queues/conference.json
-    uv run cli.py pipeline --queue <file> [--steps record,transcribe,correct]
+    uv run cli.py record --queue data/queues/conference.json [--start-at "22:00"]
+    uv run cli.py pipeline --queue <file> [--steps record,transcribe,correct] [--start-at "HH:MM"]
     uv run cli.py transfer-transcripts [--apply-corrections] [--force]
     uv run cli.py screenshot
 """
@@ -25,7 +25,7 @@ import shutil
 import subprocess
 import sys
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 LONG_RUNNING_COMMANDS = {"record", "transcribe", "analyze", "pipeline"}
@@ -67,6 +67,35 @@ def background_relaunch(args: argparse.Namespace, log_dir: Path) -> int:
     print(f"Log:     {log_file}")
     print(f"Command: {' '.join(child_cmd)}")
     print(f"Tail:    tail -f {log_file}")
+    return 0
+
+
+def wait_until(start_at: str) -> int:
+    """Sleep until the specified time. Returns 0 on success, 1 on parse error."""
+    now = datetime.now()
+    target = None
+    for fmt in ("%Y-%m-%d %H:%M", "%H:%M"):
+        try:
+            target = datetime.strptime(start_at, fmt)
+            if fmt == "%H:%M":
+                target = target.replace(year=now.year, month=now.month, day=now.day)
+                if target <= now:
+                    target += timedelta(days=1)
+            break
+        except ValueError:
+            continue
+
+    if target is None:
+        print(f"Invalid --start-at format: {start_at} (use 'HH:MM' or 'YYYY-MM-DD HH:MM')")
+        return 1
+
+    delta = (target - now).total_seconds()
+    if delta > 0:
+        print(f"Scheduled: waiting until {target.strftime('%Y-%m-%d %H:%M')}")
+        print(f"   ({delta/3600:.1f} hours / {delta/60:.0f} minutes from now)")
+        print(f"   PID: {os.getpid()}")
+        time.sleep(delta)
+        print(f"Wake up! Starting at {datetime.now().strftime('%H:%M:%S')}")
     return 0
 
 
@@ -120,6 +149,8 @@ def build_parser() -> argparse.ArgumentParser:
     # --- record ---
     r = sub.add_parser("record", help="Record videos from a queue")
     r.add_argument("--queue", required=True, help="Queue JSON file")
+    r.add_argument("--start-at", default=None,
+        help="Delay start until this time (format: 'YYYY-MM-DD HH:MM' or 'HH:MM' for today)")
     r.add_argument("--foreground", action="store_true",
                    help="Run in foreground instead of backgrounding (default: background)")
 
@@ -137,6 +168,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="Skip preflight validation checks")
     p.add_argument("--test-mode", action="store_true",
         help="Use local test video instead of Patreon (no network access needed)")
+    p.add_argument("--start-at", default=None,
+        help="Delay start until this time (format: 'YYYY-MM-DD HH:MM' or 'HH:MM' for today)")
     p.add_argument("--foreground", action="store_true",
                    help="Run in foreground instead of backgrounding (default: background)")
 
@@ -264,6 +297,10 @@ def main() -> int:
         from src.capture.batch import load_queue
         queue = load_queue(Path(args.queue))
         print(f"Loaded {len(queue)} entries from {args.queue}")
+        if args.start_at:
+            rc = wait_until(args.start_at)
+            if rc:
+                return rc
 
     elif args.command == "pipeline":
         import asyncio
@@ -287,6 +324,12 @@ def main() -> int:
         if not queue_data:
             print("No entries to process.")
             return 0
+
+        if args.start_at:
+            print(f"   Queue: {args.queue} ({len(queue_data)} videos)")
+            rc = wait_until(args.start_at)
+            if rc:
+                return rc
 
         if args.test_mode:
             print("*** TEST MODE — using local test video ***")

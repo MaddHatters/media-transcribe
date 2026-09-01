@@ -64,6 +64,9 @@ ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py transcribe <
 ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py analyze <folder> --single <file>"
 ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py pipeline --queue queue.json"
 
+# Schedule for later:
+ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py pipeline --queue queue.json --start-at '22:00'"
+
 # Short commands (inline):
 ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py preflight"
 ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py correct <transcripts-folder>"
