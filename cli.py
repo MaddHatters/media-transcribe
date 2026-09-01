@@ -128,6 +128,12 @@ def build_parser() -> argparse.ArgumentParser:
     tt.add_argument("--force", action="store_true")
     tt.add_argument("--dry-run", action="store_true")
 
+    # --- setup ---
+    sub.add_parser("setup", help="Launch Chrome + OBS and configure recording environment")
+
+    # --- teardown ---
+    sub.add_parser("teardown", help="Stop recording and close Chrome + OBS")
+
     # --- screenshot ---
     sub.add_parser("screenshot", help="Take a screenshot via OBS")
 
@@ -259,6 +265,16 @@ def main() -> int:
 
         output_dir = Path(args.output_dir) if args.output_dir else BACKUP_DIR
 
+        if has_record:
+            from src.capture.environment import EnvironmentManager
+            env = EnvironmentManager()
+            env_ok, env_messages = env.setup()
+            for msg in env_messages:
+                print(msg)
+            if not env_ok:
+                print("Environment setup failed — aborting")
+                return 1
+
         pf = None
         if has_record and not args.skip_preflight:
             from src.capture.preflight import Preflight
@@ -303,6 +319,22 @@ def main() -> int:
                     new, counts = apply_rules(text, rules)
                     if counts and not args.dry_run:
                         fpath.write_text(new, encoding="utf-8")
+
+    elif args.command == "setup":
+        from src.capture.environment import EnvironmentManager
+        env = EnvironmentManager()
+        ok, messages = env.setup()
+        for msg in messages:
+            print(msg)
+        return 0 if ok else 1
+
+    elif args.command == "teardown":
+        from src.capture.environment import EnvironmentManager
+        env = EnvironmentManager()
+        ok, messages = env.teardown()
+        for msg in messages:
+            print(msg)
+        return 0 if ok else 1
 
     elif args.command == "screenshot":
         from src.engines.obs_engine import OBSEngine

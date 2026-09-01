@@ -30,5 +30,18 @@ BREAK_MIN_SECONDS = 300
 BREAK_MAX_SECONDS = 1500
 CRED_TARGET = "patreon_02_ai"
 
+# -- Chrome launch flags --
+CHROME_FLAGS = [
+    f"--user-data-dir={CHROME_PROFILE}",
+    "--remote-debugging-port=9222",
+    "--start-maximized",
+    "--autoplay-policy=no-user-gesture-required",
+]
+
+# -- Scheduled task names --
+SCHTASK_NAME_CHROME = "MediaTranscribe_Chrome"
+SCHTASK_NAME_OBS = "MediaTranscribe_OBS"
+TEMP_BAT_DIR = SCRIPTS_DIR / "temp"
+
 # -- Platform detection --
 IS_WINDOWS = sys.platform == "win32"

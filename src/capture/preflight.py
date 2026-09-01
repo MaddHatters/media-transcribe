@@ -8,15 +8,14 @@ import os
 import re
 import shutil
 import subprocess
-import time
 import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 from src.config import (
-    CDP_URL, CHROME_PATH, CHROME_PROFILE,
-    OBS_PATH, OBS_HOST, OBS_PORT, OBS_PASSWORD,
+    CDP_URL,
+    OBS_HOST, OBS_PORT, OBS_PASSWORD,
     CRED_TARGET, IS_WINDOWS,
 )
 
@@ -91,32 +90,15 @@ class Preflight:
 
     def _ensure_chrome(self) -> bool:
         try:
-            data = urllib.request.urlopen(
-                f"{self._cdp_url}/json", timeout=5,
-            ).read()
+            urllib.request.urlopen(f"{self._cdp_url}/json", timeout=5)
             log.info("Chrome CDP is running")
             return True
         except Exception:
             log.warning("Chrome CDP not responding")
 
-        if not IS_WINDOWS:
-            return False
-
-        try:
-            cmd = [
-                str(CHROME_PATH),
-                f"--user-data-dir={CHROME_PROFILE}",
-                "--remote-debugging-port=9222",
-                "--start-maximized",
-            ]
-            subprocess.Popen(cmd)
-            log.info("Launched Chrome, waiting for CDP...")
-            time.sleep(5)
-            urllib.request.urlopen(f"{self._cdp_url}/json", timeout=5)
-            return True
-        except Exception as exc:
-            log.error("Chrome auto-launch failed: %s", exc)
-            return False
+        from src.capture.environment import EnvironmentManager
+        env = EnvironmentManager(cdp_url=self._cdp_url)
+        return env._setup_chrome()
 
     def _ensure_obs(self) -> bool:
         try:
@@ -131,23 +113,9 @@ class Preflight:
         except Exception:
             log.warning("OBS WebSocket not responding")
 
-        if not IS_WINDOWS:
-            return False
-
-        try:
-            subprocess.Popen([str(OBS_PATH), "--minimize-to-tray"])
-            log.info("Launched OBS, waiting for WebSocket...")
-            time.sleep(8)
-            import obsws_python as obs
-            client = obs.ReqClient(
-                host=OBS_HOST, port=OBS_PORT,
-                password=OBS_PASSWORD, timeout=5,
-            )
-            client.base_client.ws.close()
-            return True
-        except Exception as exc:
-            log.error("OBS auto-launch failed: %s", exc)
-            return False
+        from src.capture.environment import EnvironmentManager
+        env = EnvironmentManager(cdp_url=self._cdp_url)
+        return env._setup_obs()
 
     def _check_patreon_session(self) -> bool:
         try:
