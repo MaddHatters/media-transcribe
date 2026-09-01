@@ -70,25 +70,41 @@ class Pipeline:
         active_steps = self._validate_steps(steps) if steps else STEPS
         results: list[PipelineResult] = []
 
-        for i, post in enumerate(queue):
-            try:
-                result = await self._process_one(post, active_steps)
-                results.append(result)
-            except Exception as exc:
-                log.error("Pipeline failed for %s: %s", getattr(post, 'url', post), exc)
-                results.append(PipelineResult(
-                    post_url=getattr(post, 'url', str(post)),
-                    post_title=getattr(post, 'title', ''),
-                    steps_failed={"pipeline": str(exc)},
-                ))
+        try:
+            for i, post in enumerate(queue):
+                try:
+                    result = await self._process_one(post, active_steps)
+                    results.append(result)
+                except Exception as exc:
+                    log.error("Pipeline failed for %s: %s", getattr(post, 'url', post), exc)
+                    results.append(PipelineResult(
+                        post_url=getattr(post, 'url', str(post)),
+                        post_title=getattr(post, 'title', ''),
+                        steps_failed={"pipeline": str(exc)},
+                    ))
 
-            if "record" in active_steps and i < len(queue) - 1:
-                self._health_check()
-                if self._enable_breaks:
-                    from src.capture.batch import human_break
-                    await asyncio.to_thread(human_break, i + 1, len(queue))
+                if "record" in active_steps and i < len(queue) - 1:
+                    self._health_check()
+                    if self._enable_breaks:
+                        from src.capture.batch import human_break
+                        await asyncio.to_thread(human_break, i + 1, len(queue))
+        except BaseException:
+            log.critical("PIPELINE FAILED — stopping OBS recording", exc_info=True)
+            raise
+        finally:
+            self._emergency_stop_engine()
 
         return results
+
+    def _emergency_stop_engine(self) -> None:
+        if self._engine is None:
+            return
+        try:
+            if self._engine.is_recording():
+                self._engine.stop()
+                log.warning("[pipeline-guard] Stopped recording after crash")
+        except Exception:
+            pass
 
     async def _process_one(self, post, steps: list[str]) -> PipelineResult:
         result = PipelineResult(

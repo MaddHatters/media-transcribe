@@ -21,8 +21,10 @@ from __future__ import annotations
 
 import argparse
 import os
+import shutil
 import subprocess
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -34,24 +36,38 @@ def background_relaunch(args: argparse.Namespace, log_dir: Path) -> int:
     log_file = log_dir / f"{args.command}_{timestamp}.log"
     log_dir.mkdir(parents=True, exist_ok=True)
 
-    child_cmd = [sys.executable] + sys.argv + ["--foreground"]
-    fh = open(log_file, "w")  # noqa: SIM115
+    uv_path = shutil.which("uv")
+    if uv_path:
+        child_cmd = [uv_path, "run"] + sys.argv + ["--foreground"]
+    else:
+        child_cmd = [sys.executable] + sys.argv + ["--foreground"]
 
-    kwargs: dict = {"stdout": fh, "stderr": fh}
+    fh = open(log_file, "w", buffering=1)  # noqa: SIM115
+
+    kwargs: dict = {
+        "stdout": fh,
+        "stderr": fh,
+        "env": os.environ.copy(),
+        "cwd": os.getcwd(),
+    }
     if sys.platform == "win32":
-        kwargs["creationflags"] = (
-            subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS
-        )
+        kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
     else:
         kwargs["start_new_session"] = True
 
     proc = subprocess.Popen(child_cmd, **kwargs)
 
+    time.sleep(1)
+    if proc.poll() is not None:
+        print(f"ERROR: child exited immediately with code {proc.returncode}")
+        print(f"Check log: {log_file}")
+        return proc.returncode or 1
+
     print(f"PID:     {proc.pid}")
     print(f"Log:     {log_file}")
     print(f"Command: {' '.join(child_cmd)}")
     print(f"Tail:    tail -f {log_file}")
-    return proc.pid
+    return 0
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -147,11 +163,22 @@ def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
 
+    is_foreground = getattr(args, "foreground", False) or args.command not in LONG_RUNNING_COMMANDS
+    from src.logging_config import setup_logging
+    log_path = setup_logging(args.command, foreground=is_foreground)
+
     if args.command in LONG_RUNNING_COMMANDS and not getattr(args, "foreground", False):
         from src.config import IS_WINDOWS, LOGS_DIR
+        import logging
+        log = logging.getLogger("cli")
+        log.info("Backgrounding %s — log at %s", args.command, log_path)
         log_dir = LOGS_DIR if IS_WINDOWS else Path("/tmp")
-        background_relaunch(args, log_dir)
-        return 0
+        return background_relaunch(args, log_dir)
+
+    if args.command in LONG_RUNNING_COMMANDS and getattr(args, "foreground", False):
+        import logging
+        log = logging.getLogger("cli")
+        log.info("Child process started: %s", " ".join(sys.argv))
 
     if args.command == "transcribe":
         from src.transcribe.whisper_runner import WhisperRunner

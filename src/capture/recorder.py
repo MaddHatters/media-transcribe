@@ -15,7 +15,8 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 POLL_INTERVAL = 30
-STALL_THRESHOLD = 6
+STALL_THRESHOLD = 3
+STUCK_THRESHOLD = 5
 
 
 @dataclass
@@ -114,6 +115,7 @@ class Recorder:
 
             log.info("[9/10] Monitoring (~%.0f min)...", duration / 60)
             stall_count = 0
+            stuck_count = 0
             last_pos = -1.0
 
             while True:
@@ -140,13 +142,21 @@ class Recorder:
 
                 if abs(pos - last_pos) < 0.5:
                     stall_count += 1
-                    if stall_count > STALL_THRESHOLD:
+                    stuck_count += 1
+                    if stuck_count >= STUCK_THRESHOLD:
+                        log.error("  STUCK — position hasn't advanced for %d checks (%.0fs). Aborting.",
+                                  STUCK_THRESHOLD, STUCK_THRESHOLD * POLL_INTERVAL)
+                        result.error = f"Recording stuck at {pos:.0f}s for {STUCK_THRESHOLD * POLL_INTERVAL}s"
+                        await asyncio.to_thread(self.engine.stop)
+                        return result
+                    elif stall_count > STALL_THRESHOLD:
                         log.warning("  STALLED — nudging")
                         await handler.seek(cdp, pos + 0.5)
                         await handler.play(cdp, detection)
                         stall_count = 0
                 else:
                     stall_count = 0
+                    stuck_count = 0
                 last_pos = pos
 
                 await asyncio.sleep(POLL_INTERVAL)
