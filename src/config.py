@@ -23,6 +23,7 @@ OBS_HOST = "localhost"
 OBS_PORT = 4455
 OBS_PASSWORD = "DK4HLJPKgslAhEgD"
 SSH_HOST = "Matt@100.66.194.100"
+REMOTE_PROJECT_DIR = "C:/Users/Matt/transcribe"
 SSH_OPTS = ["-o", "ConnectTimeout=15", "-o", "StrictHostKeyChecking=no"]
 
 # -- Recording behavior --

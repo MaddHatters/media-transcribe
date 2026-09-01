@@ -137,6 +137,9 @@ def build_parser() -> argparse.ArgumentParser:
     # --- screenshot ---
     sub.add_parser("screenshot", help="Take a screenshot via OBS")
 
+    # --- release-info ---
+    sub.add_parser("release-info", help="Show version, commit, and deploy status")
+
     return ap
 
 
@@ -346,6 +349,31 @@ def main() -> int:
         else:
             print("Screenshot failed", file=sys.stderr)
             return 1
+
+    elif args.command == "release-info":
+        from src import __version__
+        from src.config import SSH_HOST, REMOTE_PROJECT_DIR
+
+        commit = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            capture_output=True, text=True,
+        ).stdout.strip() or "unknown"
+
+        print(f"Version:  {__version__}")
+        print(f"Commit:   {commit}")
+        print(f"Target:   {SSH_HOST}:{REMOTE_PROJECT_DIR}/")
+
+        result = subprocess.run(
+            ["ssh", "-o", "ConnectTimeout=5", SSH_HOST,
+             f"cd {REMOTE_PROJECT_DIR}; uv run python -c "
+             "\"from src import __version__; print(__version__)\""],
+            capture_output=True, text=True,
+        )
+        if result.returncode == 0:
+            remote_ver = result.stdout.strip()
+            print(f"Deployed: {remote_ver}")
+        else:
+            print("Deployed: (unreachable)")
 
     return 0
 

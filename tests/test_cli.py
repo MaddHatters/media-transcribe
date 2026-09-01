@@ -88,3 +88,10 @@ def test_cli_screenshot_args():
     parser = build_parser()
     args = parser.parse_args(["screenshot"])
     assert args.command == "screenshot"
+
+
+def test_cli_release_info_args():
+    from cli import build_parser
+    parser = build_parser()
+    args = parser.parse_args(["release-info"])
+    assert args.command == "release-info"

@@ -23,6 +23,36 @@ cd /home/tuna/repos/media-transcribe
 scp -r src/ cli.py corrections.txt finance_vocab.txt Matt@100.66.194.100:"C:/Users/Matt/transcribe/"
 ```
 
+## Release / Deploy
+
+One-command deploy from devbox-01 to obs-machine:
+
+```bash
+bash scripts/release.sh            # test → deploy → verify
+bash scripts/release.sh --verify   # also runs preflight on obs-machine
+```
+
+The script:
+1. Checks you're on `main` with a clean working tree
+2. Verifies obs-machine is reachable via SSH
+3. Runs `uv run pytest` — aborts on failure
+4. SCPs project files to `C:\Users\Matt\transcribe\`
+5. Runs `uv sync --extra capture` on obs-machine
+6. Verifies deployed version matches local
+7. Runs `cli.py --help` on obs-machine to check imports
+
+### Checking deploy status
+
+```bash
+uv run cli.py release-info    # shows version, commit, deploy target, remote version
+```
+
+### After deploying
+
+```bash
+ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py pipeline --queue <file>"
+```
+
 ### Execution
 
 **All operations go through `cli.py`** — the single entry point on the obs-machine. Never invoke scripts in `src/` directly.
