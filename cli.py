@@ -28,7 +28,7 @@ import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
-LONG_RUNNING_COMMANDS = {"record", "transcribe", "analyze", "pipeline"}
+LONG_RUNNING_COMMANDS = {"record", "transcribe", "analyze", "pipeline", "watch"}
 
 
 def background_relaunch(args: argparse.Namespace, log_dir: Path) -> int:
@@ -97,6 +97,17 @@ def wait_until(start_at: str) -> int:
         time.sleep(delta)
         print(f"Wake up! Starting at {datetime.now().strftime('%H:%M:%S')}")
     return 0
+
+
+def parse_interval(value: str) -> float:
+    """Parse an interval string like '24h' or '12h' into hours."""
+    value = value.strip().lower()
+    if value.endswith("h"):
+        try:
+            return float(value[:-1])
+        except ValueError:
+            pass
+    raise ValueError(f"Invalid interval: {value} (use e.g. '24h', '12h')")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -195,6 +206,36 @@ def build_parser() -> argparse.ArgumentParser:
     # --- release-info ---
     sub.add_parser("release-info", help="Show version, commit, and deploy status")
 
+    # --- discover ---
+    d = sub.add_parser("discover", help="Discover and catalog Patreon content")
+    d.add_argument("--full-catalog", action="store_true",
+        help="Scroll to load all posts (use for initial catalog build)")
+    d.add_argument("--output", default=None,
+        help="Catalog output path (default: data/patreon_catalog.json)")
+    d.add_argument("--force", action="store_true",
+        help="Ignore cooldown timer")
+    d.add_argument("--queue-new", default=None,
+        help="Generate queue file for new video posts at this path")
+
+    # --- watch ---
+    w = sub.add_parser("watch", help="Autonomous content discovery + recording loop")
+    w.add_argument("--source", default="patreon",
+        help="Content source (default: patreon)")
+    w.add_argument("--every", required=False, default=None,
+        help="Interval between runs (e.g. '24h', '12h'). Minimum: 12h")
+    w.add_argument("--start-at", default=None,
+        help="Time of first run (format: 'HH:MM' or 'YYYY-MM-DD HH:MM')")
+    w.add_argument("--steps", default=None,
+        help="Pipeline steps to run (default: record,analyze,transcribe,correct)")
+    w.add_argument("--max-per-run", type=int, default=3,
+        help="Maximum videos to process per cycle (default: 3)")
+    w.add_argument("--dry-run", action="store_true",
+        help="Discover but don't record")
+    w.add_argument("--foreground", action="store_true",
+        help="Don't auto-background")
+    w.add_argument("--status", action="store_true",
+        help="Show watcher status and exit")
+
     return ap
 
 
@@ -207,12 +248,15 @@ def main() -> int:
     log_path = setup_logging(args.command, foreground=is_foreground)
 
     if args.command in LONG_RUNNING_COMMANDS and not getattr(args, "foreground", False):
-        from src.config import IS_WINDOWS, LOGS_DIR
-        import logging
-        log = logging.getLogger("cli")
-        log.info("Backgrounding %s — log at %s", args.command, log_path)
-        log_dir = LOGS_DIR if IS_WINDOWS else Path("/tmp")
-        return background_relaunch(args, log_dir)
+        if args.command == "watch" and getattr(args, "status", False):
+            pass  # --status is a quick inline command
+        else:
+            from src.config import IS_WINDOWS, LOGS_DIR
+            import logging
+            log = logging.getLogger("cli")
+            log.info("Backgrounding %s — log at %s", args.command, log_path)
+            log_dir = LOGS_DIR if IS_WINDOWS else Path("/tmp")
+            return background_relaunch(args, log_dir)
 
     if args.command in LONG_RUNNING_COMMANDS and getattr(args, "foreground", False):
         import logging
@@ -439,6 +483,97 @@ def main() -> int:
         else:
             print("Screenshot failed", file=sys.stderr)
             return 1
+
+    elif args.command == "discover":
+        import asyncio
+        from src.sources.discovery import PatreonDiscovery
+        from src.config import LOCAL_DATA
+
+        disc = PatreonDiscovery()
+        if not args.force and not disc.check_cooldown():
+            print("Discovery skipped (cooldown active). Use --force to override.")
+            return 0
+
+        async def _run_discovery():
+            from src.cdp import CDPClient
+            from src.sources.patreon import PatreonSource
+
+            async with CDPClient() as cdp:
+                source = PatreonSource()
+                if not await source.authenticate(cdp):
+                    print("Patreon authentication failed")
+                    return 1
+
+                posts = await disc.discover(cdp, full_catalog=args.full_catalog)
+
+                catalog_path = Path(args.output) if args.output else LOCAL_DATA / "patreon_catalog.json"
+                new_posts, all_posts = disc.diff_catalog(posts, catalog_path)
+                disc.save_catalog(all_posts, catalog_path)
+
+                video_count = sum(1 for p in all_posts if p.has_video)
+                print("Discovery complete:")
+                print(f"  Total posts found: {len(all_posts)}")
+                print(f"  With video: {video_count}")
+                print(f"  New since last check: {len(new_posts)}")
+                if new_posts:
+                    print("  New posts:")
+                    for p in new_posts:
+                        vflag = "(video)" if p.has_video else "(text)"
+                        print(f"    - {p.published_at[:10]}: {p.title} {vflag}")
+                print(f"  Catalog saved to: {catalog_path}")
+
+                if args.queue_new and new_posts:
+                    queue_path = Path(args.queue_new)
+                    count = disc.generate_queue(new_posts, queue_path)
+                    print(f"  Queue file: {queue_path} ({count} video(s))")
+
+                return 0
+
+        return asyncio.run(_run_discovery())
+
+    elif args.command == "watch":
+        if args.status:
+            from src.pipeline.watcher import ContentWatcher
+            status = ContentWatcher.read_status()
+            if status is None:
+                print("No watcher running (no status file found)")
+                return 0
+            print(f"Running:  {status['running']}")
+            print(f"PID:      {status['pid']}")
+            print(f"Cycle:    {status['cycle']}")
+            print(f"Last run: {status['last_run']}")
+            print(f"Next run: {status['next_run']}")
+            last = status.get("last_result", {})
+            print(f"Last result: found={last.get('new_found', 0)}, "
+                  f"recorded={last.get('recorded', 0)}, "
+                  f"failed={last.get('failed', 0)}")
+            print(f"Total recorded: {status['total_recorded']}")
+            print(f"Started at:     {status['started_at']}")
+            return 0
+
+        if not args.every:
+            print("--every is required (e.g. --every 24h)")
+            return 1
+
+        interval_hours = parse_interval(args.every)
+        steps = [s.replace("-", "_") for s in args.steps.split(",")] if args.steps else None
+
+        if args.start_at:
+            rc = wait_until(args.start_at)
+            if rc:
+                return rc
+
+        import asyncio
+        from src.pipeline.watcher import ContentWatcher
+
+        watcher = ContentWatcher(
+            source=args.source,
+            interval_hours=interval_hours,
+            steps=steps or ["record", "analyze", "transcribe", "correct"],
+            max_per_run=args.max_per_run,
+            dry_run=args.dry_run,
+        )
+        asyncio.run(watcher.run_forever())
 
     elif args.command == "release-info":
         from src import __version__

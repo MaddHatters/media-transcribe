@@ -95,3 +95,67 @@ async def test_get_ws_url_returns_first_page():
         mock_urlopen.return_value.read.return_value = pages_json
         url = CDPClient.get_ws_url()
         assert url == "ws://page1"
+
+
+async def test_send_buffers_events(mock_ws):
+    """Events received during _send() are stored in _events."""
+    mock_ws.recv = AsyncMock(side_effect=[
+        json.dumps({"method": "Network.responseReceived", "params": {}}),
+        json.dumps({"id": 1, "result": {}}),
+    ])
+    client = CDPClient.__new__(CDPClient)
+    client._ws = mock_ws
+    client._msg_id = 0
+    client._events = []
+    await client._send("Page.navigate", {"url": "https://example.com"})
+    assert len(client._events) == 1
+    assert client._events[0]["method"] == "Network.responseReceived"
+
+
+def test_drain_events_all():
+    """drain_events() with no filter returns all and clears."""
+    client = CDPClient.__new__(CDPClient)
+    client._events = [
+        {"method": "Network.responseReceived", "params": {}},
+        {"method": "Network.requestWillBeSent", "params": {}},
+    ]
+    events = client.drain_events()
+    assert len(events) == 2
+    assert len(client._events) == 0
+
+
+def test_drain_events_filtered():
+    """drain_events('Network.responseReceived') returns only matching events."""
+    client = CDPClient.__new__(CDPClient)
+    client._events = [
+        {"method": "Network.responseReceived", "params": {"id": 1}},
+        {"method": "Network.requestWillBeSent", "params": {"id": 2}},
+        {"method": "Network.responseReceived", "params": {"id": 3}},
+    ]
+    matched = client.drain_events("Network.responseReceived")
+    assert len(matched) == 2
+    assert all(e["method"] == "Network.responseReceived" for e in matched)
+    assert len(client._events) == 1
+    assert client._events[0]["method"] == "Network.requestWillBeSent"
+
+
+async def test_collect_events_duration(mock_ws):
+    """collect_events() reads for specified duration."""
+    import asyncio
+
+    call_count = 0
+    async def mock_recv():
+        nonlocal call_count
+        call_count += 1
+        if call_count <= 3:
+            return json.dumps({"method": f"Event.{call_count}", "params": {}})
+        await asyncio.sleep(10)
+
+    mock_ws.recv = mock_recv
+    client = CDPClient.__new__(CDPClient)
+    client._ws = mock_ws
+    client._msg_id = 0
+    client._events = []
+    count = await client.collect_events(0.5)
+    assert count >= 1
+    assert len(client._events) == count

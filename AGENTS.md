@@ -79,6 +79,24 @@ uv run cli.py transcribe ... --foreground
 
 Long-running commands auto-detach when run via SSH. Output goes to log files in `C:\Users\Matt\agent-control\logs\`.
 
+### Automated Watch
+
+```bash
+# Start autonomous content pipeline — discover + record every 24h at 10pm:
+ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py watch --source patreon --every 24h --start-at '22:00'"
+
+# Check watcher status:
+ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py watch --status"
+
+# Dry-run — discover but don't record:
+ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py watch --source patreon --every 24h --dry-run"
+
+# Custom pipeline steps and batch size:
+ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py watch --every 24h --steps record,transcribe,correct --max-per-run 5"
+```
+
+**Safety:** 12h minimum interval enforced, default 3 videos per cycle, graceful shutdown on SIGTERM/SIGINT (finishes current video).
+
 ## Infrastructure
 
 ### obs-machine
@@ -155,6 +173,35 @@ The recorder detects the video player type with a single DOM query:
   {"url": "https://www.patreon.com/posts/119811238", "filename": "Masterclass 19 - Munger Mental Models"}
 ]
 ```
+
+### Content Discovery
+
+Discover and catalog Patreon content via CDP network interception:
+
+```bash
+# Check for new posts (default — first page only):
+uv run cli.py discover
+
+# Build initial full catalog (scrolls to load all posts):
+uv run cli.py discover --full-catalog --output data/patreon_catalog.json
+
+# Force discovery (ignore 12-hour cooldown):
+uv run cli.py discover --force
+
+# Discover and generate queue for new videos:
+uv run cli.py discover --queue-new data/new_queue.json
+# Then record:
+uv run cli.py pipeline --queue data/new_queue.json
+```
+
+**Safety guarantees:**
+- 12-hour cooldown between discovery runs (override with `--force`)
+- Max 5 page loads per session
+- Random 2–5 second delays between scrolls
+- No direct HTTP requests — all data from browser's own API calls via CDP
+- Every page load logged with timestamp for audit
+
+**Catalog location:** `data/patreon_catalog.json` (default)
 
 ## Project Structure
 ```

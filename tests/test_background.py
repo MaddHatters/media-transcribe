@@ -11,7 +11,7 @@ from cli import LONG_RUNNING_COMMANDS, background_relaunch, build_parser
 
 
 def test_long_running_commands_identified():
-    assert LONG_RUNNING_COMMANDS == {"record", "transcribe", "analyze", "pipeline"}
+    assert LONG_RUNNING_COMMANDS == {"record", "transcribe", "analyze", "pipeline", "watch"}
 
 
 class TestForegroundFlagParsed:

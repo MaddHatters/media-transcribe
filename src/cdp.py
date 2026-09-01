@@ -23,6 +23,7 @@ class CDPClient:
         self._cdp_url = cdp_url
         self._ws = None
         self._msg_id = 0
+        self._events: list[dict] = []
 
     async def connect(self) -> None:
         ws_url = self.get_ws_url(self._cdp_url)
@@ -52,6 +53,34 @@ class CDPClient:
             resp = json.loads(await self._ws.recv())
             if resp.get("id") == mid:
                 return resp
+            if "method" in resp:
+                self._events.append(resp)
+
+    def drain_events(self, method: str | None = None) -> list[dict]:
+        if method is None:
+            events = self._events[:]
+            self._events.clear()
+            return events
+        matched = [e for e in self._events if e.get("method") == method]
+        self._events = [e for e in self._events if e.get("method") != method]
+        return matched
+
+    async def collect_events(self, duration: float) -> int:
+        deadline = asyncio.get_event_loop().time() + duration
+        count = 0
+        while True:
+            remaining = deadline - asyncio.get_event_loop().time()
+            if remaining <= 0:
+                break
+            try:
+                raw = await asyncio.wait_for(self._ws.recv(), timeout=remaining)
+                resp = json.loads(raw)
+                if "method" in resp:
+                    self._events.append(resp)
+                    count += 1
+            except asyncio.TimeoutError:
+                break
+        return count
 
     async def navigate(self, url: str, wait: float = 8.0) -> None:
         await self._send("Page.navigate", {"url": url})
