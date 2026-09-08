@@ -23,6 +23,16 @@ cd /home/tuna/repos/media-transcribe
 scp -r src/ cli.py corrections.txt finance_vocab.txt Matt@100.66.194.100:"C:/Users/Matt/transcribe/"
 ```
 
+## Test
+
+- **Command**: `uv run pytest` (from repo root)
+- **Pre-requisites**: None (tests are pure unit tests, no GPU/OBS/SSH needed)
+- **Test suite**: 40+ test files covering CLI, pipeline stages, players, discovery, transfer, and watcher
+
+## QA
+
+Not yet configured. The obs-machine is both dev and production — there is no isolated QA environment. Unit tests are the primary validation gate; `scripts/release.sh --verify` runs preflight checks on the obs-machine post-deploy.
+
 ## Release / Deploy
 
 One-command deploy from devbox-01 to obs-machine:
