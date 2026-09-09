@@ -10,25 +10,46 @@ log = logging.getLogger(__name__)
 
 
 def _focus_chrome_win32() -> bool:
-    """Internal: focus Chrome via Win32 API."""
+    """Focus the largest Chrome window via Win32 API."""
     import ctypes
+    import ctypes.wintypes
     user32 = ctypes.windll.user32
 
+    # Minimize all windows first (Win+D)
     user32.keybd_event(0x5B, 0, 0, 0)
     user32.keybd_event(0x44, 0, 0, 0)
     user32.keybd_event(0x44, 0, 2, 0)
     user32.keybd_event(0x5B, 0, 2, 0)
     time.sleep(1)
 
-    hwnd = user32.FindWindowW("Chrome_WidgetWin_1", None)
-    if hwnd:
-        user32.ShowWindow(hwnd, 3)
-        user32.SetForegroundWindow(hwnd)
-        time.sleep(0.5)
+    # Find ALL Chrome windows, pick the largest
+    candidates = []
+
+    @ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
+    def enum_cb(hwnd, _):
+        cls = ctypes.create_unicode_buffer(256)
+        user32.GetClassNameW(hwnd, cls, 256)
+        if cls.value == "Chrome_WidgetWin_1":
+            rect = ctypes.wintypes.RECT()
+            user32.GetWindowRect(hwnd, ctypes.byref(rect))
+            w = rect.right - rect.left
+            h = rect.bottom - rect.top
+            candidates.append((hwnd, w * h))
         return True
 
-    log.warning("Chrome window not found")
-    return False
+    user32.EnumWindows(enum_cb, 0)
+
+    if not candidates:
+        log.warning("Chrome window not found")
+        return False
+
+    # Pick the largest window (main browser, not dialogs)
+    best_hwnd = max(candidates, key=lambda x: x[1])[0]
+    user32.ShowWindow(best_hwnd, 3)  # SW_MAXIMIZE
+    user32.SetForegroundWindow(best_hwnd)
+    time.sleep(0.5)
+    log.info("Focused Chrome (hwnd=%s, %d candidates)", best_hwnd, len(candidates))
+    return True
 
 
 def focus_chrome() -> bool:
