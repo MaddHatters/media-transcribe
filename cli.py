@@ -32,6 +32,17 @@ LONG_RUNNING_COMMANDS = {"record", "transcribe", "analyze", "pipeline", "watch"}
 
 
 def background_relaunch(args: argparse.Namespace, log_dir: Path) -> int:
+    """Background a long-running command. SSH-aware on Windows."""
+    from src.config import IS_WINDOWS
+    from src.capture.environment import is_ssh_session
+
+    if IS_WINDOWS and is_ssh_session():
+        return _background_via_scheduled_task(args, log_dir)
+    return _background_via_subprocess(args, log_dir)
+
+
+def _background_via_subprocess(args: argparse.Namespace, log_dir: Path) -> int:
+    """Background via subprocess.Popen — works locally but NOT over SSH on Windows."""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = log_dir / f"{args.command}_{timestamp}.log"
     log_dir.mkdir(parents=True, exist_ok=True)
@@ -67,6 +78,120 @@ def background_relaunch(args: argparse.Namespace, log_dir: Path) -> int:
     print(f"Log:     {log_file}")
     print(f"Command: {' '.join(child_cmd)}")
     print(f"Tail:    tail -f {log_file}")
+    return 0
+
+
+def _background_via_scheduled_task(args: argparse.Namespace, log_dir: Path) -> int:
+    """Background via Windows scheduled task — works over SSH."""
+    from src.config import SCHTASK_NAME_PREFIX, TEMP_BAT_DIR
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_file = log_dir / f"{args.command}_{timestamp}.log"
+    log_dir.mkdir(parents=True, exist_ok=True)
+
+    TEMP_BAT_DIR.mkdir(parents=True, exist_ok=True)
+    for old_bat in TEMP_BAT_DIR.glob("_bg_*.bat"):
+        try:
+            old_bat.unlink()
+        except OSError:
+            pass
+
+    quoted_argv = subprocess.list2cmdline(sys.argv)
+    uv_path = shutil.which("uv")
+    if uv_path:
+        child_cmd = f'"{uv_path}" run {quoted_argv} --foreground'
+    else:
+        child_cmd = f'"{sys.executable}" {quoted_argv} --foreground'
+
+    cwd = os.getcwd()
+    bat_path = TEMP_BAT_DIR / f"_bg_{args.command}_{timestamp}.bat"
+    bat_path.write_text(
+        f"@echo off\n"
+        f'cd /d "{cwd}"\n'
+        f'{child_cmd} > "{log_file}" 2>&1\n'
+        f'del "%~f0"\n',
+        encoding="utf-8",
+    )
+
+    task_name = f"{SCHTASK_NAME_PREFIX}{args.command}"
+
+    result = subprocess.run(
+        ["schtasks", "/create", "/tn", task_name,
+         "/tr", str(bat_path.resolve()),
+         "/sc", "once", "/st", "00:00",
+         "/f", "/rl", "highest", "/it"],
+        capture_output=True, text=True,
+    )
+    if result.returncode != 0:
+        print(f"ERROR: Failed to create scheduled task: {result.stderr}")
+        return 1
+
+    result = subprocess.run(
+        ["schtasks", "/run", "/tn", task_name],
+        capture_output=True, text=True,
+    )
+    if result.returncode != 0:
+        print(f"ERROR: Failed to run scheduled task: {result.stderr}")
+        return 1
+
+    time.sleep(3)
+    pid = _find_pipeline_pid()
+
+    print(f"PID:     {pid or 'detecting...'}")
+    print(f"Log:     {log_file}")
+    print(f"Task:    {task_name}")
+    print(f"Command: {child_cmd}")
+    print(f"Tail:    Get-Content '{log_file}' -Tail 20 -Wait")
+    return 0
+
+
+def _find_pipeline_pid() -> int | None:
+    """Find the Python process started by our scheduled task."""
+    try:
+        result = subprocess.run(
+            ["powershell", "-Command",
+             "Get-Process -Name python,py -ErrorAction SilentlyContinue | "
+             "Select-Object -ExpandProperty Id"],
+            capture_output=True, text=True, timeout=5,
+        )
+        pids = [int(p.strip()) for p in result.stdout.strip().split("\n") if p.strip()]
+        return pids[0] if pids else None
+    except Exception:
+        return None
+
+
+def _handle_status() -> int:
+    """Show running pipeline status."""
+    from src.config import IS_WINDOWS, LOGS_DIR, SCHTASK_NAME_PREFIX
+
+    if IS_WINDOWS:
+        for cmd in ("pipeline", "record", "transcribe", "analyze", "watch"):
+            task_name = f"{SCHTASK_NAME_PREFIX}{cmd}"
+            result = subprocess.run(
+                ["schtasks", "/query", "/tn", task_name, "/fo", "LIST"],
+                capture_output=True, text=True,
+            )
+            if result.returncode == 0:
+                print(f"Task: {task_name}")
+                for line in result.stdout.strip().split("\n"):
+                    line = line.strip()
+                    if line.startswith("Status:") or line.startswith("Last Run Time:"):
+                        print(f"  {line}")
+                print()
+    else:
+        print("Scheduled task status is only available on Windows.")
+
+    logs = sorted(LOGS_DIR.glob("*.log"), key=lambda p: p.stat().st_mtime, reverse=True)
+    if logs:
+        latest = logs[0]
+        size = latest.stat().st_size
+        lines = latest.read_text(encoding="utf-8", errors="replace").strip().split("\n")
+        last_line = lines[-1] if lines and lines[0] else "(empty)"
+        print(f"Latest log: {latest.name} ({size:,} bytes)")
+        print(f"Last line:  {last_line[:120]}")
+    else:
+        print("No log files found")
+
     return 0
 
 
@@ -202,6 +327,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     # --- screenshot ---
     sub.add_parser("screenshot", help="Take a screenshot via OBS")
+
+    # --- status ---
+    sub.add_parser("status", help="Check running pipeline status")
 
     # --- release-info ---
     sub.add_parser("release-info", help="Show version, commit, and deploy status")
@@ -489,6 +617,9 @@ def main() -> int:
         else:
             print("Screenshot failed", file=sys.stderr)
             return 1
+
+    elif args.command == "status":
+        return _handle_status()
 
     elif args.command == "discover":
         import json as json_mod

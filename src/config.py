@@ -40,6 +40,7 @@ CHROME_FLAGS = [
 ]
 
 # -- Scheduled task names --
+SCHTASK_NAME_PREFIX = "MediaTranscribe_"
 SCHTASK_NAME_CHROME = "MediaTranscribe_Chrome"
 SCHTASK_NAME_OBS = "MediaTranscribe_OBS"
 TEMP_BAT_DIR = SCRIPTS_DIR / "temp"

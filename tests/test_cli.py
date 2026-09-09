@@ -95,3 +95,10 @@ def test_cli_release_info_args():
     parser = build_parser()
     args = parser.parse_args(["release-info"])
     assert args.command == "release-info"
+
+
+def test_cli_status_args():
+    from cli import build_parser
+    parser = build_parser()
+    args = parser.parse_args(["status"])
+    assert args.command == "status"

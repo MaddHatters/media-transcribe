@@ -89,6 +89,16 @@ uv run cli.py transcribe ... --foreground
 
 Long-running commands auto-detach when run via SSH. Output goes to log files in `C:\Users\Matt\agent-control\logs\`.
 
+### Background Execution
+
+Long-running commands (record, transcribe, analyze, pipeline, watch) auto-background.
+
+- **Over SSH on Windows**: Uses Windows scheduled task with `/it` flag (runs in interactive session, survives SSH disconnect)
+- **Local/interactive**: Uses `subprocess.Popen` with `CREATE_NO_WINDOW` (Windows) or `start_new_session` (Linux)
+- **Force foreground**: Add `--foreground` flag
+
+Check status: `uv run cli.py status`
+
 ### Automated Watch
 
 ```bash
