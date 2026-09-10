@@ -37,6 +37,9 @@ CHROME_FLAGS = [
     "--remote-debugging-port=9222",
     "--start-maximized",
     "--autoplay-policy=no-user-gesture-required",
+    "--disable-session-crashed-bubble",
+    "--noerrdialogs",
+    "--disable-infobars",
 ]
 
 # -- Scheduled task names --

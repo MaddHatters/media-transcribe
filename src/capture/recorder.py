@@ -45,6 +45,15 @@ class Recorder:
         result = RecordResult(url=url, filename=filename)
 
         try:
+            # Clean up stale Chrome tabs before recording
+            from src.capture.window import clean_chrome_tabs
+            try:
+                closed = await asyncio.to_thread(clean_chrome_tabs)
+                if closed:
+                    log.info("Cleaned up %d stale Chrome tab(s)", closed)
+            except Exception as e:
+                log.warning("Tab cleanup failed (non-fatal): %s", e)
+
             log.info("[1/10] Navigating to %s", url)
             await cdp.js(
                 "if(document.fullscreenElement) document.exitFullscreen(); 'ok'"

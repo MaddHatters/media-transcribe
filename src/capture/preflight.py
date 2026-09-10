@@ -48,6 +48,14 @@ class Preflight:
         gates.append(GateResult("Chrome CDP", chrome_ok))
         if not chrome_ok:
             all_ok = False
+        else:
+            try:
+                from src.capture.window import clean_chrome_tabs
+                closed = clean_chrome_tabs()
+                if closed:
+                    log.info("Cleaned %d stale tab(s) during preflight", closed)
+            except Exception:
+                pass
 
         obs_ok = self._ensure_obs()
         gates.append(GateResult("OBS WebSocket", obs_ok))

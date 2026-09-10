@@ -90,6 +90,41 @@ def find_window(class_name: str | None = None, title_contains: str | None = None
     return None
 
 
+def clean_chrome_tabs(cdp_url: str = "http://localhost:9222") -> int:
+    """Close all Chrome tabs except one. Returns number of tabs closed.
+
+    Sync function (uses urllib, not the CDP WebSocket) — call directly from
+    sync code, or via `asyncio.to_thread(clean_chrome_tabs)` from async code.
+    """
+    import json
+    import urllib.request
+
+    try:
+        data = urllib.request.urlopen(f"{cdp_url}/json", timeout=5).read()
+        targets = json.loads(data)
+    except Exception as e:
+        log.warning("clean_chrome_tabs: failed to list targets: %s", e)
+        return 0
+
+    pages = [t for t in targets if t.get("type") == "page"]
+
+    if len(pages) <= 1:
+        return 0
+
+    closed = 0
+    # Keep the first page, close the rest
+    for page in pages[1:]:
+        try:
+            target_id = page["id"]
+            urllib.request.urlopen(f"{cdp_url}/json/close/{target_id}", timeout=5)
+            closed += 1
+            log.info("Closed stale tab: %s", page.get("title", "untitled")[:60])
+        except Exception as e:
+            log.warning("Failed to close tab %s: %s", page.get("id"), e)
+
+    return closed
+
+
 def minimize_window(hwnd: int) -> None:
     if not IS_WINDOWS or not hwnd:
         return
