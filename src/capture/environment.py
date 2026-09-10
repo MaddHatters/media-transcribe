@@ -111,6 +111,47 @@ def _obs_connect():
     )
 
 
+def _configure_obs_window(client) -> bool:
+    """Set OBS Window Capture to the current (non-blank) Chrome window.
+
+    Re-resolves from OBS's live window list every call — the class name
+    'Chrome_WidgetWin_1' is present in every Chrome window string, so a
+    substring check against the currently-set value can never detect that
+    the target has gone stale (e.g. pinned to an about:blank window).
+    """
+    settings = client.get_input_settings("Window Capture")
+    current = settings.input_settings.get("window", "")
+
+    props = client.get_input_properties_list_property_items("Window Capture", "window")
+    chrome_windows = [
+        p for p in props.property_items
+        if p.get("itemEnabled") and "chrome.exe" in p.get("itemValue", "").lower()
+    ]
+
+    if not chrome_windows:
+        log.warning("No Chrome windows available in OBS")
+        return False
+
+    # Pick the one that is NOT about:blank (prefer the page with content)
+    best = None
+    for w in chrome_windows:
+        name = w.get("itemName", "")
+        if "about:blank" not in name.lower() and "about#3ablank" not in name.lower():
+            best = w
+            break
+
+    # Fallback to first available if all are about:blank
+    if not best:
+        best = chrome_windows[0]
+
+    new_window = best["itemValue"]
+    if new_window != current:
+        client.set_input_settings("Window Capture", {"window": new_window}, True)
+        log.info("OBS Window Capture -> %s", best.get("itemName", "")[:60])
+
+    return True
+
+
 class EnvironmentManager:
     def __init__(self, cdp_url: str = CDP_URL):
         self._cdp_url = cdp_url
@@ -212,14 +253,7 @@ class EnvironmentManager:
         try:
             client = _obs_connect()
             try:
-                current = client.get_input_settings("Window Capture")
-                current_window = current.input_settings.get("window", "")
-                if "Chrome_WidgetWin_1" not in current_window:
-                    client.set_input_settings(
-                        "Window Capture",
-                        {"window": "Chrome_WidgetWin_1"},
-                        True,
-                    )
+                _configure_obs_window(client)
                 client.set_input_settings(
                     "Desktop Audio",
                     {"device_id": "default"},
