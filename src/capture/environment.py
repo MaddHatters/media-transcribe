@@ -192,7 +192,13 @@ def restart_obs() -> bool:
     time.sleep(2)
 
     # 4. Relaunch via _launch_app()
-    launched = _launch_app(OBS_PATH, ["--minimize-to-tray"], SCHTASK_NAME_OBS)
+    #    --disable-shutdown-check prevents the crash-recovery dialog that
+    #    OBS shows when the prior instance was killed via taskkill.
+    launched = _launch_app(
+        OBS_PATH,
+        ["--minimize-to-tray", "--disable-shutdown-check"],
+        SCHTASK_NAME_OBS,
+    )
     if not launched:
         log.error("Failed to relaunch OBS")
         return False
