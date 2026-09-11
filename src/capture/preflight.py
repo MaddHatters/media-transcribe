@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 DISK_MIN_GB = 5
-PREFLIGHT_VIDEO_URL = "file:///C:/Users/Matt/agent-control/scripts/audio_test.html"
+PREFLIGHT_VIDEO_URL = "file:///C:/Users/Matt/transcribe/test_assets/preflight_av_test.html"
 
 
 @dataclass
@@ -249,7 +249,7 @@ def _check_video_black(path: str) -> bool:
             return True
 
         ratio = total_black / total_duration
-        log.debug("[test-rec] Black ratio: %.2f (%.1fs / %.1fs)", ratio, total_black, total_duration)
+        log.info("[test-rec] Black ratio: %.2f (%.1fs black / %.1fs total)", ratio, total_black, total_duration)
         return ratio < 0.8
     except Exception as exc:
         log.warning("[test-rec] Black-frame check error: %s", exc)

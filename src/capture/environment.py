@@ -103,6 +103,35 @@ def _launch_app(exe_path: Path, args: list[str], task_name: str) -> bool:
         return False
 
 
+def _clean_chrome_crash_state() -> None:
+    """Reset Chrome's exit_type so the 'Restore pages?' dialog doesn't appear.
+
+    When Chrome is killed via ``taskkill``, it sets ``exit_type`` to
+    ``"Crashed"`` in ``Preferences``.  On next launch Chrome shows a
+    blocking "Restore pages?" dialog that prevents normal operation.
+
+    Setting ``exit_type`` back to ``"Normal"`` before relaunch suppresses
+    the dialog entirely.
+    """
+    from src.config import CHROME_PROFILE
+
+    prefs_path = CHROME_PROFILE / "Default" / "Preferences"
+    if not prefs_path.exists():
+        return
+    try:
+        content = prefs_path.read_text(encoding="utf-8")
+        data = json.loads(content)
+        if data.get("profile", {}).get("exit_type") != "Normal":
+            data.setdefault("profile", {})["exit_type"] = "Normal"
+            prefs_path.write_text(
+                json.dumps(data, separators=(",", ":")),
+                encoding="utf-8",
+            )
+            log.info("Reset Chrome exit_type to Normal")
+    except Exception as e:
+        log.warning("Failed to clean Chrome crash state: %s", e)
+
+
 def restart_chrome() -> bool:
     """Kill all Chrome processes and relaunch fresh with correct flags.
 
@@ -131,6 +160,8 @@ def restart_chrome() -> bool:
         log.warning("Chrome kill failed (may not be running): %s", e)
 
     time.sleep(2)  # let processes fully exit
+
+    _clean_chrome_crash_state()
 
     launched = _launch_app(CHROME_PATH, list(CHROME_FLAGS), SCHTASK_NAME_CHROME)
     if not launched:
@@ -398,16 +429,33 @@ def _obs_connect():
 
 
 def _configure_obs_window(client) -> bool:
-    """Set OBS Window Capture to the current (non-blank) Chrome window.
+    """Set OBS Window Capture to the current Chrome window and ensure it is enabled.
 
-    Re-resolves from OBS's live window list every call — the class name
-    'Chrome_WidgetWin_1' is present in every Chrome window string, so a
-    substring check against the currently-set value can never detect that
-    the target has gone stale (e.g. pinned to an about:blank window).
+    Always re-resolves from OBS's live window list and force-sets the
+    target.  This is necessary because:
+
+    1. The window **handle** changes every time Chrome restarts, even if
+       the title/class/exe string looks the same.
+    2. The scene item may have been disabled by external scripts (e.g.
+       ``FixOBS``), so we must explicitly re-enable it.
+    3. When Chrome navigates, the title portion of the OBS window
+       identifier changes and OBS loses the match.  Re-setting the
+       value from the live list picks up the current title.
     """
-    settings = client.get_input_settings("Window Capture")
-    current = settings.input_settings.get("window", "")
+    # --- Ensure the Window Capture scene item is enabled ---
+    try:
+        items = client.get_scene_item_list("Scene")
+        for item in items.scene_items:
+            if item.get("sourceName") == "Window Capture":
+                item_id = item["sceneItemId"]
+                if not item.get("sceneItemEnabled"):
+                    client.set_scene_item_enabled("Scene", item_id, True)
+                    log.info("Enabled Window Capture scene item (id=%d)", item_id)
+                break
+    except Exception as e:
+        log.warning("Could not check/enable Window Capture scene item: %s", e)
 
+    # --- Retarget to the current Chrome window ---
     props = client.get_input_properties_list_property_items("Window Capture", "window")
     chrome_windows = [
         p for p in props.property_items
@@ -431,9 +479,10 @@ def _configure_obs_window(client) -> bool:
         best = chrome_windows[0]
 
     new_window = best["itemValue"]
-    if new_window != current:
-        client.set_input_settings("Window Capture", {"window": new_window}, True)
-        log.info("OBS Window Capture -> %s", best.get("itemName", "")[:60])
+    # Always set — even if the string matches, the underlying window
+    # handle may have changed after a Chrome restart.
+    client.set_input_settings("Window Capture", {"window": new_window}, True)
+    log.info("OBS Window Capture -> %s", best.get("itemName", "")[:60])
 
     return True
 
@@ -467,6 +516,53 @@ class EnvironmentManager:
             return False, messages
 
         return True, messages
+
+    def _prime_chrome_content(self) -> None:
+        """Navigate Chrome to a coloured page so the window isn't blank.
+
+        OBS Window-Capture (WGC) initialises with whatever the target
+        window is currently showing.  If Chrome is on about:blank the
+        first capture frames are black, which fails the preflight
+        video-black gate.  Loading a bright data-URI gives WGC non-black
+        pixels from the moment the capture session starts.
+        """
+        _COLOUR_PAGE = (
+            "data:text/html,"
+            "<html><body style='margin:0;background:%2316a085;"
+            "display:flex;align-items:center;justify-content:center;"
+            "height:100vh'>"
+            "<h1 style='color:white;font-size:4em'>Preflight</h1>"
+            "</body></html>"
+        )
+        try:
+            # Get the first available tab's webSocketDebuggerUrl
+            data = urllib.request.urlopen(
+                f"{self._cdp_url}/json", timeout=5,
+            ).read()
+            tabs = json.loads(data)
+            ws_url = None
+            for tab in tabs:
+                if tab.get("type") == "page":
+                    ws_url = tab.get("webSocketDebuggerUrl")
+                    break
+            if not ws_url:
+                log.warning("No Chrome page tab found for priming")
+                return
+
+            import websockets.sync.client as ws_sync
+
+            conn = ws_sync.connect(ws_url)
+            conn.send(json.dumps({
+                "id": 1,
+                "method": "Page.navigate",
+                "params": {"url": _COLOUR_PAGE},
+            }))
+            conn.recv(timeout=5)
+            conn.close()
+            time.sleep(1)  # let the page render
+            log.info("Primed Chrome with colour page for WGC")
+        except Exception as exc:
+            log.warning("Chrome content priming failed (non-fatal): %s", exc)
 
     def teardown(self) -> tuple[bool, list[str]]:
         messages: list[str] = []
