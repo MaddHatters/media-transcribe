@@ -125,6 +125,48 @@ def clean_chrome_tabs(cdp_url: str = "http://localhost:9222") -> int:
     return closed
 
 
+def close_stale_chrome_windows() -> int:
+    """Close small/stale Chrome windows via Win32, keeping only the main browser window."""
+    if not IS_WINDOWS:
+        return 0
+
+    import ctypes
+    import ctypes.wintypes
+    user32 = ctypes.windll.user32
+
+    candidates = []
+    @ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
+    def enum_cb(hwnd, _):
+        cls = ctypes.create_unicode_buffer(256)
+        user32.GetClassNameW(hwnd, cls, 256)
+        if cls.value == "Chrome_WidgetWin_1":
+            rect = ctypes.wintypes.RECT()
+            user32.GetWindowRect(hwnd, ctypes.byref(rect))
+            w = rect.right - rect.left
+            h = rect.bottom - rect.top
+            title = ctypes.create_unicode_buffer(256)
+            user32.GetWindowTextW(hwnd, title, 256)
+            candidates.append((hwnd, w, h, title.value))
+        return True
+
+    user32.EnumWindows(enum_cb, 0)
+
+    if len(candidates) <= 1:
+        return 0
+
+    largest = max(candidates, key=lambda x: x[1] * x[2])
+    WM_CLOSE = 0x0010
+    closed = 0
+    for hwnd, w, h, title in candidates:
+        if hwnd == largest[0]:
+            continue
+        user32.PostMessageW(hwnd, WM_CLOSE, 0, 0)
+        log.info("Closed stale Chrome window: %dx%d '%s'", w, h, title[:60])
+        closed += 1
+
+    return closed
+
+
 def minimize_window(hwnd: int) -> None:
     if not IS_WINDOWS or not hwnd:
         return

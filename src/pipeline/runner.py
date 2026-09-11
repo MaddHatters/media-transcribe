@@ -58,6 +58,14 @@ class Pipeline:
         if not obs_ok:
             log.warning("[health] OBS WebSocket lost — attempting recovery")
 
+        from src.capture.window import close_stale_chrome_windows
+        try:
+            closed = close_stale_chrome_windows()
+            if closed:
+                log.info("[health] Closed %d stale Chrome window(s)", closed)
+        except Exception:
+            pass
+
     async def run(
         self,
         queue: list,

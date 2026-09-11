@@ -54,6 +54,16 @@ class Recorder:
             except Exception as e:
                 log.warning("Tab cleanup failed (non-fatal): %s", e)
 
+            # Clean up stale Chrome windows (restore dialogs, popups) before recording
+            from src.capture.window import close_stale_chrome_windows
+            try:
+                closed_win = await asyncio.to_thread(close_stale_chrome_windows)
+                if closed_win:
+                    log.info("Closed %d stale Chrome window(s)", closed_win)
+                    await asyncio.sleep(1)
+            except Exception as e:
+                log.warning("Window cleanup failed (non-fatal): %s", e)
+
             log.info("[1/10] Navigating to %s", url)
             await cdp.js(
                 "if(document.fullscreenElement) document.exitFullscreen(); 'ok'"
