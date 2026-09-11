@@ -149,6 +149,68 @@ def restart_chrome() -> bool:
     return False
 
 
+def restart_obs() -> bool:
+    """Kill OBS and relaunch fresh. Returns True if OBS WebSocket responds after restart.
+
+    Used at the start of each pipeline run so recordings never inherit
+    stuck recordings, stale window-capture sources, or orphaned state
+    from a prior run. Mirrors ``restart_chrome`` — same SSH-aware launch
+    mechanism and same poll-until-ready pattern.
+
+    Returns True if OBS WebSocket is responding after restart.
+    """
+    if not IS_WINDOWS:
+        log.debug("Not Windows — restart_obs is a no-op")
+        return False
+
+    log.info("Restarting OBS (clean slate)...")
+
+    # 1. Stop any active recording first (graceful)
+    try:
+        client = _obs_connect()
+        try:
+            status = client.get_record_status()
+            if status.output_active:
+                client.stop_record()
+                log.info("Stopped active OBS recording before restart")
+        finally:
+            client.base_client.ws.close()
+    except Exception:
+        pass  # OBS may not be running or WebSocket may be dead
+
+    # 2. Kill obs64.exe process
+    try:
+        subprocess.run(
+            ["taskkill", "/f", "/im", "obs64.exe"],
+            capture_output=True, timeout=10,
+        )
+        log.info("OBS processes killed")
+    except Exception as e:
+        log.warning("OBS kill failed (may not be running): %s", e)
+
+    # 3. Wait for processes to fully exit
+    time.sleep(2)
+
+    # 4. Relaunch via _launch_app()
+    launched = _launch_app(OBS_PATH, ["--minimize-to-tray"], SCHTASK_NAME_OBS)
+    if not launched:
+        log.error("Failed to relaunch OBS")
+        return False
+
+    # 5. Poll OBS WebSocket for up to 30s
+    for _ in range(30):
+        try:
+            client = _obs_connect()
+            client.base_client.ws.close()
+            log.info("OBS WebSocket ready after restart")
+            return True
+        except Exception:
+            time.sleep(1)
+
+    log.error("OBS WebSocket not responding after restart")
+    return False
+
+
 def _obs_connect():
     import obsws_python as obs
     return obs.ReqClient(
@@ -203,14 +265,20 @@ class EnvironmentManager:
         self._cdp_url = cdp_url
 
     def setup(self) -> tuple[bool, list[str]]:
+        """Launch Chrome + OBS with a clean slate and configure OBS sources.
+
+        Always kills and restarts both Chrome and OBS fresh so recordings
+        never inherit ghost processes, stale OBS Window Capture sources,
+        or stuck recordings from a prior run.
+        """
         messages: list[str] = []
 
-        chrome_ok = self._setup_chrome()
+        chrome_ok = restart_chrome()
         messages.append(f"Chrome: {'OK' if chrome_ok else 'FAILED'}")
         if not chrome_ok:
             return False, messages
 
-        obs_ok = self._setup_obs()
+        obs_ok = restart_obs()
         messages.append(f"OBS: {'OK' if obs_ok else 'FAILED'}")
         if not obs_ok:
             return False, messages

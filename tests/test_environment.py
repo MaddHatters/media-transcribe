@@ -148,6 +148,147 @@ def test_launch_app_exception_returns_false():
 
 
 # ---------------------------------------------------------------------------
+# restart_chrome() — module-level clean-slate function
+# ---------------------------------------------------------------------------
+
+def test_restart_chrome_not_windows():
+    from src.capture.environment import restart_chrome
+    with patch("src.capture.environment.IS_WINDOWS", False):
+        result = restart_chrome()
+    assert result is False
+
+
+def test_restart_chrome_success():
+    from src.capture.environment import restart_chrome
+    call_count = 0
+
+    def urlopen_side_effect(url, timeout=None):
+        nonlocal call_count
+        call_count += 1
+        return MagicMock(read=MagicMock(return_value=b'[]'))
+
+    with patch("src.capture.environment.IS_WINDOWS", True), \
+         patch("src.capture.environment.subprocess.run") as mock_run, \
+         patch("src.capture.environment._launch_app", return_value=True), \
+         patch("src.capture.environment.urllib.request.urlopen", side_effect=urlopen_side_effect), \
+         patch("src.capture.environment.time.sleep"):
+        mock_run.return_value = MagicMock(returncode=0)
+        result = restart_chrome()
+    assert result is True
+
+
+def test_restart_chrome_cdp_timeout():
+    from src.capture.environment import restart_chrome
+    with patch("src.capture.environment.IS_WINDOWS", True), \
+         patch("src.capture.environment.subprocess.run") as mock_run, \
+         patch("src.capture.environment._launch_app", return_value=True), \
+         patch("src.capture.environment.urllib.request.urlopen", side_effect=Exception("timeout")), \
+         patch("src.capture.environment.time.sleep"):
+        mock_run.return_value = MagicMock(returncode=0)
+        result = restart_chrome()
+    assert result is False
+
+
+def test_restart_chrome_launch_fails():
+    from src.capture.environment import restart_chrome
+    with patch("src.capture.environment.IS_WINDOWS", True), \
+         patch("src.capture.environment.subprocess.run") as mock_run, \
+         patch("src.capture.environment._launch_app", return_value=False), \
+         patch("src.capture.environment.time.sleep"):
+        mock_run.return_value = MagicMock(returncode=0)
+        result = restart_chrome()
+    assert result is False
+
+
+# ---------------------------------------------------------------------------
+# restart_obs() — module-level clean-slate function
+# ---------------------------------------------------------------------------
+
+def test_restart_obs_not_windows():
+    from src.capture.environment import restart_obs
+    with patch("src.capture.environment.IS_WINDOWS", False):
+        result = restart_obs()
+    assert result is False
+
+
+def test_restart_obs_success():
+    from src.capture.environment import restart_obs
+    mock_client = MagicMock()
+    mock_client.get_record_status.return_value.output_active = False
+
+    connect_count = 0
+
+    def connect_side_effect():
+        nonlocal connect_count
+        connect_count += 1
+        if connect_count == 1:
+            # First call: graceful stop check (no active recording)
+            return mock_client
+        # Subsequent calls: polling after restart
+        return MagicMock()
+
+    with patch("src.capture.environment.IS_WINDOWS", True), \
+         patch("src.capture.environment._obs_connect", side_effect=connect_side_effect), \
+         patch("src.capture.environment.subprocess.run") as mock_run, \
+         patch("src.capture.environment._launch_app", return_value=True), \
+         patch("src.capture.environment.time.sleep"):
+        mock_run.return_value = MagicMock(returncode=0)
+        result = restart_obs()
+    assert result is True
+
+
+def test_restart_obs_stops_active_recording():
+    from src.capture.environment import restart_obs
+    mock_client = MagicMock()
+    mock_client.get_record_status.return_value.output_active = True
+
+    connect_count = 0
+
+    def connect_side_effect():
+        nonlocal connect_count
+        connect_count += 1
+        if connect_count == 1:
+            # First call: recording is active, should stop it
+            return mock_client
+        # Subsequent calls: polling after restart
+        return MagicMock()
+
+    with patch("src.capture.environment.IS_WINDOWS", True), \
+         patch("src.capture.environment._obs_connect", side_effect=connect_side_effect), \
+         patch("src.capture.environment.subprocess.run") as mock_run, \
+         patch("src.capture.environment._launch_app", return_value=True), \
+         patch("src.capture.environment.time.sleep"):
+        mock_run.return_value = MagicMock(returncode=0)
+        result = restart_obs()
+    mock_client.stop_record.assert_called_once()
+    assert result is True
+
+
+def test_restart_obs_websocket_timeout():
+    from src.capture.environment import restart_obs
+    with patch("src.capture.environment.IS_WINDOWS", True), \
+         patch("src.capture.environment._obs_connect", side_effect=Exception("refused")), \
+         patch("src.capture.environment.subprocess.run") as mock_run, \
+         patch("src.capture.environment._launch_app", return_value=True), \
+         patch("src.capture.environment.time.sleep"):
+        mock_run.return_value = MagicMock(returncode=0)
+        result = restart_obs()
+    assert result is False
+
+
+def test_restart_obs_launch_fails():
+    from src.capture.environment import restart_obs
+    with patch("src.capture.environment.IS_WINDOWS", True), \
+         patch("src.capture.environment._obs_connect", side_effect=Exception("not running")), \
+         patch("src.capture.environment.subprocess.run") as mock_run, \
+         patch("src.capture.environment._launch_app", return_value=False), \
+         patch("src.capture.environment.time.sleep"):
+        mock_run.return_value = MagicMock(returncode=0)
+        result = restart_obs()
+    assert result is False
+
+
+# ---------------------------------------------------------------------------
 # EnvironmentManager._setup_chrome
 # ---------------------------------------------------------------------------
 
@@ -283,10 +424,10 @@ def test_configure_obs_handles_failure():
 def test_setup_all_succeed():
     from src.capture.environment import EnvironmentManager
     env = EnvironmentManager()
-    env._setup_chrome = MagicMock(return_value=True)
-    env._setup_obs = MagicMock(return_value=True)
-    env._configure_obs = MagicMock(return_value=True)
-    ok, messages = env.setup()
+    with patch("src.capture.environment.restart_chrome", return_value=True), \
+         patch("src.capture.environment.restart_obs", return_value=True):
+        env._configure_obs = MagicMock(return_value=True)
+        ok, messages = env.setup()
     assert ok is True
     assert len(messages) == 3
 
@@ -294,8 +435,8 @@ def test_setup_all_succeed():
 def test_setup_chrome_fails():
     from src.capture.environment import EnvironmentManager
     env = EnvironmentManager()
-    env._setup_chrome = MagicMock(return_value=False)
-    ok, messages = env.setup()
+    with patch("src.capture.environment.restart_chrome", return_value=False):
+        ok, messages = env.setup()
     assert ok is False
     assert "FAILED" in messages[0]
 
@@ -303,19 +444,19 @@ def test_setup_chrome_fails():
 def test_setup_obs_fails():
     from src.capture.environment import EnvironmentManager
     env = EnvironmentManager()
-    env._setup_chrome = MagicMock(return_value=True)
-    env._setup_obs = MagicMock(return_value=False)
-    ok, messages = env.setup()
+    with patch("src.capture.environment.restart_chrome", return_value=True), \
+         patch("src.capture.environment.restart_obs", return_value=False):
+        ok, messages = env.setup()
     assert ok is False
 
 
 def test_setup_configure_fails():
     from src.capture.environment import EnvironmentManager
     env = EnvironmentManager()
-    env._setup_chrome = MagicMock(return_value=True)
-    env._setup_obs = MagicMock(return_value=True)
-    env._configure_obs = MagicMock(return_value=False)
-    ok, messages = env.setup()
+    with patch("src.capture.environment.restart_chrome", return_value=True), \
+         patch("src.capture.environment.restart_obs", return_value=True):
+        env._configure_obs = MagicMock(return_value=False)
+        ok, messages = env.setup()
     assert ok is False
 
 
