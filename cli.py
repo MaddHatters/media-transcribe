@@ -529,6 +529,15 @@ def main() -> int:
 
         output_dir = Path(args.output_dir) if args.output_dir else BACKUP_DIR
 
+        # Fresh Chrome for each pipeline run — no reuse of stale sessions
+        if has_record:
+            from src.capture.environment import restart_chrome
+            from src.config import IS_WINDOWS
+            if IS_WINDOWS:
+                if not restart_chrome():
+                    print("Failed to restart Chrome — aborting")
+                    return 1
+
         if has_record:
             from src.capture.environment import EnvironmentManager
             env = EnvironmentManager()

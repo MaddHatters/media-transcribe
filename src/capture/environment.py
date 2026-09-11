@@ -103,6 +103,52 @@ def _launch_app(exe_path: Path, args: list[str], task_name: str) -> bool:
         return False
 
 
+def restart_chrome() -> bool:
+    """Kill all Chrome processes and relaunch fresh with correct flags.
+
+    Used at the start of each pipeline run so recordings never inherit
+    stale windows, restore dialogs, or cached session state from a prior
+    run. Relaunch reuses `_launch_app` — the same SSH-aware mechanism
+    `EnvironmentManager._setup_chrome` uses (scheduled task with `/it`
+    when running over SSH, direct `Popen` when local) — so the relaunched
+    Chrome behaves identically to a normal setup() launch.
+
+    Returns True if Chrome CDP is responding after restart.
+    """
+    if not IS_WINDOWS:
+        log.debug("Not Windows — restart_chrome is a no-op")
+        return False
+
+    log.info("Restarting Chrome (clean slate)...")
+
+    try:
+        subprocess.run(
+            ["taskkill", "/f", "/im", "chrome.exe"],
+            capture_output=True, timeout=10,
+        )
+        log.info("Chrome processes killed")
+    except Exception as e:
+        log.warning("Chrome kill failed (may not be running): %s", e)
+
+    time.sleep(2)  # let processes fully exit
+
+    launched = _launch_app(CHROME_PATH, list(CHROME_FLAGS), SCHTASK_NAME_CHROME)
+    if not launched:
+        log.error("Failed to relaunch Chrome")
+        return False
+
+    for _ in range(30):
+        try:
+            urllib.request.urlopen(f"{CDP_URL}/json", timeout=2)
+            log.info("Chrome CDP ready after restart")
+            return True
+        except Exception:
+            time.sleep(1)
+
+    log.error("Chrome CDP not responding after restart")
+    return False
+
+
 def _obs_connect():
     import obsws_python as obs
     return obs.ReqClient(
