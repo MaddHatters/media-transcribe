@@ -226,12 +226,39 @@ head -20 test_output/*/transcript.srt
 
 ## Clean-Slate Behavior
 
-The pipeline kills and restarts both Chrome and OBS fresh at the start of
-every run. This is intentional.
+The pipeline ensures a clean state for both Chrome and OBS at the start of
+every run.
 
-### Why
+### Chrome — full kill + restart
 
-Previous runs can leave behind:
+`restart_chrome()` kills all `chrome.exe` processes via `taskkill /f`, waits
+2 seconds, relaunches with correct flags, and polls CDP for up to 30 seconds.
+Chrome restarts reliably from SSH because CDP is a network protocol that
+doesn't require GPU access.
+
+### OBS — smart reuse
+
+`restart_obs()` uses a **reuse-if-responsive** strategy:
+
+- If OBS WebSocket responds: stops any active recording and returns (no kill)
+- If OBS WebSocket is dead: kills `obs64.exe`, attempts relaunch, polls for 30s
+
+**Why not always kill+restart?** OBS requires GPU access (Direct3D 11) to
+initialize, which is only available in the interactive desktop session. When
+OBS is started via SSH (even with scheduled tasks and `/it` flag), the GPU
+renderer hangs silently and the WebSocket plugin never starts. OBS must be
+started from the physical console or RDP.
+
+If OBS is dead and the pipeline can't restart it:
+
+```bash
+# Connect via RDP and run:
+C:\Users\Matt\transcribe\start_obs.bat
+
+# Or double-click obs64.exe from the desktop
+```
+
+### What clean-slate prevents
 
 - **Ghost Chrome processes** — CDP responds to health checks but there's no
   visible UI window, so OBS Window Capture records a black screen
@@ -240,19 +267,12 @@ Previous runs can leave behind:
 - **Stuck OBS recordings** — a crashed run left OBS in "recording" state,
   blocking the next `start_record` call
 
-### How it works
+### Post-run cleanup
 
-1. `restart_chrome()` — kills all `chrome.exe` processes via `taskkill /f`,
-   waits 2 seconds, relaunches with correct flags, polls CDP for up to 30
-   seconds
-2. `restart_obs()` — gracefully stops any active recording, kills `obs64.exe`
-   via `taskkill /f`, waits 2 seconds, relaunches minimized-to-tray, polls
-   OBS WebSocket for up to 30 seconds
-3. `_configure_obs()` — re-targets Window Capture to the current Chrome
-   window (not `about:blank`), sets Desktop Audio device
-
-The `teardown` step at the end of a pipeline run stops recording, closes
-Chrome via CDP, kills OBS, and cleans up temporary scheduled-task files.
+`_configure_obs()` re-targets Window Capture to the current Chrome window
+and sets the Desktop Audio device. The `teardown` step at the end of a
+pipeline run stops recording, closes Chrome via CDP, kills OBS, and cleans
+up temporary scheduled-task files.
 
 ## Troubleshooting
 
