@@ -186,10 +186,6 @@ class Recorder:
             result.output_path = output_path
             result.ok = True
 
-            await cdp.js(
-                "if(document.fullscreenElement) document.exitFullscreen(); 'ok'"
-            )
-
         except Exception as exc:
             result.error = str(exc)
             log.error("Recording failed: %s", exc)
@@ -198,5 +194,23 @@ class Recorder:
                     await asyncio.to_thread(self.engine.stop)
                 except Exception:
                     pass
+
+        finally:
+            # Post-recording cleanup — always runs (success, failure, or exception).
+            # Restores a clean state so the same tab can be reused for the next video.
+            try:
+                await cdp.js(
+                    "if(document.fullscreenElement) document.exitFullscreen(); 'ok'"
+                )
+                await asyncio.sleep(0.5)
+                await cdp.navigate("about:blank", wait=2.0)
+
+                from src.capture.window import clean_chrome_tabs, close_stale_chrome_windows
+                await asyncio.to_thread(clean_chrome_tabs)
+                await asyncio.to_thread(close_stale_chrome_windows)
+
+                log.info("Post-recording cleanup complete")
+            except Exception as e:
+                log.warning("Post-recording cleanup failed: %s", e)
 
         return result
