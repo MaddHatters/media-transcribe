@@ -383,10 +383,17 @@ def test_configure_obs_sets_window_capture():
     mock_settings = MagicMock()
     mock_settings.input_settings = {"window": "SomeOtherWindow"}
     mock_client.get_input_settings.return_value = mock_settings
+    # Mock the live window list returned by OBS
+    mock_props = MagicMock()
+    mock_props.property_items = [
+        {"itemEnabled": True, "itemValue": "Masterclass:Chrome_WidgetWin_1:chrome.exe",
+         "itemName": "Masterclass — Chrome"},
+    ]
+    mock_client.get_input_properties_list_property_items.return_value = mock_props
     with patch("src.capture.environment._obs_connect", return_value=mock_client):
         result = env._configure_obs()
     mock_client.set_input_settings.assert_any_call(
-        "Window Capture", {"window": "Chrome_WidgetWin_1"}, True,
+        "Window Capture", {"window": "Masterclass:Chrome_WidgetWin_1:chrome.exe"}, True,
     )
     mock_client.set_input_settings.assert_any_call(
         "Desktop Audio", {"device_id": "default"}, True,
@@ -399,8 +406,16 @@ def test_configure_obs_skips_window_if_already_set():
     env = EnvironmentManager()
     mock_client = MagicMock()
     mock_settings = MagicMock()
-    mock_settings.input_settings = {"window": "Chrome_WidgetWin_1:some:details"}
+    chrome_window_value = "Masterclass:Chrome_WidgetWin_1:chrome.exe"
+    mock_settings.input_settings = {"window": chrome_window_value}
     mock_client.get_input_settings.return_value = mock_settings
+    # Mock the live window list — same value as current, so no change needed
+    mock_props = MagicMock()
+    mock_props.property_items = [
+        {"itemEnabled": True, "itemValue": chrome_window_value,
+         "itemName": "Masterclass — Chrome"},
+    ]
+    mock_client.get_input_properties_list_property_items.return_value = mock_props
     with patch("src.capture.environment._obs_connect", return_value=mock_client):
         result = env._configure_obs()
     calls = [c for c in mock_client.set_input_settings.call_args_list
