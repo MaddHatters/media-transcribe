@@ -211,46 +211,53 @@ def test_restart_obs_not_windows():
     assert result is False
 
 
-def test_restart_obs_success():
+def test_restart_obs_reuses_running():
+    """When OBS WebSocket responds, reuse process (no kill/restart)."""
     from src.capture.environment import restart_obs
     mock_client = MagicMock()
     mock_client.get_record_status.return_value.output_active = False
 
-    connect_count = 0
-
-    def connect_side_effect():
-        nonlocal connect_count
-        connect_count += 1
-        if connect_count == 1:
-            # First call: graceful stop check (no active recording)
-            return mock_client
-        # Subsequent calls: polling after restart
-        return MagicMock()
-
     with patch("src.capture.environment.IS_WINDOWS", True), \
-         patch("src.capture.environment._obs_connect", side_effect=connect_side_effect), \
-         patch("src.capture.environment.subprocess.run") as mock_run, \
-         patch("src.capture.environment._launch_app", return_value=True), \
-         patch("src.capture.environment.time.sleep"):
-        mock_run.return_value = MagicMock(returncode=0)
+         patch("src.capture.environment._obs_connect", return_value=mock_client), \
+         patch("src.capture.environment.subprocess.run") as mock_run:
         result = restart_obs()
     assert result is True
+    # Should NOT have called taskkill since OBS was responsive
+    taskkill_calls = [c for c in mock_run.call_args_list
+                      if "taskkill" in str(c)]
+    assert len(taskkill_calls) == 0
 
 
 def test_restart_obs_stops_active_recording():
+    """When OBS has a stuck recording, stop it via WebSocket (no kill)."""
     from src.capture.environment import restart_obs
     mock_client = MagicMock()
     mock_client.get_record_status.return_value.output_active = True
 
+    with patch("src.capture.environment.IS_WINDOWS", True), \
+         patch("src.capture.environment._obs_connect", return_value=mock_client), \
+         patch("src.capture.environment.subprocess.run") as mock_run:
+        result = restart_obs()
+    mock_client.stop_record.assert_called_once()
+    assert result is True
+    # Should NOT have called taskkill since OBS was responsive
+    taskkill_calls = [c for c in mock_run.call_args_list
+                      if "taskkill" in str(c)]
+    assert len(taskkill_calls) == 0
+
+
+def test_restart_obs_kills_and_relaunches_when_dead():
+    """When OBS WebSocket is dead, kill and restart."""
+    from src.capture.environment import restart_obs
     connect_count = 0
 
     def connect_side_effect():
         nonlocal connect_count
         connect_count += 1
         if connect_count == 1:
-            # First call: recording is active, should stop it
-            return mock_client
-        # Subsequent calls: polling after restart
+            # First call: WebSocket dead
+            raise Exception("refused")
+        # After relaunch: WebSocket responds
         return MagicMock()
 
     with patch("src.capture.environment.IS_WINDOWS", True), \
@@ -260,11 +267,11 @@ def test_restart_obs_stops_active_recording():
          patch("src.capture.environment.time.sleep"):
         mock_run.return_value = MagicMock(returncode=0)
         result = restart_obs()
-    mock_client.stop_record.assert_called_once()
     assert result is True
 
 
 def test_restart_obs_websocket_timeout():
+    """When OBS is dead and restart fails to bring up WebSocket."""
     from src.capture.environment import restart_obs
     with patch("src.capture.environment.IS_WINDOWS", True), \
          patch("src.capture.environment._obs_connect", side_effect=Exception("refused")), \
@@ -277,6 +284,7 @@ def test_restart_obs_websocket_timeout():
 
 
 def test_restart_obs_launch_fails():
+    """When OBS is dead and _launch_app fails."""
     from src.capture.environment import restart_obs
     with patch("src.capture.environment.IS_WINDOWS", True), \
          patch("src.capture.environment._obs_connect", side_effect=Exception("not running")), \
