@@ -149,6 +149,162 @@ def restart_chrome() -> bool:
     return False
 
 
+def _clean_obs_crash_markers() -> None:
+    """Remove OBS crash markers so the crash-recovery dialog is less likely.
+
+    OBS 32.x shows a blocking "OBS Studio Crash Detected" dialog when it
+    detects an unclean shutdown. It checks two things:
+      1. ``LastCrashState`` in ``global.ini``
+      2. Whether the most recent log ended with ``==== Shutdown complete ====``
+
+    Cleaning both reduces the chance of the dialog, though OBS may still
+    detect a crash from other signals.  The smart launcher handles the
+    dialog as a fallback (see ``_launch_obs_with_dialog_handler``).
+    """
+    import datetime
+
+    appdata = Path(os.environ.get("APPDATA", ""))
+    obs_dir = appdata / "obs-studio"
+
+    # Fix global.ini — set LastCrashState=false
+    global_ini = obs_dir / "global.ini"
+    if global_ini.exists():
+        try:
+            content = global_ini.read_text(encoding="utf-8")
+            if "LastCrashState=true" in content:
+                content = content.replace("LastCrashState=true", "LastCrashState=false")
+                global_ini.write_text(content, encoding="utf-8")
+                log.info("Set LastCrashState=false in global.ini")
+        except Exception as e:
+            log.warning("Failed to fix global.ini: %s", e)
+
+    # Delete today's incomplete log files (crash remnants)
+    log_dir = obs_dir / "logs"
+    if log_dir.exists():
+        today = datetime.date.today().strftime("%Y-%m-%d")
+        for f in log_dir.glob(f"{today}*.txt"):
+            try:
+                f.unlink()
+                log.debug("Deleted crash log: %s", f.name)
+            except Exception:
+                pass
+
+
+# Language: Python helper script (runs on the interactive desktop via schtasks)
+# This is deployed as a .py file and executed by a scheduled task with /it flag
+# so it can interact with OBS's GUI crash dialog.
+_OBS_SMART_LAUNCHER_SCRIPT = r'''
+import subprocess, time, os, pathlib, socket, ctypes, ctypes.wintypes, sys
+
+obs_exe = sys.argv[1] if len(sys.argv) > 1 else r"C:\Program Files\obs-studio\bin\64bit\obs64.exe"
+ws_port = int(sys.argv[2]) if len(sys.argv) > 2 else 4455
+
+user32 = ctypes.windll.user32
+WNDENUMPROC = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
+
+# Launch OBS
+proc = subprocess.Popen(
+    [obs_exe, "--minimize-to-tray"],
+    cwd=os.path.dirname(obs_exe),
+)
+
+# Monitor for crash dialog and dismiss it; wait for WebSocket
+for attempt in range(45):
+    time.sleep(2)
+    if proc.poll() is not None:
+        sys.exit(proc.poll() or 1)
+
+    # Find crash dialog by title
+    crash_hwnd_holder = [None]
+    def find_crash(hwnd, _):
+        pid = ctypes.wintypes.DWORD()
+        user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+        if pid.value == proc.pid and user32.IsWindowVisible(hwnd):
+            length = user32.GetWindowTextLengthW(hwnd)
+            buf = ctypes.create_unicode_buffer(max(length + 1, 1))
+            user32.GetWindowTextW(hwnd, buf, length + 1)
+            if "Crash" in buf.value or "Safe" in buf.value:
+                crash_hwnd_holder[0] = hwnd
+        return True
+    user32.EnumWindows(WNDENUMPROC(find_crash), 0)
+
+    if crash_hwnd_holder[0]:
+        hwnd = crash_hwnd_holder[0]
+        rect = ctypes.wintypes.RECT()
+        user32.GetWindowRect(hwnd, ctypes.byref(rect))
+        user32.SetForegroundWindow(hwnd)
+        time.sleep(0.5)
+        # "Run in Normal Mode" is the RIGHT button (~80% width, ~85% height)
+        cx = rect.left + int((rect.right - rect.left) * 0.80)
+        cy = rect.top + int((rect.bottom - rect.top) * 0.85)
+        user32.SetCursorPos(cx, cy)
+        time.sleep(0.3)
+        user32.mouse_event(0x0002, 0, 0, 0, 0)  # MOUSEEVENTF_LEFTDOWN
+        time.sleep(0.05)
+        user32.mouse_event(0x0004, 0, 0, 0, 0)  # MOUSEEVENTF_LEFTUP
+        time.sleep(3)
+        continue
+
+    # Check WebSocket port
+    try:
+        s = socket.create_connection(("localhost", ws_port), timeout=2)
+        s.close()
+        sys.exit(0)  # Success
+    except Exception:
+        pass
+
+sys.exit(1)  # Timed out
+'''
+
+
+def _launch_obs_with_dialog_handler() -> bool:
+    """Launch OBS via a smart launcher that dismisses the crash dialog.
+
+    OBS 32.x shows a blocking "OBS Studio Crash Detected" dialog when it
+    detects an unclean shutdown (e.g. after ``taskkill``).  The dialog has
+    two buttons: "Run in Safe Mode" (left) and "Run in Normal Mode" (right).
+
+    Since the dialog is a Qt window, ``EnumChildWindows`` cannot find the
+    buttons (they are not native Win32 controls).  Instead, this launcher
+    uses ``SetCursorPos`` + ``mouse_event`` to click the "Run in Normal
+    Mode" button at its known position (80% width, 85% height of the
+    dialog rect).
+
+    The smart launcher script is deployed as a ``.py`` file and executed
+    by a scheduled task with ``/it`` (interactive) so it can interact
+    with the OBS GUI on the desktop session.
+
+    Returns True if the scheduled task was created and started.
+    """
+    TEMP_BAT_DIR.mkdir(parents=True, exist_ok=True)
+    launcher_path = TEMP_BAT_DIR / "obs_smart_launcher.py"
+    launcher_path.write_text(_OBS_SMART_LAUNCHER_SCRIPT, encoding="utf-8")
+
+    task_name = SCHTASK_NAME_OBS
+    result = subprocess.run(
+        [
+            "schtasks", "/create", "/tn", task_name,
+            "/tr", f'py -3 "{launcher_path}" "{OBS_PATH}" {OBS_PORT}',
+            "/sc", "once", "/st", "00:00", "/f", "/it", "/ru", "Matt",
+        ],
+        capture_output=True, text=True,
+    )
+    if result.returncode != 0:
+        log.error("schtasks /create failed: %s", result.stderr)
+        return False
+
+    result = subprocess.run(
+        ["schtasks", "/run", "/tn", task_name],
+        capture_output=True, text=True,
+    )
+    if result.returncode != 0:
+        log.error("schtasks /run failed: %s", result.stderr)
+        return False
+
+    log.info("OBS smart launcher scheduled task started")
+    return True
+
+
 def restart_obs() -> bool:
     """Ensure OBS is in a clean state for a new pipeline run.
 
@@ -158,9 +314,11 @@ def restart_obs() -> bool:
           that prevent OBS from restarting via scheduled task over SSH)
 
     If OBS WebSocket is dead (ghost process or not running):
-        - Kill obs64.exe
-        - Relaunch via _launch_app() with --disable-shutdown-check
-        - Poll WebSocket for up to 30s
+        - Kill obs64.exe and clean crash markers
+        - Relaunch via smart launcher that handles the OBS 32.x crash
+          dialog ("Run in Normal Mode" vs "Run in Safe Mode")
+        - Poll WebSocket for up to 90s (OBS may need time to initialize
+          D3D11 after the dialog is dismissed)
 
     Window Capture retargeting happens in _configure_obs() after this
     function returns, so stale sources are fixed regardless of whether
@@ -190,7 +348,7 @@ def restart_obs() -> bool:
     except Exception:
         log.info("OBS WebSocket not responding — killing and restarting")
 
-    # 2. OBS not responding — kill and attempt restart
+    # 2. OBS not responding — kill and clean up crash markers
     try:
         subprocess.run(
             ["taskkill", "/f", "/im", "obs64.exe"],
@@ -201,30 +359,33 @@ def restart_obs() -> bool:
         log.warning("OBS kill failed (may not be running): %s", e)
 
     time.sleep(2)
+    _clean_obs_crash_markers()
 
-    # 3. Relaunch via _launch_app()
-    #    --disable-shutdown-check prevents the crash-recovery dialog that
-    #    OBS shows when the prior instance was killed via taskkill.
-    launched = _launch_app(
-        OBS_PATH,
-        ["--minimize-to-tray", "--disable-shutdown-check"],
-        SCHTASK_NAME_OBS,
-    )
+    # 3. Launch OBS via the smart launcher that handles the crash dialog.
+    #    The launcher runs on the interactive desktop (via schtasks /it)
+    #    and clicks "Run in Normal Mode" if the crash dialog appears.
+    if is_ssh_session():
+        launched = _launch_obs_with_dialog_handler()
+    else:
+        # Local session — launch directly, no dialog handler needed
+        launched = _launch_app(
+            OBS_PATH, ["--minimize-to-tray"], SCHTASK_NAME_OBS,
+        )
     if not launched:
         log.error("Failed to relaunch OBS")
         return False
 
-    # 4. Poll OBS WebSocket for up to 30s
-    for _ in range(30):
+    # 4. Poll OBS WebSocket for up to 90s (crash dialog + D3D11 init)
+    for i in range(45):
         try:
             client = _obs_connect()
             client.base_client.ws.close()
-            log.info("OBS WebSocket ready after restart")
+            log.info("OBS WebSocket ready after restart (%ds)", i * 2)
             return True
         except Exception:
-            time.sleep(1)
+            time.sleep(2)
 
-    log.error("OBS WebSocket not responding after restart")
+    log.error("OBS WebSocket not responding after restart (90s timeout)")
     return False
 
 
