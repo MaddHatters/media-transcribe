@@ -8,11 +8,18 @@ if TYPE_CHECKING:
     from src.cdp import CDPClient
 
 
+def title_to_filename(title: str) -> str:
+    bad = '<>:"/\\|?*'
+    cleaned = "".join("_" if c in bad else c for c in title).strip()
+    return cleaned if cleaned.strip("_ ") else "episode"
+
+
 @dataclass
 class Post:
     url: str
     title: str
     filename: str = ""
+    post_type: str = ""
     player_type: str | None = None
     duration: float | None = None
     recorded: bool = False
@@ -20,9 +27,7 @@ class Post:
 
     def __post_init__(self):
         if not self.filename:
-            bad = '<>:"/\\|?*'
-            cleaned = "".join("_" if c in bad else c for c in self.title).strip()
-            self.filename = cleaned if cleaned.strip("_ ") else "episode"
+            self.filename = title_to_filename(self.title)
 
 
 @runtime_checkable

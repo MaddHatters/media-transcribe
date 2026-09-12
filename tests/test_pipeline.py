@@ -314,3 +314,68 @@ async def test_no_record_mode_no_crash():
         results = await pipeline.run(posts, steps=["transcribe", "correct"])
         assert len(results) == 1
         assert not results[0].steps_failed
+
+
+# --- Catalog write-back ---
+
+@pytest.mark.asyncio
+async def test_write_back_on_success():
+    from src.catalog import extract_post_id
+    mock_catalog = MagicMock()
+    pipeline = Pipeline(source=None, engine=None, catalog=mock_catalog)
+    posts = [MagicMock(url="https://www.patreon.com/posts/12345", title="A", filename="a")]
+
+    with patch.object(pipeline, "_process_one", new_callable=AsyncMock) as mock_p:
+        mock_p.return_value = PipelineResult(
+            post_url="https://www.patreon.com/posts/12345", post_title="A",
+        )
+        await pipeline.run(posts, steps=["transcribe"])
+
+    mock_catalog.update_post.assert_called_once()
+    call_args = mock_catalog.update_post.call_args
+    assert call_args[0][0] == "12345"
+    assert call_args[0][1]["ingested_status"] == "complete"
+
+
+@pytest.mark.asyncio
+async def test_write_back_on_failure():
+    mock_catalog = MagicMock()
+    pipeline = Pipeline(source=None, engine=None, catalog=mock_catalog)
+    posts = [MagicMock(url="https://www.patreon.com/posts/99999", title="A", filename="a")]
+
+    with patch.object(pipeline, "_process_one", new_callable=AsyncMock) as mock_p:
+        mock_p.return_value = PipelineResult(
+            post_url="https://www.patreon.com/posts/99999", post_title="A",
+            steps_failed={"record": "OBS timeout"},
+        )
+        await pipeline.run(posts, steps=["record"])
+
+    call_args = mock_catalog.update_post.call_args
+    assert call_args[0][1]["ingested_status"] == "failed"
+    assert "OBS timeout" in call_args[0][1]["error"]
+
+
+@pytest.mark.asyncio
+async def test_no_write_back_without_catalog():
+    pipeline = Pipeline(source=None, engine=None, catalog=None)
+    posts = [MagicMock(url="http://a", title="A", filename="a")]
+
+    with patch.object(pipeline, "_process_one", new_callable=AsyncMock) as mock_p:
+        mock_p.return_value = PipelineResult(post_url="http://a", post_title="A")
+        results = await pipeline.run(posts, steps=["transcribe"])
+        assert len(results) == 1
+
+
+def test_extract_post_id_simple():
+    from src.catalog import extract_post_id
+    assert extract_post_id("https://www.patreon.com/posts/154133781") == "154133781"
+
+
+def test_extract_post_id_slug():
+    from src.catalog import extract_post_id
+    assert extract_post_id("https://www.patreon.com/firedupwealth/posts/degen-gambling-165364356") == "165364356"
+
+
+def test_extract_post_id_with_query():
+    from src.catalog import extract_post_id
+    assert extract_post_id("https://www.patreon.com/posts/12345?utm=foo") == "12345"

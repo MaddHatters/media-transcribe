@@ -4,12 +4,16 @@ from __future__ import annotations
 import asyncio
 import logging
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from src.catalog import CatalogManager
     from src.engines.base import CaptureEngine
     from src.sources.base import Post, Source
+
+from src.catalog import extract_post_id
 
 log = logging.getLogger(__name__)
 
@@ -35,12 +39,14 @@ class PipelineResult:
 
 class Pipeline:
     def __init__(self, source, engine, output_dir: Path | None = None,
-                 enable_breaks: bool = False, preflight=None):
+                 enable_breaks: bool = False, preflight=None,
+                 catalog: CatalogManager | None = None):
         self._source = source
         self._engine = engine
         self._output_dir = output_dir or Path(".")
         self._enable_breaks = enable_breaks
         self._preflight = preflight
+        self._catalog = catalog
 
     def _validate_steps(self, steps: list[str]) -> list[str]:
         for s in steps:
@@ -85,11 +91,14 @@ class Pipeline:
                     results.append(result)
                 except Exception as exc:
                     log.error("Pipeline failed for %s: %s", getattr(post, 'url', post), exc)
-                    results.append(PipelineResult(
+                    result = PipelineResult(
                         post_url=getattr(post, 'url', str(post)),
                         post_title=getattr(post, 'title', ''),
                         steps_failed={"pipeline": str(exc)},
-                    ))
+                    )
+                    results.append(result)
+
+                self._write_back_to_catalog(post, result)
 
                 if "record" in active_steps and i < len(queue) - 1:
                     self._health_check()
@@ -113,6 +122,42 @@ class Pipeline:
                 log.warning("[pipeline-guard] Stopped recording after crash")
         except Exception:
             pass
+
+    def _write_back_to_catalog(self, post, result: PipelineResult) -> None:
+        if not self._catalog:
+            return
+        post_id = extract_post_id(getattr(post, "url", ""))
+        if not post_id:
+            return
+        updates: dict = {}
+        if result.steps_failed:
+            updates["ingested_status"] = "failed"
+            updates["error"] = "; ".join(
+                f"{k}: {v}" for k, v in result.steps_failed.items()
+            )
+        else:
+            updates["ingested_status"] = "complete"
+            updates["ingested_at"] = datetime.now(timezone.utc).isoformat()
+            recording = result.output_paths.get("recording", "")
+            if recording:
+                try:
+                    updates["recording_mb"] = round(
+                        Path(recording).stat().st_size / (1024 * 1024), 1
+                    )
+                except OSError:
+                    pass
+                updates["output_path"] = recording
+            txt_path = result.output_paths.get("transcript_txt", "")
+            if txt_path:
+                try:
+                    words = len(Path(txt_path).read_text(encoding="utf-8").split())
+                    updates["transcript_words"] = words
+                except OSError:
+                    pass
+        try:
+            self._catalog.update_post(post_id, updates)
+        except KeyError:
+            log.warning("Post %s not found in catalog — skipping write-back", post_id)
 
     async def _process_one(self, post, steps: list[str]) -> PipelineResult:
         result = PipelineResult(

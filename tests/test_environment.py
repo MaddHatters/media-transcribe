@@ -409,15 +409,11 @@ def test_configure_obs_sets_window_capture():
     assert result is True
 
 
-def test_configure_obs_skips_window_if_already_set():
+def test_configure_obs_always_sets_window_even_if_unchanged():
     from src.capture.environment import EnvironmentManager
     env = EnvironmentManager()
     mock_client = MagicMock()
-    mock_settings = MagicMock()
     chrome_window_value = "Masterclass:Chrome_WidgetWin_1:chrome.exe"
-    mock_settings.input_settings = {"window": chrome_window_value}
-    mock_client.get_input_settings.return_value = mock_settings
-    # Mock the live window list — same value as current, so no change needed
     mock_props = MagicMock()
     mock_props.property_items = [
         {"itemEnabled": True, "itemValue": chrome_window_value,
@@ -428,7 +424,8 @@ def test_configure_obs_skips_window_if_already_set():
         result = env._configure_obs()
     calls = [c for c in mock_client.set_input_settings.call_args_list
              if c[0][0] == "Window Capture"]
-    assert len(calls) == 0
+    assert len(calls) == 1
+    assert calls[0][0][1] == {"window": chrome_window_value}
     assert result is True
 
 

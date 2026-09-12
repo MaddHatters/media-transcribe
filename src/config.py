@@ -16,6 +16,7 @@ OBS_PATH = Path(r"C:\Program Files\obs-studio\bin\64bit\obs64.exe")
 # -- Paths: devbox-01 (Linux) --
 LOCAL_TRANSCRIPTS = Path("/mnt/secondary/media/patreon/FIRE Investing Masterclass/transcripts")
 LOCAL_DATA = Path("/home/tuna/repos/media-transcribe/data")
+CATALOG_PATH = LOCAL_DATA / "patreon_full_catalog.json"
 
 # -- Network --
 CDP_URL = "http://localhost:9222"

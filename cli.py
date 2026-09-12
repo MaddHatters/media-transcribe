@@ -28,6 +28,9 @@ import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
+from src.config import CATALOG_PATH
+from src.sources.base import title_to_filename
+
 LONG_RUNNING_COMMANDS = {"record", "transcribe", "analyze", "pipeline", "watch"}
 
 
@@ -292,7 +295,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     # --- pipeline ---
     p = sub.add_parser("pipeline", help="Run the full pipeline")
-    p.add_argument("--queue", required=True, help="Queue JSON file")
+    p.add_argument("--queue", required=False, default=None, help="Queue JSON file")
+    p.add_argument("--from-catalog", default=None, metavar="PATH", nargs="?",
+        const=str(CATALOG_PATH),
+        help="Read unprocessed posts from catalog file")
     p.add_argument("--steps", default=None, help="Comma-separated step names")
     p.add_argument("--output-dir", default=None,
         help="Output directory for recordings (default: D:\\MasterClass Video Backup)")
@@ -334,6 +340,16 @@ def build_parser() -> argparse.ArgumentParser:
     # --- release-info ---
     sub.add_parser("release-info", help="Show version, commit, and deploy status")
 
+    # --- catalog-refresh ---
+    cr = sub.add_parser("catalog-refresh", help="Refresh catalog from Patreon public API")
+    cr.add_argument("--catalog", default=str(CATALOG_PATH),
+        help="Catalog file path")
+    cr.add_argument("--campaign-id", default="5008493")
+    cr.add_argument("--full", action="store_true",
+        help="Paginate through all posts (slow, respects cooldown)")
+    cr.add_argument("--force", action="store_true",
+        help="Ignore cooldown timer")
+
     # --- discover ---
     d = sub.add_parser("discover", help="Discover content from Patreon")
     d.add_argument("--full-catalog", action="store_true",
@@ -342,7 +358,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Only discover video posts (default: True)")
     d.add_argument("--all-types", action="store_true",
         help="Discover all post types, not just video")
-    d.add_argument("--output", default="data/patreon_catalog.json",
+    d.add_argument("--output", default=str(CATALOG_PATH),
         help="Catalog output path")
     d.add_argument("--queue-new", default=None,
         help="Write new (unrecorded) video posts to a queue file")
@@ -482,17 +498,55 @@ def main() -> int:
 
     elif args.command == "pipeline":
         import asyncio
+        import logging
         from src.pipeline.runner import Pipeline
         from src.capture.batch import load_queue, filter_unseen, mild_shuffle
         from src.sources.base import Post
         from src.config import BACKUP_DIR
 
-        queue_data = load_queue(Path(args.queue))
+        log = logging.getLogger("cli")
+
+        if args.from_catalog and args.queue:
+            print("Error: --from-catalog and --queue are mutually exclusive")
+            return 1
+        if not args.from_catalog and not args.queue:
+            print("Error: one of --queue or --from-catalog is required")
+            return 1
+
+        catalog_mgr = None
+        if args.from_catalog:
+            from src.catalog import CatalogManager
+            catalog_mgr = CatalogManager(Path(args.from_catalog))
+            pending = catalog_mgr.get_pending()
+            processable = []
+            skip_updates: dict[str, dict] = {}
+            for entry in pending:
+                pt = entry.get("post_type", "")
+                if entry.get("has_video"):
+                    processable.append(entry)
+                elif pt == "poll":
+                    skip_updates[entry["post_id"]] = {
+                        "ingested_status": "skipped",
+                        "error": "poll posts not ingested",
+                    }
+                else:
+                    skip_updates[entry["post_id"]] = {
+                        "ingested_status": "skipped",
+                        "error": f"{pt} handler not yet implemented",
+                    }
+                    log.info("Skipping post_type=%s: handler not yet implemented", pt)
+            if skip_updates:
+                catalog_mgr.update_posts_batch(skip_updates)
+            queue_data = [{"url": e["url"], "filename": title_to_filename(e["title"]),
+                           "post_type": e.get("post_type", "")} for e in processable]
+        else:
+            queue_data = load_queue(Path(args.queue))
+
         steps = [s.replace("-", "_") for s in args.steps.split(",")] if args.steps else None
         has_record = not steps or "record" in steps
 
         skipped_seen = 0
-        if has_record:
+        if has_record and not args.from_catalog:
             queue_data, skipped_seen = filter_unseen(queue_data)
             if skipped_seen:
                 print(f"Skipping {skipped_seen} already-recorded URL(s)")
@@ -504,7 +558,8 @@ def main() -> int:
             return 0
 
         if args.start_at:
-            print(f"   Queue: {args.queue} ({len(queue_data)} videos)")
+            label = args.from_catalog or args.queue
+            print(f"   Queue: {label} ({len(queue_data)} videos)")
             rc = wait_until(args.start_at)
             if rc:
                 return rc
@@ -513,7 +568,8 @@ def main() -> int:
             print("*** TEST MODE — using local test video ***")
 
         posts = [Post(url=e["url"], title=e.get("title", e["filename"]),
-                      filename=e["filename"]) for e in queue_data]
+                      filename=e["filename"],
+                      post_type=e.get("post_type", "")) for e in queue_data]
 
         engine = None
         source = None
@@ -560,7 +616,7 @@ def main() -> int:
         pipeline = Pipeline(
             source=source, engine=engine, output_dir=output_dir,
             enable_breaks=has_record and not args.no_breaks,
-            preflight=pf,
+            preflight=pf, catalog=catalog_mgr,
         )
         results = asyncio.run(pipeline.run(posts, steps=steps))
 
@@ -630,9 +686,32 @@ def main() -> int:
     elif args.command == "status":
         return _handle_status()
 
+    elif args.command == "catalog-refresh":
+        from src.catalog import CatalogManager
+        from src.sources.discovery import PatreonDiscovery, MAX_PAGES
+
+        catalog = CatalogManager(Path(args.catalog))
+        discovery = PatreonDiscovery(campaign_id=args.campaign_id)
+
+        if args.full and not args.force:
+            if not discovery.check_cooldown(Path("data")):
+                print("Cooldown active. Use --force to override.")
+                return 0
+
+        max_pages = MAX_PAGES if args.full else 1
+        posts = discovery.fetch_posts(media_type=None, max_pages=max_pages)
+        merged, new_count = catalog.merge_discovered(posts)
+        catalog.save(merged)
+
+        if args.full:
+            discovery.update_cooldown(Path("data"))
+
+        print(f"Catalog refreshed: {new_count} new, {len(merged)} total")
+
     elif args.command == "discover":
         import json as json_mod
-        from src.sources.discovery import PatreonDiscovery, DiscoveredPost, MAX_PAGES
+        from src.catalog import CatalogManager
+        from src.sources.discovery import PatreonDiscovery, MAX_PAGES
 
         discovery = PatreonDiscovery(campaign_id=args.campaign_id)
 
@@ -653,27 +732,9 @@ def main() -> int:
         catalog_path = Path(args.output)
         new_posts = discovery.diff_catalog(posts, catalog_path)
 
-        if catalog_path.exists():
-            existing = json_mod.loads(catalog_path.read_text(encoding="utf-8"))
-            existing_by_id = {p["post_id"]: p for p in existing.get("posts", [])}
-            from dataclasses import asdict
-            discovered_by_id = {p.post_id: p for p in posts}
-            all_posts = list(discovered_by_id.values())
-            valid_fields = {f.name for f in DiscoveredPost.__dataclass_fields__.values()}
-            for pid, pdata in existing_by_id.items():
-                if pid not in discovered_by_id and pdata is not None:
-                    filtered = {k: v for k, v in pdata.items() if k in valid_fields}
-                    filtered.setdefault("post_id", pid)
-                    filtered.setdefault("url", f"https://www.patreon.com/posts/{pid}")
-                    filtered.setdefault("title", "")
-                    filtered.setdefault("created_at", "")
-                    filtered.setdefault("post_type", "")
-                    filtered.setdefault("has_video", False)
-                    all_posts.append(DiscoveredPost(**filtered))
-        else:
-            all_posts = posts
-
-        discovery.save_catalog(all_posts, catalog_path)
+        catalog = CatalogManager(catalog_path)
+        merged, new_count = catalog.merge_discovered(posts)
+        catalog.save(merged)
 
         if args.full_catalog:
             discovery.update_cooldown(Path("data"))
@@ -690,12 +751,8 @@ def main() -> int:
 
         if args.queue_new and new_posts:
             video_posts = [p for p in new_posts if p.has_video]
-            bad = '<>:"/\\|?*'
-            queue = []
-            for p in video_posts:
-                cleaned = "".join("_" if c in bad else c for c in p.title).strip()
-                filename = cleaned if cleaned.strip("_ ") else "episode"
-                queue.append({"url": p.url, "filename": filename})
+            queue = [{"url": p.url, "filename": title_to_filename(p.title)}
+                     for p in video_posts]
             Path(args.queue_new).parent.mkdir(parents=True, exist_ok=True)
             Path(args.queue_new).write_text(
                 json_mod.dumps(queue, indent=2), encoding="utf-8")
