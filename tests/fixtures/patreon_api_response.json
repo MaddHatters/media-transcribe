@@ -1,0 +1,160 @@
+{
+  "data": [
+    {
+      "id": "119811238",
+      "attributes": {
+        "title": "Masterclass 19 - Munger Mental Models",
+        "created_at": "2025-01-15T18:30:00.000+00:00",
+        "published_at": "2025-01-15T18:45:00.000+00:00",
+        "edited_at": "2025-01-16T10:00:00.000+00:00",
+        "post_type": "video_external_file",
+        "url": "https://www.patreon.com/firedupwealth/posts/masterclass-19-119811238",
+        "patreon_url": "/posts/masterclass-19-119811238",
+        "like_count": 42,
+        "comment_count": 7,
+        "is_paid": true,
+        "min_cents_pledged_to_view": 7500,
+        "video_preview": {
+          "duration": 1651.0,
+          "full_content_duration": 1651.0,
+          "url": "https://stream.mux.com/abc123.m3u8"
+        },
+        "embed": null,
+        "image": {
+          "url": "https://c10.patreonusercontent.com/4/patreon-media/p/post/119811238/full.jpg",
+          "thumb_url": "https://c10.patreonusercontent.com/4/patreon-media/p/post/119811238/thumb.jpg",
+          "large_url": "https://c10.patreonusercontent.com/4/patreon-media/p/post/119811238/large.jpg",
+          "width": 1920,
+          "height": 1080
+        },
+        "post_file": null
+      },
+      "relationships": {
+        "user_defined_tags": {
+          "data": [
+            {"id": "user_defined;masterclass", "type": "post_tag"},
+            {"id": "user_defined;stock market investing", "type": "post_tag"}
+          ]
+        },
+        "campaign": {"data": {"id": "5008493", "type": "campaign"}}
+      },
+      "type": "post"
+    },
+    {
+      "id": "119500001",
+      "attributes": {
+        "title": "Weekly Market Recap - Jan 10",
+        "created_at": "2025-01-10T12:00:00.000+00:00",
+        "published_at": "2025-01-10T12:15:00.000+00:00",
+        "edited_at": null,
+        "post_type": "video_embed",
+        "url": "https://www.patreon.com/firedupwealth/posts/weekly-market-recap-119500001",
+        "patreon_url": "/posts/weekly-market-recap-119500001",
+        "like_count": 15,
+        "comment_count": 3,
+        "is_paid": false,
+        "min_cents_pledged_to_view": 0,
+        "video_preview": null,
+        "embed": {
+          "url": "https://youtu.be/hMprXab8x8E?si=B-Wl3aUJiMBAWlsI",
+          "provider": "YouTube",
+          "subject": "Weekly Market Recap - Jan 10",
+          "description": "Weekly market recap and analysis"
+        },
+        "image": {
+          "url": "https://c10.patreonusercontent.com/4/patreon-media/p/post/119500001/full.jpg",
+          "thumb_url": "https://c10.patreonusercontent.com/4/patreon-media/p/post/119500001/thumb.jpg",
+          "large_url": "https://c10.patreonusercontent.com/4/patreon-media/p/post/119500001/large.jpg",
+          "width": 1280,
+          "height": 720
+        },
+        "post_file": null
+      },
+      "relationships": {
+        "user_defined_tags": {
+          "data": [
+            {"id": "user_defined;Chart day", "type": "post_tag"},
+            {"id": "user_defined;technical analysis", "type": "post_tag"}
+          ]
+        },
+        "campaign": {"data": {"id": "5008493", "type": "campaign"}}
+      },
+      "type": "post"
+    },
+    {
+      "id": "119200002",
+      "attributes": {
+        "title": "Community Q&A Thread",
+        "created_at": "2025-01-05T09:00:00.000+00:00",
+        "published_at": "2025-01-05T09:00:00.000+00:00",
+        "edited_at": null,
+        "post_type": "text_only",
+        "url": "https://www.patreon.com/firedupwealth/posts/community-qa-119200002",
+        "patreon_url": "/posts/community-qa-119200002",
+        "like_count": 8,
+        "comment_count": 22,
+        "is_paid": false,
+        "min_cents_pledged_to_view": 0,
+        "video_preview": null,
+        "embed": null,
+        "image": null,
+        "post_file": null
+      },
+      "relationships": {
+        "user_defined_tags": {
+          "data": []
+        },
+        "campaign": {"data": {"id": "5008493", "type": "campaign"}}
+      },
+      "type": "post"
+    },
+    {
+      "id": "118900003",
+      "attributes": {
+        "title": "Podcast Episode 42 - Dividend Growth",
+        "created_at": "2024-12-28T15:00:00.000+00:00",
+        "published_at": "2024-12-28T15:30:00.000+00:00",
+        "edited_at": "2024-12-29T08:00:00.000+00:00",
+        "post_type": "podcast",
+        "url": "https://www.patreon.com/firedupwealth/posts/podcast-ep-42-118900003",
+        "patreon_url": "/posts/podcast-ep-42-118900003",
+        "like_count": 25,
+        "comment_count": 5,
+        "is_paid": true,
+        "min_cents_pledged_to_view": 6000,
+        "video_preview": null,
+        "embed": null,
+        "image": {
+          "url": "https://c10.patreonusercontent.com/4/patreon-media/p/post/118900003/full.jpg",
+          "thumb_url": "https://c10.patreonusercontent.com/4/patreon-media/p/post/118900003/thumb.jpg",
+          "large_url": "https://c10.patreonusercontent.com/4/patreon-media/p/post/118900003/large.jpg",
+          "width": 1400,
+          "height": 1400
+        },
+        "post_file": {
+          "duration": 4233.0,
+          "full_content_duration": 4233.0,
+          "url": "https://patreon.com/media/podcast_ep42.mp3"
+        }
+      },
+      "relationships": {
+        "user_defined_tags": {
+          "data": [
+            {"id": "user_defined;dividend portfolio", "type": "post_tag"},
+            {"id": "user_defined;podcast", "type": "post_tag"}
+          ]
+        },
+        "campaign": {"data": {"id": "5008493", "type": "campaign"}}
+      },
+      "type": "post"
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "total": 1994,
+      "cursors": {
+        "next": "eyJwIjoiMjAyNC0xMi0yOFQxNTowMDowMC4wMDBaIn0="
+      }
+    }
+  }
+}

@@ -390,6 +390,13 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main() -> int:
+    # Force UTF-8 output — Windows cp1252 can't encode emoji from Patreon content
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, OSError):
+        pass
+
     parser = build_parser()
     args = parser.parse_args()
 

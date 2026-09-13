@@ -16,3 +16,9 @@ acquire/episodes.txt
 logs/
 # generated test video (created on obs-machine via generate-test-video)
 test_assets/test_video.mp4
+# OBS machine data files (generated catalogs, queues)
+catalog_*.json
+*_queue.json
+data/patreon_full_catalog.json
+# App review reports (generated, not source)
+app_review/
