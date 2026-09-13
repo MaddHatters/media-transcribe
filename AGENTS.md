@@ -17,10 +17,13 @@ slide OCR). Everything runs offline — no API keys, no uploads.
 
 ### Deployment
 
+Both machines are git repos pointing at the same GitHub origin. See [`DEPLOY.md`](DEPLOY.md) for the full deployment guide.
+
 ```bash
 # Deploy from devbox-01 to obs-machine:
 cd /home/tuna/repos/media-transcribe
-scp -r src/ cli.py corrections.txt finance_vocab.txt Matt@100.66.194.100:"C:/Users/Matt/transcribe/"
+git push origin main
+ssh Matt@100.66.194.100 "powershell -Command \"git -C 'C:\Users\Matt\transcribe' pull origin main\""
 ```
 
 ## Test
@@ -35,21 +38,20 @@ Not yet configured. The obs-machine is both dev and production — there is no i
 
 ## Release / Deploy
 
-One-command deploy from devbox-01 to obs-machine:
+**Primary method** — git-based (see [`DEPLOY.md`](DEPLOY.md)):
+
+```bash
+uv run pytest tests/ -v                    # test locally
+git push origin main                       # push to GitHub
+ssh Matt@100.66.194.100 "powershell -Command \"git -C 'C:\Users\Matt\transcribe' pull origin main\""
+```
+
+**Legacy method** — SCP-based (`scripts/release.sh`), still works as fallback:
 
 ```bash
 bash scripts/release.sh            # test → deploy → verify
 bash scripts/release.sh --verify   # also runs preflight on obs-machine
 ```
-
-The script:
-1. Checks you're on `main` with a clean working tree
-2. Verifies obs-machine is reachable via SSH
-3. Runs `uv run pytest` — aborts on failure
-4. SCPs project files to `C:\Users\Matt\transcribe\`
-5. Runs `uv sync --extra capture` on obs-machine
-6. Verifies deployed version matches local
-7. Runs `cli.py --help` on obs-machine to check imports
 
 ### Checking deploy status
 
@@ -144,6 +146,10 @@ ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py watch --ever
 - **Chrome**: CDP on localhost:9222
 - **Python**: Use `py -3` (3.12). Never `python` (3.8.2, too old).
 
+### Windows Recording Traps
+
+See [`docs/windows-recording-traps.md`](docs/windows-recording-traps.md) for known pitfalls when operating the OBS recording pipeline, including disconnected RDP sessions, OBS crash dialogs, system vs venv Python, and encoding issues.
+
 ### devbox-01 paths
 - Source repo: `/home/tuna/repos/media-transcribe/`
 - Patreon recordings: `/mnt/secondary/media/patreon/FIRE Investing Masterclass/`
@@ -213,22 +219,26 @@ scp data/new_queue.json Matt@100.66.194.100:C:/Users/Matt/transcribe/
 ssh Matt@100.66.194.100 "cd C:\Users\Matt\transcribe; uv run cli.py pipeline --queue new_queue.json"
 ```
 
-**Catalog location:** `data/patreon_catalog.json` (default)
+**Catalog location:** `data/catalog.json` (canonical, tracked in git)
 
 ## Project Structure
 ```
 src/
 ├── config.py           ← constants (paths, credentials, OBS config)
+├── catalog.py          ← CatalogManager — single source of truth for post lifecycle
 ├── cdp.py              ← Chrome DevTools Protocol client
 ├── players/            ← mux.py, vimeo.py, html5.py, detector.py
-├── sources/            ← patreon.py, youtube.py
+├── sources/            ← patreon.py, youtube.py, discovery.py, base.py
 ├── engines/            ← obs_engine.py, ytdlp_engine.py, null_engine.py
 ├── capture/            ← recorder.py, batch.py, preflight.py, window.py
 ├── transcribe/         ← whisper_runner.py, corrections.py, visual_gaps.py
 ├── analyze/            ← quality.py, frames.py, ocr.py
-├── pipeline/           ← runner.py (end-to-end orchestration)
+├── pipeline/           ← runner.py, watcher.py (end-to-end orchestration)
 └── transfer/           ← sync.py (SCP between machines)
 cli.py                  ← single entry point
+data/catalog.json       ← canonical Patreon catalog (tracked in git)
+docs/                   ← operational docs (windows-recording-traps.md)
+specs/                  ← implementation plans
 ```
 
 ## Tooling
