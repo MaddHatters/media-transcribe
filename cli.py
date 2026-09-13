@@ -31,7 +31,7 @@ from pathlib import Path
 from src.config import CATALOG_PATH
 from src.sources.base import title_to_filename
 
-LONG_RUNNING_COMMANDS = {"record", "transcribe", "analyze", "pipeline", "watch", "serve"}
+LONG_RUNNING_COMMANDS = {"record", "transcribe", "analyze", "pipeline", "watch", "serve", "web"}
 
 
 def background_relaunch(args: argparse.Namespace, log_dir: Path) -> int:
@@ -373,6 +373,12 @@ def build_parser() -> argparse.ArgumentParser:
                    help="gRPC server port (default: 8421)")
     s.add_argument("--foreground", action="store_true",
                    help="Run in foreground instead of backgrounding")
+
+    # --- web (dashboard server) ---
+    w = sub.add_parser("web", help="Start the pipeline dashboard web server")
+    w.add_argument("--host", default="0.0.0.0")
+    w.add_argument("--port", type=int, default=8420)
+    w.add_argument("--dev", action="store_true", help="Enable auto-reload for development")
 
     # --- watch ---
     w = sub.add_parser("watch", help="Autonomous content discovery + recording loop")
@@ -822,6 +828,16 @@ def main() -> int:
             dry_run=args.dry_run,
         )
         asyncio.run(watcher.run_forever())
+
+    elif args.command == "web":
+        import uvicorn
+        uvicorn.run(
+            "web.app:create_app",
+            factory=True,
+            host=args.host,
+            port=args.port,
+            reload=getattr(args, "dev", False),
+        )
 
     elif args.command == "release-info":
         from src import __version__
