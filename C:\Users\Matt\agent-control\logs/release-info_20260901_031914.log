@@ -1,0 +1,50 @@
+2026-09-01 03:19:14,526 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-01 03:19:14,526 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-01 03:19:14,527 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-01 03:19:14,527 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-01 03:19:14,528 INFO     src.capture.preflight: [preflight] Patreon session .................... OK (skipped (test mode))
+2026-09-01 03:19:14,528 INFO     src.capture.preflight: [preflight] Patreon session .................... OK (skipped (test mode))
+2026-09-01 03:19:14,528 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-01 03:19:14,528 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-01 03:19:14,528 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-01 03:19:14,528 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-01 03:19:14,528 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-01 03:19:14,528 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-01 03:19:14,529 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-01 03:19:14,529 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-01 03:19:14,530 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-01 03:19:14,530 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-01 03:19:14,530 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-01 03:19:14,530 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-01 03:19:14,530 INFO     src.capture.preflight: [preflight] Patreon session .................... OK (skipped (test mode))
+2026-09-01 03:19:14,530 INFO     src.capture.preflight: [preflight] Patreon session .................... OK (skipped (test mode))
+2026-09-01 03:19:14,531 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50 GB free)
+2026-09-01 03:19:14,531 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50 GB free)
+2026-09-01 03:19:14,531 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-01 03:19:14,531 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-01 03:19:14,531 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-01 03:19:14,531 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-01 03:19:14,531 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-01 03:19:14,531 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-01 03:19:14,544 ERROR    src.transfer.sync: Upload failed: connection refused
+2026-09-01 03:19:14,544 ERROR    src.transfer.sync: Upload failed: connection refused
+2026-09-01 03:19:14,545 ERROR    src.transfer.sync: Download failed: not found
+2026-09-01 03:19:14,545 ERROR    src.transfer.sync: Download failed: not found
+2026-09-01 03:19:14,559 INFO     src.transcribe.whisper_runner: SKIP done (already done)
+2026-09-01 03:19:14,559 INFO     src.transcribe.whisper_runner: SKIP done (already done)
+2026-09-01 03:19:14,560 INFO     src.transcribe.whisper_runner: DONE new (0.0m audio / 0.0m wall, 16199.8x)
+2026-09-01 03:19:14,560 INFO     src.transcribe.whisper_runner: DONE new (0.0m audio / 0.0m wall, 16199.8x)
+2026-09-01 03:19:14,561 INFO     src.transcribe.whisper_runner: DONE new (0.0m audio / 0.0m wall, 18582.3x)
+2026-09-01 03:19:14,561 INFO     src.transcribe.whisper_runner: DONE new (0.0m audio / 0.0m wall, 18582.3x)
+2026-09-01 03:19:14,578 ERROR    src.sources.youtube: yt-dlp failed: ERROR: Video not found
+2026-09-01 03:19:14,578 ERROR    src.sources.youtube: yt-dlp failed: ERROR: Video not found
+2026-09-01 03:19:14,580 ERROR    src.sources.youtube: yt-dlp catalog error: Command 'cmd' timed out after 60 seconds
+2026-09-01 03:19:14,580 ERROR    src.sources.youtube: yt-dlp catalog error: Command 'cmd' timed out after 60 seconds
+2026-09-01 03:19:14,591 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://youtube.com/watch?v=abc123 -o /tmp/ytdlp_test/my_video.%(ext)s --no-playlist
+2026-09-01 03:19:14,591 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://youtube.com/watch?v=abc123 -o /tmp/ytdlp_test/my_video.%(ext)s --no-playlist
+2026-09-01 03:19:14,593 ERROR    src.engines.ytdlp_engine: yt-dlp exited with code 1
+2026-09-01 03:19:14,593 ERROR    src.engines.ytdlp_engine: yt-dlp exited with code 1
+2026-09-01 03:19:14,595 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://example.com -o /tmp/pytest-of-tuna/pytest-124/test_output_path_templating0/lecture_01.%(ext)s --no-playlist
+2026-09-01 03:19:14,595 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://example.com -o /tmp/pytest-of-tuna/pytest-124/test_output_path_templating0/lecture_01.%(ext)s --no-playlist
+2026-09-01 03:19:14,596 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://example.com/video -o /tmp/ytdlp_test/video.%(ext)s --no-playlist
+2026-09-01 03:19:14,596 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://example.com/video -o /tmp/ytdlp_test/video.%(ext)s --no-playlist

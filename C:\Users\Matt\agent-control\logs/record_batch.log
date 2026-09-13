@@ -1,0 +1,56 @@
+2026-08-25 02:51:46  INFO     
+2026-08-25 02:51:46  INFO     ############################################################
+2026-08-25 02:51:46  INFO     # record_batch.py — serial multi-video Patreon recorder
+2026-08-25 02:51:46  INFO     # Started: 2026-08-25 02:51:46
+2026-08-25 02:51:46  INFO     ############################################################
+2026-08-25 02:51:46  INFO     [queue] Loaded 3 entries from /tmp/tmpjkeznzeg.json
+2026-08-25 02:51:46  INFO     [queue] 3 video(s) to record
+2026-08-25 02:51:46  INFO     
+2026-08-25 02:51:46  INFO     [dry-run] Would record 3 video(s):
+2026-08-25 02:51:46  INFO     
+2026-08-25 02:51:46  INFO        1. Test Video 1
+2026-08-25 02:51:46  INFO           https://www.patreon.com/posts/111
+2026-08-25 02:51:46  INFO        2. Test Video 2
+2026-08-25 02:51:46  INFO           https://www.patreon.com/posts/222
+2026-08-25 02:51:46  INFO        3. Test Video 3
+2026-08-25 02:51:46  INFO           https://www.patreon.com/posts/333
+2026-08-25 02:51:46  INFO     
+2026-08-25 02:51:46  INFO       Estimated break time: ~30 min (300-1500s per break, 2 breaks)
+2026-08-25 02:51:46  INFO       Break range per video: 5-25 min
+2026-08-25 03:15:47  INFO     
+2026-08-25 03:15:47  INFO     ############################################################
+2026-08-25 03:15:47  INFO     # record_batch.py — serial multi-video Patreon recorder
+2026-08-25 03:15:47  INFO     # Started: 2026-08-25 03:15:47
+2026-08-25 03:15:47  INFO     ############################################################
+2026-08-25 03:15:47  INFO     [queue] Loaded 2 entries from /tmp/tmpt1nafhub.json
+2026-08-25 03:15:47  INFO     [queue] 2 video(s) to record
+2026-08-25 03:15:47  INFO     
+2026-08-25 03:15:47  INFO     [dry-run] Would record 2 video(s):
+2026-08-25 03:15:47  INFO     
+2026-08-25 03:15:47  INFO        1. Test Video 1
+2026-08-25 03:15:47  INFO           https://www.patreon.com/posts/111
+2026-08-25 03:15:47  INFO        2. Test Video 2
+2026-08-25 03:15:47  INFO           https://www.patreon.com/posts/222
+2026-08-25 03:15:47  INFO     
+2026-08-25 03:15:47  INFO       Estimated break time: ~15 min (300-1500s per break, 1 breaks)
+2026-08-25 03:15:47  INFO       Break range per video: 5-25 min
+2026-08-25 03:16:30  INFO     
+2026-08-25 03:16:30  INFO     ############################################################
+2026-08-25 03:16:30  INFO     # record_batch.py — serial multi-video Patreon recorder
+2026-08-25 03:16:30  INFO     # Started: 2026-08-25 03:16:30
+2026-08-25 03:16:30  INFO     ############################################################
+2026-08-25 03:16:30  INFO     [queue] Loaded 3 entries from /tmp/tmpfwhatih6.json
+2026-08-25 03:16:30  INFO     [queue] 3 video(s) to record
+2026-08-25 03:16:30  INFO     [order] Mildly shuffled 3 URLs (use --no-shuffle to keep original order)
+2026-08-25 03:16:30  INFO     
+2026-08-25 03:16:30  INFO     [dry-run] Would record 3 video(s):
+2026-08-25 03:16:30  INFO     
+2026-08-25 03:16:30  INFO        1. Test 1
+2026-08-25 03:16:30  INFO           https://www.patreon.com/posts/111
+2026-08-25 03:16:30  INFO        2. Test 2
+2026-08-25 03:16:30  INFO           https://www.patreon.com/posts/222
+2026-08-25 03:16:30  INFO        3. Test 3
+2026-08-25 03:16:30  INFO           https://www.patreon.com/posts/333
+2026-08-25 03:16:30  INFO     
+2026-08-25 03:16:30  INFO       Estimated break time: ~30 min (300-1500s per break, 2 breaks)
+2026-08-25 03:16:30  INFO       Break range per video: 5-25 min

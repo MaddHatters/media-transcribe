@@ -1,0 +1,22 @@
+2026-09-01 02:53:49,643 ERROR    src.transfer.sync: Upload failed: connection refused
+2026-09-01 02:53:49,643 ERROR    src.transfer.sync: Upload failed: connection refused
+2026-09-01 02:53:49,645 ERROR    src.transfer.sync: Download failed: not found
+2026-09-01 02:53:49,645 ERROR    src.transfer.sync: Download failed: not found
+2026-09-01 02:53:49,658 INFO     src.transcribe.whisper_runner: SKIP done (already done)
+2026-09-01 02:53:49,658 INFO     src.transcribe.whisper_runner: SKIP done (already done)
+2026-09-01 02:53:49,659 INFO     src.transcribe.whisper_runner: DONE new (0.0m audio / 0.0m wall, 17085.3x)
+2026-09-01 02:53:49,659 INFO     src.transcribe.whisper_runner: DONE new (0.0m audio / 0.0m wall, 17085.3x)
+2026-09-01 02:53:49,660 INFO     src.transcribe.whisper_runner: DONE new (0.0m audio / 0.0m wall, 19046.0x)
+2026-09-01 02:53:49,660 INFO     src.transcribe.whisper_runner: DONE new (0.0m audio / 0.0m wall, 19046.0x)
+2026-09-01 02:53:49,675 ERROR    src.sources.youtube: yt-dlp failed: ERROR: Video not found
+2026-09-01 02:53:49,675 ERROR    src.sources.youtube: yt-dlp failed: ERROR: Video not found
+2026-09-01 02:53:49,677 ERROR    src.sources.youtube: yt-dlp catalog error: Command 'cmd' timed out after 60 seconds
+2026-09-01 02:53:49,677 ERROR    src.sources.youtube: yt-dlp catalog error: Command 'cmd' timed out after 60 seconds
+2026-09-01 02:53:49,689 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://youtube.com/watch?v=abc123 -o /tmp/ytdlp_test/my_video.%(ext)s --no-playlist
+2026-09-01 02:53:49,689 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://youtube.com/watch?v=abc123 -o /tmp/ytdlp_test/my_video.%(ext)s --no-playlist
+2026-09-01 02:53:49,690 ERROR    src.engines.ytdlp_engine: yt-dlp exited with code 1
+2026-09-01 02:53:49,690 ERROR    src.engines.ytdlp_engine: yt-dlp exited with code 1
+2026-09-01 02:53:49,692 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://example.com -o /tmp/pytest-of-tuna/pytest-110/test_output_path_templating0/lecture_01.%(ext)s --no-playlist
+2026-09-01 02:53:49,692 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://example.com -o /tmp/pytest-of-tuna/pytest-110/test_output_path_templating0/lecture_01.%(ext)s --no-playlist
+2026-09-01 02:53:49,693 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://example.com/video -o /tmp/ytdlp_test/video.%(ext)s --no-playlist
+2026-09-01 02:53:49,693 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://example.com/video -o /tmp/ytdlp_test/video.%(ext)s --no-playlist

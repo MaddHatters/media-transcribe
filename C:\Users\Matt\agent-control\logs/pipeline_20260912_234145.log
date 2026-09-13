@@ -1,0 +1,917 @@
+2026-09-12 23:41:45,102 INFO     cli: Child process started: cli.py pipeline --from-catalog --queue /tmp/q.json --foreground
+2026-09-12 23:41:45,105 INFO     cli: Child process started: cli.py pipeline --foreground
+2026-09-12 23:41:45,105 INFO     cli: Child process started: cli.py pipeline --foreground
+2026-09-12 23:41:45,123 ERROR    src.sources.discovery: Patreon API request failed (page 2): <urlopen error Connection refused>
+2026-09-12 23:41:45,123 ERROR    src.sources.discovery: Patreon API request failed (page 2): <urlopen error Connection refused>
+2026-09-12 23:41:45,123 ERROR    src.sources.discovery: Patreon API request failed (page 1): <urlopen error timeout>
+2026-09-12 23:41:45,123 ERROR    src.sources.discovery: Patreon API request failed (page 1): <urlopen error timeout>
+2026-09-12 23:41:45,126 INFO     src.sources.discovery: Discovery cooldown active — 1.0 hours since last run
+2026-09-12 23:41:45,126 INFO     src.sources.discovery: Discovery cooldown active — 1.0 hours since last run
+2026-09-12 23:41:45,138 ERROR    src.capture.environment: schtasks /create failed: error
+2026-09-12 23:41:45,138 ERROR    src.capture.environment: schtasks /create failed: error
+2026-09-12 23:41:45,140 ERROR    src.capture.environment: Failed to launch /app.exe: fail
+2026-09-12 23:41:45,140 ERROR    src.capture.environment: Failed to launch /app.exe: fail
+2026-09-12 23:41:45,141 INFO     src.capture.environment: Restarting Chrome (clean slate)...
+2026-09-12 23:41:45,141 INFO     src.capture.environment: Restarting Chrome (clean slate)...
+2026-09-12 23:41:45,141 INFO     src.capture.environment: Chrome processes killed
+2026-09-12 23:41:45,141 INFO     src.capture.environment: Chrome processes killed
+2026-09-12 23:41:45,141 INFO     src.capture.environment: Chrome CDP ready after restart
+2026-09-12 23:41:45,141 INFO     src.capture.environment: Chrome CDP ready after restart
+2026-09-12 23:41:45,141 INFO     src.capture.environment: Restarting Chrome (clean slate)...
+2026-09-12 23:41:45,141 INFO     src.capture.environment: Restarting Chrome (clean slate)...
+2026-09-12 23:41:45,141 INFO     src.capture.environment: Chrome processes killed
+2026-09-12 23:41:45,141 INFO     src.capture.environment: Chrome processes killed
+2026-09-12 23:41:45,142 ERROR    src.capture.environment: Chrome CDP not responding after restart
+2026-09-12 23:41:45,142 ERROR    src.capture.environment: Chrome CDP not responding after restart
+2026-09-12 23:41:45,142 INFO     src.capture.environment: Restarting Chrome (clean slate)...
+2026-09-12 23:41:45,142 INFO     src.capture.environment: Restarting Chrome (clean slate)...
+2026-09-12 23:41:45,142 INFO     src.capture.environment: Chrome processes killed
+2026-09-12 23:41:45,142 INFO     src.capture.environment: Chrome processes killed
+2026-09-12 23:41:45,142 ERROR    src.capture.environment: Failed to relaunch Chrome
+2026-09-12 23:41:45,142 ERROR    src.capture.environment: Failed to relaunch Chrome
+2026-09-12 23:41:45,143 INFO     src.capture.environment: Ensuring OBS clean state...
+2026-09-12 23:41:45,143 INFO     src.capture.environment: Ensuring OBS clean state...
+2026-09-12 23:41:45,143 INFO     src.capture.environment: OBS WebSocket responding — clean state ready
+2026-09-12 23:41:45,143 INFO     src.capture.environment: OBS WebSocket responding — clean state ready
+2026-09-12 23:41:45,144 INFO     src.capture.environment: Ensuring OBS clean state...
+2026-09-12 23:41:45,144 INFO     src.capture.environment: Ensuring OBS clean state...
+2026-09-12 23:41:45,144 INFO     src.capture.environment: Stopped active OBS recording (clean slate)
+2026-09-12 23:41:45,144 INFO     src.capture.environment: Stopped active OBS recording (clean slate)
+2026-09-12 23:41:45,144 INFO     src.capture.environment: OBS WebSocket responding — clean state ready
+2026-09-12 23:41:45,144 INFO     src.capture.environment: OBS WebSocket responding — clean state ready
+2026-09-12 23:41:45,145 INFO     src.capture.environment: Ensuring OBS clean state...
+2026-09-12 23:41:45,145 INFO     src.capture.environment: Ensuring OBS clean state...
+2026-09-12 23:41:45,145 INFO     src.capture.environment: OBS WebSocket not responding — killing and restarting
+2026-09-12 23:41:45,145 INFO     src.capture.environment: OBS WebSocket not responding — killing and restarting
+2026-09-12 23:41:45,145 INFO     src.capture.environment: OBS processes killed
+2026-09-12 23:41:45,145 INFO     src.capture.environment: OBS processes killed
+2026-09-12 23:41:45,146 INFO     src.capture.environment: OBS WebSocket ready after restart (0s)
+2026-09-12 23:41:45,146 INFO     src.capture.environment: OBS WebSocket ready after restart (0s)
+2026-09-12 23:41:45,146 INFO     src.capture.environment: Ensuring OBS clean state...
+2026-09-12 23:41:45,146 INFO     src.capture.environment: Ensuring OBS clean state...
+2026-09-12 23:41:45,146 INFO     src.capture.environment: OBS WebSocket not responding — killing and restarting
+2026-09-12 23:41:45,146 INFO     src.capture.environment: OBS WebSocket not responding — killing and restarting
+2026-09-12 23:41:45,146 INFO     src.capture.environment: OBS processes killed
+2026-09-12 23:41:45,146 INFO     src.capture.environment: OBS processes killed
+2026-09-12 23:41:45,147 ERROR    src.capture.environment: OBS WebSocket not responding after restart (90s timeout)
+2026-09-12 23:41:45,147 ERROR    src.capture.environment: OBS WebSocket not responding after restart (90s timeout)
+2026-09-12 23:41:45,147 INFO     src.capture.environment: Ensuring OBS clean state...
+2026-09-12 23:41:45,147 INFO     src.capture.environment: Ensuring OBS clean state...
+2026-09-12 23:41:45,147 INFO     src.capture.environment: OBS WebSocket not responding — killing and restarting
+2026-09-12 23:41:45,147 INFO     src.capture.environment: OBS WebSocket not responding — killing and restarting
+2026-09-12 23:41:45,147 INFO     src.capture.environment: OBS processes killed
+2026-09-12 23:41:45,147 INFO     src.capture.environment: OBS processes killed
+2026-09-12 23:41:45,147 ERROR    src.capture.environment: Failed to relaunch OBS
+2026-09-12 23:41:45,147 ERROR    src.capture.environment: Failed to relaunch OBS
+2026-09-12 23:41:45,148 INFO     src.capture.environment: Chrome CDP already running
+2026-09-12 23:41:45,148 INFO     src.capture.environment: Chrome CDP already running
+2026-09-12 23:41:45,149 INFO     src.capture.environment: Chrome CDP is now responding
+2026-09-12 23:41:45,149 INFO     src.capture.environment: Chrome CDP is now responding
+2026-09-12 23:41:45,149 INFO     src.capture.environment: OBS WebSocket already running
+2026-09-12 23:41:45,149 INFO     src.capture.environment: OBS WebSocket already running
+2026-09-12 23:41:45,150 INFO     src.capture.environment: OBS WebSocket is now responding
+2026-09-12 23:41:45,150 INFO     src.capture.environment: OBS WebSocket is now responding
+2026-09-12 23:41:45,151 INFO     src.capture.environment: OBS Window Capture -> Masterclass — Chrome
+2026-09-12 23:41:45,151 INFO     src.capture.environment: OBS Window Capture -> Masterclass — Chrome
+2026-09-12 23:41:45,152 INFO     src.capture.environment: OBS Window Capture -> Masterclass — Chrome
+2026-09-12 23:41:45,152 INFO     src.capture.environment: OBS Window Capture -> Masterclass — Chrome
+2026-09-12 23:41:45,152 ERROR    src.capture.environment: OBS configuration failed: conn refused
+2026-09-12 23:41:45,152 ERROR    src.capture.environment: OBS configuration failed: conn refused
+2026-09-12 23:41:45,155 INFO     src.capture.environment: Stopped OBS recording
+2026-09-12 23:41:45,155 INFO     src.capture.environment: Stopped OBS recording
+2026-09-12 23:41:45,155 WARNING  src.capture.environment: CDP Browser.close failed: down
+2026-09-12 23:41:45,155 WARNING  src.capture.environment: CDP Browser.close failed: down
+2026-09-12 23:41:45,156 WARNING  src.capture.environment: CDP Browser.close failed: down
+2026-09-12 23:41:45,156 WARNING  src.capture.environment: CDP Browser.close failed: down
+2026-09-12 23:41:45,157 WARNING  src.capture.environment: Could not stop OBS recording: down
+2026-09-12 23:41:45,157 WARNING  src.capture.environment: Could not stop OBS recording: down
+2026-09-12 23:41:45,157 WARNING  src.capture.environment: CDP Browser.close failed: No module named 'websockets'
+2026-09-12 23:41:45,157 WARNING  src.capture.environment: CDP Browser.close failed: No module named 'websockets'
+2026-09-12 23:41:45,158 WARNING  src.capture.environment: Could not stop OBS recording: down
+2026-09-12 23:41:45,158 WARNING  src.capture.environment: Could not stop OBS recording: down
+2026-09-12 23:41:45,158 WARNING  src.capture.environment: CDP Browser.close failed: down
+2026-09-12 23:41:45,158 WARNING  src.capture.environment: CDP Browser.close failed: down
+2026-09-12 23:41:45,158 INFO     src.capture.environment: Chrome killed via taskkill
+2026-09-12 23:41:45,158 INFO     src.capture.environment: Chrome killed via taskkill
+2026-09-12 23:41:45,158 INFO     src.capture.environment: OBS killed via taskkill
+2026-09-12 23:41:45,158 INFO     src.capture.environment: OBS killed via taskkill
+2026-09-12 23:41:45,164 WARNING  root: [crash-guard] Stopped orphaned OBS recording
+2026-09-12 23:41:45,164 WARNING  root: [crash-guard] Stopped orphaned OBS recording
+2026-09-12 23:41:45,165 CRITICAL root: Unhandled exception
+Traceback (most recent call last):
+  File "/home/tuna/repos/media-transcribe/tests/test_error_handling.py", line 61, in test_excepthook_logs_to_file
+    raise ValueError("test crash")
+ValueError: test crash
+2026-09-12 23:41:45,165 CRITICAL root: Unhandled exception
+Traceback (most recent call last):
+  File "/home/tuna/repos/media-transcribe/tests/test_error_handling.py", line 61, in test_excepthook_logs_to_file
+    raise ValueError("test crash")
+ValueError: test crash
+2026-09-12 23:41:45,167 INFO     test.format: hello format check
+2026-09-12 23:41:45,167 INFO     test.format: hello format check
+2026-09-12 23:41:45,168 INFO     src.capture.recorder: [1/10] Navigating to http://test
+2026-09-12 23:41:45,168 INFO     src.capture.recorder: [1/10] Navigating to http://test
+2026-09-12 23:41:45,169 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:45,169 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:45,169 INFO     src.capture.recorder:   Duration: 600s (10.0 min)
+2026-09-12 23:41:45,169 INFO     src.capture.recorder:   Duration: 600s (10.0 min)
+2026-09-12 23:41:45,169 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:45,169 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:45,169 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:45,169 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:45,169 INFO     src.capture.recorder: [5/10] Re-pause at 0:00
+2026-09-12 23:41:45,169 INFO     src.capture.recorder: [5/10] Re-pause at 0:00
+2026-09-12 23:41:45,169 INFO     src.capture.recorder: [6/10] Hiding cursor
+2026-09-12 23:41:45,169 INFO     src.capture.recorder: [6/10] Hiding cursor
+2026-09-12 23:41:45,169 INFO     src.capture.recorder: [7/10] Starting capture engine (<MagicMock name='mock.name' id='139686221198736'>)
+2026-09-12 23:41:45,169 INFO     src.capture.recorder: [7/10] Starting capture engine (<MagicMock name='mock.name' id='139686221198736'>)
+2026-09-12 23:41:45,169 INFO     src.capture.recorder: [8/10] Playing...
+2026-09-12 23:41:45,169 INFO     src.capture.recorder: [8/10] Playing...
+2026-09-12 23:41:45,170 INFO     src.capture.recorder: [9/10] Monitoring (~10 min)...
+2026-09-12 23:41:45,170 INFO     src.capture.recorder: [9/10] Monitoring (~10 min)...
+2026-09-12 23:41:45,170 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,170 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,170 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,170 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,170 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,170 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,170 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,170 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,170 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,170 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,170 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,170 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,170 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,170 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,170 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,170 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,170 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,170 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,170 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,170 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,170 WARNING  src.capture.recorder:   STALLED — nudging
+2026-09-12 23:41:45,170 WARNING  src.capture.recorder:   STALLED — nudging
+2026-09-12 23:41:45,170 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,170 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,170 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,170 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,170 ERROR    src.capture.recorder:   STUCK — position hasn't advanced for 5 checks (150s). Aborting.
+2026-09-12 23:41:45,170 ERROR    src.capture.recorder:   STUCK — position hasn't advanced for 5 checks (150s). Aborting.
+2026-09-12 23:41:45,170 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:45,170 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:45,173 WARNING  src.capture.recorder: Tab cleanup failed (non-fatal): %d format: a real number is required, not str
+2026-09-12 23:41:45,173 WARNING  src.capture.recorder: Tab cleanup failed (non-fatal): %d format: a real number is required, not str
+2026-09-12 23:41:45,174 WARNING  src.capture.recorder: Window cleanup failed (non-fatal): %d format: a real number is required, not str
+2026-09-12 23:41:45,174 WARNING  src.capture.recorder: Window cleanup failed (non-fatal): %d format: a real number is required, not str
+2026-09-12 23:41:45,174 INFO     src.capture.recorder: [1/10] Navigating to http://test
+2026-09-12 23:41:45,174 INFO     src.capture.recorder: [1/10] Navigating to http://test
+2026-09-12 23:41:45,175 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:45,175 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:45,175 INFO     src.capture.recorder:   Duration: 600s (10.0 min)
+2026-09-12 23:41:45,175 INFO     src.capture.recorder:   Duration: 600s (10.0 min)
+2026-09-12 23:41:45,175 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:45,175 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:45,175 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:45,175 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:45,175 INFO     src.capture.recorder: [5/10] Re-pause at 0:00
+2026-09-12 23:41:45,175 INFO     src.capture.recorder: [5/10] Re-pause at 0:00
+2026-09-12 23:41:45,175 INFO     src.capture.recorder: [6/10] Hiding cursor
+2026-09-12 23:41:45,175 INFO     src.capture.recorder: [6/10] Hiding cursor
+2026-09-12 23:41:45,176 INFO     src.capture.recorder: [7/10] Starting capture engine (<MagicMock name='mock.name' id='139686219921360'>)
+2026-09-12 23:41:45,176 INFO     src.capture.recorder: [7/10] Starting capture engine (<MagicMock name='mock.name' id='139686219921360'>)
+2026-09-12 23:41:45,176 INFO     src.capture.recorder: [8/10] Playing...
+2026-09-12 23:41:45,176 INFO     src.capture.recorder: [8/10] Playing...
+2026-09-12 23:41:45,176 INFO     src.capture.recorder: [9/10] Monitoring (~10 min)...
+2026-09-12 23:41:45,176 INFO     src.capture.recorder: [9/10] Monitoring (~10 min)...
+2026-09-12 23:41:45,176 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,176 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,176 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,176 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,176 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,176 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,176 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,176 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,176 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,176 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,176 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,176 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,176 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,176 INFO     src.capture.recorder:   100s / 600s (16.7%)
+2026-09-12 23:41:45,176 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,176 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,176 INFO     src.capture.recorder:   200s / 600s (33.3%)
+2026-09-12 23:41:45,176 INFO     src.capture.recorder:   200s / 600s (33.3%)
+2026-09-12 23:41:45,176 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,176 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,176 INFO     src.capture.recorder:   500s / 600s (83.3%)
+2026-09-12 23:41:45,176 INFO     src.capture.recorder:   500s / 600s (83.3%)
+2026-09-12 23:41:45,176 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,176 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:45,176 INFO     src.capture.recorder:   599s / 600s (99.8%)
+2026-09-12 23:41:45,176 INFO     src.capture.recorder:   599s / 600s (99.8%)
+2026-09-12 23:41:45,177 INFO     src.capture.recorder:   VIDEO ENDED
+2026-09-12 23:41:45,177 INFO     src.capture.recorder:   VIDEO ENDED
+2026-09-12 23:41:45,177 INFO     src.capture.recorder: [10/10] Stopping capture
+2026-09-12 23:41:45,177 INFO     src.capture.recorder: [10/10] Stopping capture
+2026-09-12 23:41:45,177 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:45,177 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:45,178 CRITICAL src.pipeline.runner: PIPELINE FAILED — stopping OBS recording
+Traceback (most recent call last):
+  File "/home/tuna/repos/media-transcribe/src/pipeline/runner.py", line 107, in run
+    await asyncio.to_thread(human_break, i + 1, len(queue))
+  File "/usr/lib/python3.12/unittest/mock.py", line 2262, in _execute_mock_call
+    raise effect
+RuntimeError: process-level crash
+2026-09-12 23:41:45,178 CRITICAL src.pipeline.runner: PIPELINE FAILED — stopping OBS recording
+Traceback (most recent call last):
+  File "/home/tuna/repos/media-transcribe/src/pipeline/runner.py", line 107, in run
+    await asyncio.to_thread(human_break, i + 1, len(queue))
+  File "/usr/lib/python3.12/unittest/mock.py", line 2262, in _execute_mock_call
+    raise effect
+RuntimeError: process-level crash
+2026-09-12 23:41:45,179 WARNING  src.pipeline.runner: [pipeline-guard] Stopped recording after crash
+2026-09-12 23:41:45,179 WARNING  src.pipeline.runner: [pipeline-guard] Stopped recording after crash
+2026-09-12 23:41:45,180 ERROR    src.analyze.frames: Frame extraction failed at 10.0s: error
+2026-09-12 23:41:45,180 ERROR    src.analyze.frames: Frame extraction failed at 10.0s: error
+2026-09-12 23:41:46,210 WARNING  src.engines.obs_engine: File locked, retrying in 5s... (1/6)
+2026-09-12 23:41:46,210 WARNING  src.engines.obs_engine: File locked, retrying in 5s... (1/6)
+2026-09-12 23:41:46,210 WARNING  src.engines.obs_engine: File locked, retrying in 5s... (2/6)
+2026-09-12 23:41:46,210 WARNING  src.engines.obs_engine: File locked, retrying in 5s... (2/6)
+2026-09-12 23:41:46,210 WARNING  src.engines.obs_engine: File locked, retrying in 5s... (3/6)
+2026-09-12 23:41:46,210 WARNING  src.engines.obs_engine: File locked, retrying in 5s... (3/6)
+2026-09-12 23:41:46,210 INFO     src.engines.obs_engine: Moved: D:\MasterClass Video Backup/test_file.mp4 (1.0 MB)
+2026-09-12 23:41:46,210 INFO     src.engines.obs_engine: Moved: D:\MasterClass Video Backup/test_file.mp4 (1.0 MB)
+2026-09-12 23:41:46,211 WARNING  src.engines.obs_engine: File locked, retrying in 5s... (1/6)
+2026-09-12 23:41:46,211 WARNING  src.engines.obs_engine: File locked, retrying in 5s... (1/6)
+2026-09-12 23:41:46,211 WARNING  src.engines.obs_engine: File locked, retrying in 5s... (2/6)
+2026-09-12 23:41:46,211 WARNING  src.engines.obs_engine: File locked, retrying in 5s... (2/6)
+2026-09-12 23:41:46,211 WARNING  src.engines.obs_engine: File locked, retrying in 5s... (3/6)
+2026-09-12 23:41:46,211 WARNING  src.engines.obs_engine: File locked, retrying in 5s... (3/6)
+2026-09-12 23:41:46,211 WARNING  src.engines.obs_engine: File locked, retrying in 5s... (4/6)
+2026-09-12 23:41:46,211 WARNING  src.engines.obs_engine: File locked, retrying in 5s... (4/6)
+2026-09-12 23:41:46,211 WARNING  src.engines.obs_engine: File locked, retrying in 5s... (5/6)
+2026-09-12 23:41:46,211 WARNING  src.engines.obs_engine: File locked, retrying in 5s... (5/6)
+2026-09-12 23:41:46,211 ERROR    src.engines.obs_engine: Could not move after 6 attempts: /tmp/tmpqd1ugnqv.mp4
+2026-09-12 23:41:46,211 ERROR    src.engines.obs_engine: Could not move after 6 attempts: /tmp/tmpqd1ugnqv.mp4
+2026-09-12 23:41:46,218 INFO     src.sources.patreon: Patreon session is valid
+2026-09-12 23:41:46,218 INFO     src.sources.patreon: Patreon session is valid
+2026-09-12 23:41:46,219 INFO     src.sources.patreon: Login form detected — attempting auto-login
+2026-09-12 23:41:46,219 INFO     src.sources.patreon: Login form detected — attempting auto-login
+2026-09-12 23:41:46,219 INFO     src.sources.patreon: Login succeeded
+2026-09-12 23:41:46,219 INFO     src.sources.patreon: Login succeeded
+2026-09-12 23:41:46,220 INFO     src.sources.patreon: Login form detected — attempting auto-login
+2026-09-12 23:41:46,220 INFO     src.sources.patreon: Login form detected — attempting auto-login
+2026-09-12 23:41:46,220 ERROR    src.sources.patreon: No credentials for target=patreon_02_ai
+2026-09-12 23:41:46,220 ERROR    src.sources.patreon: No credentials for target=patreon_02_ai
+2026-09-12 23:41:46,221 INFO     src.sources.patreon: Login form detected — attempting auto-login
+2026-09-12 23:41:46,221 INFO     src.sources.patreon: Login form detected — attempting auto-login
+2026-09-12 23:41:46,221 ERROR    src.sources.patreon: Login failed (form still present)
+2026-09-12 23:41:46,221 ERROR    src.sources.patreon: Login failed (form still present)
+2026-09-12 23:41:46,226 WARNING  src.pipeline.runner: [pipeline-guard] Stopped recording after crash
+2026-09-12 23:41:46,226 WARNING  src.pipeline.runner: [pipeline-guard] Stopped recording after crash
+2026-09-12 23:41:46,226 ERROR    src.pipeline.runner: Pipeline failed for http://a: fail
+2026-09-12 23:41:46,226 ERROR    src.pipeline.runner: Pipeline failed for http://a: fail
+2026-09-12 23:41:46,227 WARNING  src.pipeline.runner: [pipeline-guard] Stopped recording after crash
+2026-09-12 23:41:46,227 WARNING  src.pipeline.runner: [pipeline-guard] Stopped recording after crash
+2026-09-12 23:41:46,230 WARNING  src.pipeline.runner: [pipeline-guard] Stopped recording after crash
+2026-09-12 23:41:46,230 WARNING  src.pipeline.runner: [pipeline-guard] Stopped recording after crash
+2026-09-12 23:41:46,231 WARNING  src.pipeline.runner: [pipeline-guard] Stopped recording after crash
+2026-09-12 23:41:46,231 WARNING  src.pipeline.runner: [pipeline-guard] Stopped recording after crash
+2026-09-12 23:41:46,232 WARNING  src.pipeline.runner: [pipeline-guard] Stopped recording after crash
+2026-09-12 23:41:46,232 WARNING  src.pipeline.runner: [pipeline-guard] Stopped recording after crash
+2026-09-12 23:41:46,233 WARNING  src.pipeline.runner: [pipeline-guard] Stopped recording after crash
+2026-09-12 23:41:46,233 WARNING  src.pipeline.runner: [pipeline-guard] Stopped recording after crash
+2026-09-12 23:41:46,234 WARNING  src.pipeline.runner: [pipeline-guard] Stopped recording after crash
+2026-09-12 23:41:46,234 WARNING  src.pipeline.runner: [pipeline-guard] Stopped recording after crash
+2026-09-12 23:41:46,239 WARNING  src.pipeline.runner: No corrections file found — skipping
+2026-09-12 23:41:46,239 WARNING  src.pipeline.runner: No corrections file found — skipping
+2026-09-12 23:41:46,254 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,254 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,254 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,254 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,254 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,254 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,255 INFO     src.capture.preflight: [preflight] Patreon session .................... OK
+2026-09-12 23:41:46,255 INFO     src.capture.preflight: [preflight] Patreon session .................... OK
+2026-09-12 23:41:46,255 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,255 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,255 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 23:41:46,255 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 23:41:46,255 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 23:41:46,255 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 23:41:46,255 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,255 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,255 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,255 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,255 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,255 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,255 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,255 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,255 INFO     src.capture.preflight: [preflight] Patreon session .................... OK
+2026-09-12 23:41:46,255 INFO     src.capture.preflight: [preflight] Patreon session .................... OK
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... FAIL
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... FAIL
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Patreon session .................... FAIL (skipped (no Chrome))
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Patreon session .................... FAIL (skipped (no Chrome))
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Test recording (video) ............. FAIL (skipped)
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Test recording (video) ............. FAIL (skipped)
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. FAIL (skipped)
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. FAIL (skipped)
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ FAIL (skipped)
+2026-09-12 23:41:46,256 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ FAIL (skipped)
+2026-09-12 23:41:46,257 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,257 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,257 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,257 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,257 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,257 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,257 INFO     src.capture.preflight: [preflight] Patreon session .................... OK
+2026-09-12 23:41:46,257 INFO     src.capture.preflight: [preflight] Patreon session .................... OK
+2026-09-12 23:41:46,257 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,257 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,257 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 23:41:46,257 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 23:41:46,257 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 23:41:46,257 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 23:41:46,257 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,257 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,258 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,258 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,258 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,258 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,258 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... FAIL
+2026-09-12 23:41:46,258 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... FAIL
+2026-09-12 23:41:46,258 INFO     src.capture.preflight: [preflight] Patreon session .................... OK
+2026-09-12 23:41:46,258 INFO     src.capture.preflight: [preflight] Patreon session .................... OK
+2026-09-12 23:41:46,258 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,258 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,258 INFO     src.capture.preflight: [preflight] Test recording (video) ............. FAIL (skipped)
+2026-09-12 23:41:46,258 INFO     src.capture.preflight: [preflight] Test recording (video) ............. FAIL (skipped)
+2026-09-12 23:41:46,258 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. FAIL (skipped)
+2026-09-12 23:41:46,258 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. FAIL (skipped)
+2026-09-12 23:41:46,258 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ FAIL (skipped)
+2026-09-12 23:41:46,258 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ FAIL (skipped)
+2026-09-12 23:41:46,259 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,259 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,259 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,259 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,259 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,259 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,259 INFO     src.capture.preflight: [preflight] Patreon session .................... OK
+2026-09-12 23:41:46,259 INFO     src.capture.preflight: [preflight] Patreon session .................... OK
+2026-09-12 23:41:46,259 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,259 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,259 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 23:41:46,259 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 23:41:46,259 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 23:41:46,259 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 23:41:46,259 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,259 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,259 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,259 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,259 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,259 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,259 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,259 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Patreon session .................... FAIL
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Patreon session .................... FAIL
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,260 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,260 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Patreon session .................... OK
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Patreon session .................... OK
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Disk space ......................... FAIL (2.1 GB free)
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Disk space ......................... FAIL (2.1 GB free)
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,260 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,261 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,261 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,261 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,261 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,261 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,261 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,261 INFO     src.capture.preflight: [preflight] Patreon session .................... OK
+2026-09-12 23:41:46,261 INFO     src.capture.preflight: [preflight] Patreon session .................... OK
+2026-09-12 23:41:46,261 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,261 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,261 INFO     src.capture.preflight: [preflight] Test recording (video) ............. FAIL
+2026-09-12 23:41:46,261 INFO     src.capture.preflight: [preflight] Test recording (video) ............. FAIL
+2026-09-12 23:41:46,261 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 23:41:46,261 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 23:41:46,261 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,261 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,262 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,262 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,262 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,262 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,262 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,262 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,262 INFO     src.capture.preflight: [preflight] Patreon session .................... OK
+2026-09-12 23:41:46,262 INFO     src.capture.preflight: [preflight] Patreon session .................... OK
+2026-09-12 23:41:46,262 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,262 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,262 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 23:41:46,262 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 23:41:46,262 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. FAIL
+2026-09-12 23:41:46,262 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. FAIL
+2026-09-12 23:41:46,262 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,262 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,263 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... FAIL
+2026-09-12 23:41:46,263 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... FAIL
+2026-09-12 23:41:46,263 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,263 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,263 INFO     src.capture.preflight: [preflight] Patreon session .................... FAIL (skipped (no Chrome))
+2026-09-12 23:41:46,263 INFO     src.capture.preflight: [preflight] Patreon session .................... FAIL (skipped (no Chrome))
+2026-09-12 23:41:46,263 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,263 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,263 INFO     src.capture.preflight: [preflight] Test recording (video) ............. FAIL (skipped)
+2026-09-12 23:41:46,263 INFO     src.capture.preflight: [preflight] Test recording (video) ............. FAIL (skipped)
+2026-09-12 23:41:46,263 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. FAIL (skipped)
+2026-09-12 23:41:46,263 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. FAIL (skipped)
+2026-09-12 23:41:46,263 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ FAIL (skipped)
+2026-09-12 23:41:46,263 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ FAIL (skipped)
+2026-09-12 23:41:46,264 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,264 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,264 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,264 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,264 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... FAIL
+2026-09-12 23:41:46,264 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... FAIL
+2026-09-12 23:41:46,264 INFO     src.capture.preflight: [preflight] Patreon session .................... OK
+2026-09-12 23:41:46,264 INFO     src.capture.preflight: [preflight] Patreon session .................... OK
+2026-09-12 23:41:46,264 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,264 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,264 INFO     src.capture.preflight: [preflight] Test recording (video) ............. FAIL (skipped)
+2026-09-12 23:41:46,264 INFO     src.capture.preflight: [preflight] Test recording (video) ............. FAIL (skipped)
+2026-09-12 23:41:46,264 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. FAIL (skipped)
+2026-09-12 23:41:46,264 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. FAIL (skipped)
+2026-09-12 23:41:46,264 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ FAIL (skipped)
+2026-09-12 23:41:46,264 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ FAIL (skipped)
+2026-09-12 23:41:46,265 INFO     src.capture.preflight: Chrome CDP is running
+2026-09-12 23:41:46,265 INFO     src.capture.preflight: Chrome CDP is running
+2026-09-12 23:41:46,265 WARNING  src.capture.preflight: Chrome CDP not responding
+2026-09-12 23:41:46,265 WARNING  src.capture.preflight: Chrome CDP not responding
+2026-09-12 23:41:46,266 WARNING  src.capture.preflight: Low disk space: 2.0 GB free
+2026-09-12 23:41:46,266 WARNING  src.capture.preflight: Low disk space: 2.0 GB free
+2026-09-12 23:41:46,267 ERROR    src.capture.preflight: Patreon session check failed: CDP down
+2026-09-12 23:41:46,267 ERROR    src.capture.preflight: Patreon session check failed: CDP down
+2026-09-12 23:41:46,267 ERROR    src.capture.preflight: [test-rec] Test recording failed: OBS error
+2026-09-12 23:41:46,267 ERROR    src.capture.preflight: [test-rec] Test recording failed: OBS error
+2026-09-12 23:41:46,274 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,274 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,274 INFO     src.capture.recorder: [1/10] Navigating to https://example.com/video
+2026-09-12 23:41:46,274 INFO     src.capture.recorder: [1/10] Navigating to https://example.com/video
+2026-09-12 23:41:46,275 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,275 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,275 INFO     src.capture.recorder:   Duration: 100s (1.7 min)
+2026-09-12 23:41:46,275 INFO     src.capture.recorder:   Duration: 100s (1.7 min)
+2026-09-12 23:41:46,275 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:46,275 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:46,275 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:46,275 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:46,275 INFO     src.capture.recorder: [5/10] Re-pause at 0:00
+2026-09-12 23:41:46,275 INFO     src.capture.recorder: [5/10] Re-pause at 0:00
+2026-09-12 23:41:46,275 INFO     src.capture.recorder: [6/10] Hiding cursor
+2026-09-12 23:41:46,275 INFO     src.capture.recorder: [6/10] Hiding cursor
+2026-09-12 23:41:46,275 INFO     src.capture.recorder: [7/10] Starting capture engine (null)
+2026-09-12 23:41:46,275 INFO     src.capture.recorder: [7/10] Starting capture engine (null)
+2026-09-12 23:41:46,275 INFO     src.capture.recorder: [8/10] Playing...
+2026-09-12 23:41:46,275 INFO     src.capture.recorder: [8/10] Playing...
+2026-09-12 23:41:46,276 INFO     src.capture.recorder: [9/10] Monitoring (~2 min)...
+2026-09-12 23:41:46,276 INFO     src.capture.recorder: [9/10] Monitoring (~2 min)...
+2026-09-12 23:41:46,276 INFO     src.capture.recorder:   0s / 100s (0.0%)
+2026-09-12 23:41:46,276 INFO     src.capture.recorder:   0s / 100s (0.0%)
+2026-09-12 23:41:46,276 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,276 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,276 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,276 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,276 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,276 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,276 INFO     src.capture.recorder:   99s / 100s (99.0%)
+2026-09-12 23:41:46,276 INFO     src.capture.recorder:   99s / 100s (99.0%)
+2026-09-12 23:41:46,276 INFO     src.capture.recorder:   VIDEO ENDED
+2026-09-12 23:41:46,276 INFO     src.capture.recorder:   VIDEO ENDED
+2026-09-12 23:41:46,276 INFO     src.capture.recorder: [10/10] Stopping capture
+2026-09-12 23:41:46,276 INFO     src.capture.recorder: [10/10] Stopping capture
+2026-09-12 23:41:46,276 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,276 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,277 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:46,277 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:46,280 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,280 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,280 INFO     src.capture.recorder: [1/10] Navigating to https://example.com
+2026-09-12 23:41:46,280 INFO     src.capture.recorder: [1/10] Navigating to https://example.com
+2026-09-12 23:41:46,280 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,280 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,280 ERROR    src.capture.recorder: No supported player found (detected: None)
+2026-09-12 23:41:46,280 ERROR    src.capture.recorder: No supported player found (detected: None)
+2026-09-12 23:41:46,280 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,280 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,280 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:46,280 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:46,284 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,284 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,284 INFO     src.capture.recorder: [1/10] Navigating to https://example.com
+2026-09-12 23:41:46,284 INFO     src.capture.recorder: [1/10] Navigating to https://example.com
+2026-09-12 23:41:46,284 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,284 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,284 INFO     src.capture.recorder:   Duration: 1800s (30.0 min)
+2026-09-12 23:41:46,284 INFO     src.capture.recorder:   Duration: 1800s (30.0 min)
+2026-09-12 23:41:46,284 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:46,284 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:46,284 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:46,284 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:46,284 ERROR    src.capture.recorder: Fullscreen rejected after all attempts
+2026-09-12 23:41:46,284 ERROR    src.capture.recorder: Fullscreen rejected after all attempts
+2026-09-12 23:41:46,285 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,285 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,285 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:46,285 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:46,287 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,287 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,287 INFO     src.capture.recorder: [1/10] Navigating to https://example.com
+2026-09-12 23:41:46,287 INFO     src.capture.recorder: [1/10] Navigating to https://example.com
+2026-09-12 23:41:46,288 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,288 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,288 INFO     src.capture.recorder:   Duration: 100s (1.7 min)
+2026-09-12 23:41:46,288 INFO     src.capture.recorder:   Duration: 100s (1.7 min)
+2026-09-12 23:41:46,288 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:46,288 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:46,288 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:46,288 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:46,288 INFO     src.capture.recorder: [5/10] Re-pause at 0:00
+2026-09-12 23:41:46,288 INFO     src.capture.recorder: [5/10] Re-pause at 0:00
+2026-09-12 23:41:46,288 INFO     src.capture.recorder: [6/10] Hiding cursor
+2026-09-12 23:41:46,288 INFO     src.capture.recorder: [6/10] Hiding cursor
+2026-09-12 23:41:46,288 INFO     src.capture.recorder: [7/10] Starting capture engine (null)
+2026-09-12 23:41:46,288 INFO     src.capture.recorder: [7/10] Starting capture engine (null)
+2026-09-12 23:41:46,288 INFO     src.capture.recorder: [8/10] Playing...
+2026-09-12 23:41:46,288 INFO     src.capture.recorder: [8/10] Playing...
+2026-09-12 23:41:46,288 INFO     src.capture.recorder: [9/10] Monitoring (~2 min)...
+2026-09-12 23:41:46,288 INFO     src.capture.recorder: [9/10] Monitoring (~2 min)...
+2026-09-12 23:41:46,288 INFO     src.capture.recorder:   0s / 100s (0.0%)
+2026-09-12 23:41:46,288 INFO     src.capture.recorder:   0s / 100s (0.0%)
+2026-09-12 23:41:46,288 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,288 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,289 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,289 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,289 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,289 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,289 INFO     src.capture.recorder:   99s / 100s (99.0%)
+2026-09-12 23:41:46,289 INFO     src.capture.recorder:   99s / 100s (99.0%)
+2026-09-12 23:41:46,289 INFO     src.capture.recorder:   VIDEO ENDED
+2026-09-12 23:41:46,289 INFO     src.capture.recorder:   VIDEO ENDED
+2026-09-12 23:41:46,289 INFO     src.capture.recorder: [10/10] Stopping capture
+2026-09-12 23:41:46,289 INFO     src.capture.recorder: [10/10] Stopping capture
+2026-09-12 23:41:46,289 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,289 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,289 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:46,289 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:46,292 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,292 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,292 INFO     src.capture.recorder: [1/10] Navigating to https://example.com
+2026-09-12 23:41:46,292 INFO     src.capture.recorder: [1/10] Navigating to https://example.com
+2026-09-12 23:41:46,292 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,292 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,292 INFO     src.capture.recorder:   Duration: 100s (1.7 min)
+2026-09-12 23:41:46,292 INFO     src.capture.recorder:   Duration: 100s (1.7 min)
+2026-09-12 23:41:46,292 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:46,292 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:46,293 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:46,293 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:46,293 INFO     src.capture.recorder: [5/10] Re-pause at 0:00
+2026-09-12 23:41:46,293 INFO     src.capture.recorder: [5/10] Re-pause at 0:00
+2026-09-12 23:41:46,293 INFO     src.capture.recorder: [6/10] Hiding cursor
+2026-09-12 23:41:46,293 INFO     src.capture.recorder: [6/10] Hiding cursor
+2026-09-12 23:41:46,293 INFO     src.capture.recorder: [7/10] Starting capture engine (null)
+2026-09-12 23:41:46,293 INFO     src.capture.recorder: [7/10] Starting capture engine (null)
+2026-09-12 23:41:46,293 INFO     src.capture.recorder: [8/10] Playing...
+2026-09-12 23:41:46,293 INFO     src.capture.recorder: [8/10] Playing...
+2026-09-12 23:41:46,293 INFO     src.capture.recorder: [9/10] Monitoring (~2 min)...
+2026-09-12 23:41:46,293 INFO     src.capture.recorder: [9/10] Monitoring (~2 min)...
+2026-09-12 23:41:46,293 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,293 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,293 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,293 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,293 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,293 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,293 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,293 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,293 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,293 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,293 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,293 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,293 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,293 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,294 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,294 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,294 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,294 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,294 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,294 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,294 WARNING  src.capture.recorder:   STALLED — nudging
+2026-09-12 23:41:46,294 WARNING  src.capture.recorder:   STALLED — nudging
+2026-09-12 23:41:46,294 INFO     src.capture.recorder:   99s / 100s (99.0%)
+2026-09-12 23:41:46,294 INFO     src.capture.recorder:   99s / 100s (99.0%)
+2026-09-12 23:41:46,294 INFO     src.capture.recorder:   VIDEO ENDED
+2026-09-12 23:41:46,294 INFO     src.capture.recorder:   VIDEO ENDED
+2026-09-12 23:41:46,294 INFO     src.capture.recorder: [10/10] Stopping capture
+2026-09-12 23:41:46,294 INFO     src.capture.recorder: [10/10] Stopping capture
+2026-09-12 23:41:46,294 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,294 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,294 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:46,294 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:46,297 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,297 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,297 INFO     src.capture.recorder: [1/10] Navigating to https://example.com
+2026-09-12 23:41:46,297 INFO     src.capture.recorder: [1/10] Navigating to https://example.com
+2026-09-12 23:41:46,297 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,297 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,298 INFO     src.capture.recorder:   Duration: 1800s (30.0 min)
+2026-09-12 23:41:46,298 INFO     src.capture.recorder:   Duration: 1800s (30.0 min)
+2026-09-12 23:41:46,298 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:46,298 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:46,298 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:46,298 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:46,298 INFO     src.capture.recorder: [5/10] Re-pause at 0:00
+2026-09-12 23:41:46,298 INFO     src.capture.recorder: [5/10] Re-pause at 0:00
+2026-09-12 23:41:46,298 INFO     src.capture.recorder: [6/10] Hiding cursor
+2026-09-12 23:41:46,298 INFO     src.capture.recorder: [6/10] Hiding cursor
+2026-09-12 23:41:46,298 INFO     src.capture.recorder: [7/10] Starting capture engine (broken)
+2026-09-12 23:41:46,298 INFO     src.capture.recorder: [7/10] Starting capture engine (broken)
+2026-09-12 23:41:46,298 ERROR    src.capture.recorder: Recording failed: Engine exploded
+2026-09-12 23:41:46,298 ERROR    src.capture.recorder: Recording failed: Engine exploded
+2026-09-12 23:41:46,298 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,298 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,298 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:46,298 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:46,301 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,301 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,301 INFO     src.capture.recorder: [1/10] Navigating to https://example.com
+2026-09-12 23:41:46,301 INFO     src.capture.recorder: [1/10] Navigating to https://example.com
+2026-09-12 23:41:46,301 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,301 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,301 INFO     src.capture.recorder:   Duration: 100s (1.7 min)
+2026-09-12 23:41:46,301 INFO     src.capture.recorder:   Duration: 100s (1.7 min)
+2026-09-12 23:41:46,302 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:46,302 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:46,302 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:46,302 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:46,302 INFO     src.capture.recorder: [5/10] Re-pause at 0:00
+2026-09-12 23:41:46,302 INFO     src.capture.recorder: [5/10] Re-pause at 0:00
+2026-09-12 23:41:46,302 INFO     src.capture.recorder: [6/10] Hiding cursor
+2026-09-12 23:41:46,302 INFO     src.capture.recorder: [6/10] Hiding cursor
+2026-09-12 23:41:46,302 INFO     src.capture.recorder: [7/10] Starting capture engine (null)
+2026-09-12 23:41:46,302 INFO     src.capture.recorder: [7/10] Starting capture engine (null)
+2026-09-12 23:41:46,302 INFO     src.capture.recorder: [8/10] Playing...
+2026-09-12 23:41:46,302 INFO     src.capture.recorder: [8/10] Playing...
+2026-09-12 23:41:46,302 INFO     src.capture.recorder: [9/10] Monitoring (~2 min)...
+2026-09-12 23:41:46,302 INFO     src.capture.recorder: [9/10] Monitoring (~2 min)...
+2026-09-12 23:41:46,302 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,302 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,302 INFO     src.capture.recorder:   VIDEO ENDED
+2026-09-12 23:41:46,302 INFO     src.capture.recorder:   VIDEO ENDED
+2026-09-12 23:41:46,302 INFO     src.capture.recorder: [10/10] Stopping capture
+2026-09-12 23:41:46,302 INFO     src.capture.recorder: [10/10] Stopping capture
+2026-09-12 23:41:46,303 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,303 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,303 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:46,303 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:46,305 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,305 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,305 INFO     src.capture.recorder: [1/10] Navigating to https://example.com
+2026-09-12 23:41:46,305 INFO     src.capture.recorder: [1/10] Navigating to https://example.com
+2026-09-12 23:41:46,305 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,305 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,305 INFO     src.capture.recorder:   Duration: 100s (1.7 min)
+2026-09-12 23:41:46,305 INFO     src.capture.recorder:   Duration: 100s (1.7 min)
+2026-09-12 23:41:46,306 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:46,306 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:46,306 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:46,306 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:46,306 INFO     src.capture.recorder: [5/10] Re-pause at 0:00
+2026-09-12 23:41:46,306 INFO     src.capture.recorder: [5/10] Re-pause at 0:00
+2026-09-12 23:41:46,306 INFO     src.capture.recorder: [6/10] Hiding cursor
+2026-09-12 23:41:46,306 INFO     src.capture.recorder: [6/10] Hiding cursor
+2026-09-12 23:41:46,306 INFO     src.capture.recorder: [7/10] Starting capture engine (null)
+2026-09-12 23:41:46,306 INFO     src.capture.recorder: [7/10] Starting capture engine (null)
+2026-09-12 23:41:46,306 INFO     src.capture.recorder: [8/10] Playing...
+2026-09-12 23:41:46,306 INFO     src.capture.recorder: [8/10] Playing...
+2026-09-12 23:41:46,306 INFO     src.capture.recorder: [9/10] Monitoring (~2 min)...
+2026-09-12 23:41:46,306 INFO     src.capture.recorder: [9/10] Monitoring (~2 min)...
+2026-09-12 23:41:46,306 INFO     src.capture.recorder:   99s / 100s (99.0%)
+2026-09-12 23:41:46,306 INFO     src.capture.recorder:   99s / 100s (99.0%)
+2026-09-12 23:41:46,306 INFO     src.capture.recorder:   VIDEO ENDED
+2026-09-12 23:41:46,306 INFO     src.capture.recorder:   VIDEO ENDED
+2026-09-12 23:41:46,306 INFO     src.capture.recorder: [10/10] Stopping capture
+2026-09-12 23:41:46,306 INFO     src.capture.recorder: [10/10] Stopping capture
+2026-09-12 23:41:46,307 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,307 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,307 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:46,307 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:46,310 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,310 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,310 INFO     src.capture.recorder: [1/10] Navigating to https://example.com
+2026-09-12 23:41:46,310 INFO     src.capture.recorder: [1/10] Navigating to https://example.com
+2026-09-12 23:41:46,310 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,310 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,311 ERROR    src.capture.recorder: Could not determine video duration
+2026-09-12 23:41:46,311 ERROR    src.capture.recorder: Could not determine video duration
+2026-09-12 23:41:46,311 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,311 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,311 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:46,311 INFO     src.capture.recorder: Post-recording cleanup complete
+2026-09-12 23:41:46,313 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,313 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,313 INFO     src.capture.recorder: [1/10] Navigating to https://example.com
+2026-09-12 23:41:46,313 INFO     src.capture.recorder: [1/10] Navigating to https://example.com
+2026-09-12 23:41:46,314 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,314 INFO     src.capture.recorder: [2/10] Detecting player...
+2026-09-12 23:41:46,314 INFO     src.capture.recorder:   Duration: 100s (1.7 min)
+2026-09-12 23:41:46,314 INFO     src.capture.recorder:   Duration: 100s (1.7 min)
+2026-09-12 23:41:46,314 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:46,314 INFO     src.capture.recorder: [3/10] Reset to 0:00 + unmute
+2026-09-12 23:41:46,314 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:46,314 INFO     src.capture.recorder: [4/10] Entering fullscreen...
+2026-09-12 23:41:46,314 INFO     src.capture.recorder: [5/10] Re-pause at 0:00
+2026-09-12 23:41:46,314 INFO     src.capture.recorder: [5/10] Re-pause at 0:00
+2026-09-12 23:41:46,314 INFO     src.capture.recorder: [6/10] Hiding cursor
+2026-09-12 23:41:46,314 INFO     src.capture.recorder: [6/10] Hiding cursor
+2026-09-12 23:41:46,314 INFO     src.capture.recorder: [7/10] Starting capture engine (null)
+2026-09-12 23:41:46,314 INFO     src.capture.recorder: [7/10] Starting capture engine (null)
+2026-09-12 23:41:46,314 INFO     src.capture.recorder: [8/10] Playing...
+2026-09-12 23:41:46,314 INFO     src.capture.recorder: [8/10] Playing...
+2026-09-12 23:41:46,314 INFO     src.capture.recorder: [9/10] Monitoring (~2 min)...
+2026-09-12 23:41:46,314 INFO     src.capture.recorder: [9/10] Monitoring (~2 min)...
+2026-09-12 23:41:46,315 INFO     src.capture.recorder:   0s / 100s (0.0%)
+2026-09-12 23:41:46,315 INFO     src.capture.recorder:   0s / 100s (0.0%)
+2026-09-12 23:41:46,315 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,315 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,315 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,315 WARNING  src.capture.recorder:   PAUSED — auto-resuming
+2026-09-12 23:41:46,315 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,315 INFO     src.capture.recorder:   50s / 100s (50.0%)
+2026-09-12 23:41:46,315 INFO     src.capture.recorder:   99s / 100s (99.0%)
+2026-09-12 23:41:46,315 INFO     src.capture.recorder:   99s / 100s (99.0%)
+2026-09-12 23:41:46,315 INFO     src.capture.recorder:   VIDEO ENDED
+2026-09-12 23:41:46,315 INFO     src.capture.recorder:   VIDEO ENDED
+2026-09-12 23:41:46,315 INFO     src.capture.recorder: [10/10] Stopping capture
+2026-09-12 23:41:46,315 INFO     src.capture.recorder: [10/10] Stopping capture
+2026-09-12 23:41:46,315 WARNING  src.capture.recorder: Post-recording cleanup failed: 
+2026-09-12 23:41:46,315 WARNING  src.capture.recorder: Post-recording cleanup failed: 
+2026-09-12 23:41:46,362 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,362 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,364 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,364 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,364 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,364 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,364 INFO     src.capture.preflight: [preflight] Patreon session .................... OK (skipped (test mode))
+2026-09-12 23:41:46,364 INFO     src.capture.preflight: [preflight] Patreon session .................... OK (skipped (test mode))
+2026-09-12 23:41:46,364 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,364 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 23:41:46,365 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 23:41:46,365 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 23:41:46,365 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 23:41:46,365 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 23:41:46,365 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,365 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,366 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,366 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 23:41:46,367 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,367 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 23:41:46,367 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,367 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 23:41:46,368 INFO     src.capture.preflight: [preflight] Patreon session .................... OK (skipped (test mode))
+2026-09-12 23:41:46,368 INFO     src.capture.preflight: [preflight] Patreon session .................... OK (skipped (test mode))
+2026-09-12 23:41:46,368 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50 GB free)
+2026-09-12 23:41:46,368 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50 GB free)
+2026-09-12 23:41:46,368 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 23:41:46,368 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 23:41:46,369 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 23:41:46,369 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 23:41:46,369 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,369 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 23:41:46,382 ERROR    src.transfer.sync: Upload failed: connection refused
+2026-09-12 23:41:46,382 ERROR    src.transfer.sync: Upload failed: connection refused
+2026-09-12 23:41:46,383 ERROR    src.transfer.sync: Download failed: not found
+2026-09-12 23:41:46,383 ERROR    src.transfer.sync: Download failed: not found
+2026-09-12 23:41:46,395 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 23:41:46,395 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 23:41:46,396 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T23:41:46.396331
+2026-09-12 23:41:46,396 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T23:41:46.396331
+2026-09-12 23:41:46,396 INFO     src.pipeline.watcher: [watch] Capping at 3 (remaining saved for next cycle)
+2026-09-12 23:41:46,396 INFO     src.pipeline.watcher: [watch] Capping at 3 (remaining saved for next cycle)
+2026-09-12 23:41:46,397 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (3 total recorded)
+2026-09-12 23:41:46,397 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (3 total recorded)
+2026-09-12 23:41:46,398 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 23:41:46,398 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 23:41:46,398 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T23:41:46.398958
+2026-09-12 23:41:46,398 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T23:41:46.398958
+2026-09-12 23:41:46,399 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (2 total recorded)
+2026-09-12 23:41:46,399 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (2 total recorded)
+2026-09-12 23:41:46,417 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 23:41:46,417 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 23:41:46,417 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T23:41:46.417656
+2026-09-12 23:41:46,417 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T23:41:46.417656
+2026-09-12 23:41:46,418 INFO     src.pipeline.watcher: [watch] No new content found
+2026-09-12 23:41:46,418 INFO     src.pipeline.watcher: [watch] No new content found
+2026-09-12 23:41:46,418 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (0 total recorded)
+2026-09-12 23:41:46,418 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (0 total recorded)
+2026-09-12 23:41:46,419 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 23:41:46,419 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 23:41:46,420 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T23:41:46.420134
+2026-09-12 23:41:46,420 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T23:41:46.420134
+2026-09-12 23:41:46,420 INFO     src.pipeline.watcher: [watch] No new content found
+2026-09-12 23:41:46,420 INFO     src.pipeline.watcher: [watch] No new content found
+2026-09-12 23:41:46,420 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (0 total recorded)
+2026-09-12 23:41:46,420 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (0 total recorded)
+2026-09-12 23:41:46,422 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 23:41:46,422 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 23:41:46,422 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T23:41:46.422715
+2026-09-12 23:41:46,422 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T23:41:46.422715
+2026-09-12 23:41:46,423 ERROR    src.pipeline.watcher: [watch] Cycle 1 failed: discovery exploded
+2026-09-12 23:41:46,423 ERROR    src.pipeline.watcher: [watch] Cycle 1 failed: discovery exploded
+2026-09-12 23:41:46,423 INFO     src.pipeline.watcher: [watch] Next cycle at 2026-09-13T23:41:46.423522
+2026-09-12 23:41:46,423 INFO     src.pipeline.watcher: [watch] Next cycle at 2026-09-13T23:41:46.423522
+2026-09-12 23:41:46,423 INFO     src.pipeline.watcher: [watch] Cycle 2 starting at 2026-09-12T23:41:46.423932
+2026-09-12 23:41:46,423 INFO     src.pipeline.watcher: [watch] Cycle 2 starting at 2026-09-12T23:41:46.423932
+2026-09-12 23:41:46,424 INFO     src.pipeline.watcher: [watch] No new content found
+2026-09-12 23:41:46,424 INFO     src.pipeline.watcher: [watch] No new content found
+2026-09-12 23:41:46,449 INFO     src.pipeline.watcher: [watch] Watcher stopped after 2 cycles (0 total recorded)
+2026-09-12 23:41:46,449 INFO     src.pipeline.watcher: [watch] Watcher stopped after 2 cycles (0 total recorded)
+2026-09-12 23:41:46,452 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 23:41:46,452 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 23:41:46,452 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T23:41:46.452769
+2026-09-12 23:41:46,452 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T23:41:46.452769
+2026-09-12 23:41:46,453 ERROR    src.pipeline.watcher: [watch] Cycle 1 failed: pipeline exploded
+2026-09-12 23:41:46,453 ERROR    src.pipeline.watcher: [watch] Cycle 1 failed: pipeline exploded
+2026-09-12 23:41:46,453 INFO     src.pipeline.watcher: [watch] Next cycle at 2026-09-13T23:41:46.453625
+2026-09-12 23:41:46,453 INFO     src.pipeline.watcher: [watch] Next cycle at 2026-09-13T23:41:46.453625
+2026-09-12 23:41:46,454 INFO     src.pipeline.watcher: [watch] Cycle 2 starting at 2026-09-12T23:41:46.454055
+2026-09-12 23:41:46,454 INFO     src.pipeline.watcher: [watch] Cycle 2 starting at 2026-09-12T23:41:46.454055
+2026-09-12 23:41:46,454 INFO     src.pipeline.watcher: [watch] No new content found
+2026-09-12 23:41:46,454 INFO     src.pipeline.watcher: [watch] No new content found
+2026-09-12 23:41:46,454 INFO     src.pipeline.watcher: [watch] Watcher stopped after 2 cycles (0 total recorded)
+2026-09-12 23:41:46,454 INFO     src.pipeline.watcher: [watch] Watcher stopped after 2 cycles (0 total recorded)
+2026-09-12 23:41:46,456 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=True)
+2026-09-12 23:41:46,456 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=True)
+2026-09-12 23:41:46,456 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T23:41:46.456715
+2026-09-12 23:41:46,456 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T23:41:46.456715
+2026-09-12 23:41:46,457 INFO     src.pipeline.watcher: [watch] Dry-run: found 1 new video(s), skipping pipeline
+2026-09-12 23:41:46,457 INFO     src.pipeline.watcher: [watch] Dry-run: found 1 new video(s), skipping pipeline
+2026-09-12 23:41:46,457 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (0 total recorded)
+2026-09-12 23:41:46,457 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (0 total recorded)
+2026-09-12 23:41:46,458 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=True)
+2026-09-12 23:41:46,458 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=True)
+2026-09-12 23:41:46,459 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T23:41:46.459125
+2026-09-12 23:41:46,459 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T23:41:46.459125
+2026-09-12 23:41:46,459 INFO     src.pipeline.watcher: [watch] Dry-run: found 1 new video(s), skipping pipeline
+2026-09-12 23:41:46,459 INFO     src.pipeline.watcher: [watch] Dry-run: found 1 new video(s), skipping pipeline
+2026-09-12 23:41:46,459 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (0 total recorded)
+2026-09-12 23:41:46,459 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (0 total recorded)
+2026-09-12 23:41:46,462 INFO     src.pipeline.watcher: [watch] Found 1 new video(s)
+2026-09-12 23:41:46,462 INFO     src.pipeline.watcher: [watch] Found 1 new video(s)
+2026-09-12 23:41:46,467 INFO     src.transcribe.whisper_runner: SKIP done (already done)
+2026-09-12 23:41:46,467 INFO     src.transcribe.whisper_runner: SKIP done (already done)
+2026-09-12 23:41:46,479 INFO     src.transcribe.whisper_runner: DONE new (0.0m audio / 0.0m wall, 14608.0x)
+2026-09-12 23:41:46,479 INFO     src.transcribe.whisper_runner: DONE new (0.0m audio / 0.0m wall, 14608.0x)
+2026-09-12 23:41:46,481 INFO     src.transcribe.whisper_runner: DONE new (0.0m audio / 0.0m wall, 18858.4x)
+2026-09-12 23:41:46,481 INFO     src.transcribe.whisper_runner: DONE new (0.0m audio / 0.0m wall, 18858.4x)
+2026-09-12 23:41:46,495 ERROR    src.sources.youtube: yt-dlp failed: ERROR: Video not found
+2026-09-12 23:41:46,495 ERROR    src.sources.youtube: yt-dlp failed: ERROR: Video not found
+2026-09-12 23:41:46,496 ERROR    src.sources.youtube: yt-dlp catalog error: Command 'cmd' timed out after 60 seconds
+2026-09-12 23:41:46,496 ERROR    src.sources.youtube: yt-dlp catalog error: Command 'cmd' timed out after 60 seconds
+2026-09-12 23:41:46,509 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://youtube.com/watch?v=abc123 -o /tmp/ytdlp_test/my_video.%(ext)s --no-playlist
+2026-09-12 23:41:46,509 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://youtube.com/watch?v=abc123 -o /tmp/ytdlp_test/my_video.%(ext)s --no-playlist
+2026-09-12 23:41:46,511 ERROR    src.engines.ytdlp_engine: yt-dlp exited with code 1
+2026-09-12 23:41:46,511 ERROR    src.engines.ytdlp_engine: yt-dlp exited with code 1
+2026-09-12 23:41:46,512 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://example.com -o /tmp/pytest-of-tuna/pytest-268/test_output_path_templating0/lecture_01.%(ext)s --no-playlist
+2026-09-12 23:41:46,512 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://example.com -o /tmp/pytest-of-tuna/pytest-268/test_output_path_templating0/lecture_01.%(ext)s --no-playlist
+2026-09-12 23:41:46,513 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://example.com/video -o /tmp/ytdlp_test/video.%(ext)s --no-playlist
+2026-09-12 23:41:46,513 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://example.com/video -o /tmp/ytdlp_test/video.%(ext)s --no-playlist

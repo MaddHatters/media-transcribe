@@ -1,0 +1,130 @@
+2026-09-12 03:18:28,998 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 03:18:28,998 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 03:18:29,000 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 03:18:29,000 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 03:18:29,000 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 03:18:29,000 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 03:18:29,001 INFO     src.capture.preflight: [preflight] Patreon session .................... OK (skipped (test mode))
+2026-09-12 03:18:29,001 INFO     src.capture.preflight: [preflight] Patreon session .................... OK (skipped (test mode))
+2026-09-12 03:18:29,001 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 03:18:29,001 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50.2 GB free)
+2026-09-12 03:18:29,001 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 03:18:29,001 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 03:18:29,001 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 03:18:29,001 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 03:18:29,002 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 03:18:29,002 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 03:18:29,003 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 03:18:29,003 WARNING  src.capture.window: clean_chrome_tabs: failed to list targets: <urlopen error [Errno 111] Connection refused>
+2026-09-12 03:18:29,004 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 03:18:29,004 INFO     src.capture.preflight: [preflight] Chrome CDP ......................... OK
+2026-09-12 03:18:29,004 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 03:18:29,004 INFO     src.capture.preflight: [preflight] OBS WebSocket ...................... OK
+2026-09-12 03:18:29,004 INFO     src.capture.preflight: [preflight] Patreon session .................... OK (skipped (test mode))
+2026-09-12 03:18:29,004 INFO     src.capture.preflight: [preflight] Patreon session .................... OK (skipped (test mode))
+2026-09-12 03:18:29,005 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50 GB free)
+2026-09-12 03:18:29,005 INFO     src.capture.preflight: [preflight] Disk space ......................... OK (50 GB free)
+2026-09-12 03:18:29,005 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 03:18:29,005 INFO     src.capture.preflight: [preflight] Test recording (video) ............. OK
+2026-09-12 03:18:29,005 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 03:18:29,005 INFO     src.capture.preflight: [preflight] Test recording (audio) ............. OK
+2026-09-12 03:18:29,005 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 03:18:29,005 INFO     src.capture.preflight: [preflight] Test recording (resolution) ........ OK (1920x1080)
+2026-09-12 03:18:29,020 ERROR    src.transfer.sync: Upload failed: connection refused
+2026-09-12 03:18:29,020 ERROR    src.transfer.sync: Upload failed: connection refused
+2026-09-12 03:18:29,022 ERROR    src.transfer.sync: Download failed: not found
+2026-09-12 03:18:29,022 ERROR    src.transfer.sync: Download failed: not found
+2026-09-12 03:18:29,033 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 03:18:29,033 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 03:18:29,034 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T03:18:29.034534
+2026-09-12 03:18:29,034 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T03:18:29.034534
+2026-09-12 03:18:29,034 INFO     src.pipeline.watcher: [watch] Capping at 3 (remaining saved for next cycle)
+2026-09-12 03:18:29,034 INFO     src.pipeline.watcher: [watch] Capping at 3 (remaining saved for next cycle)
+2026-09-12 03:18:29,035 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (3 total recorded)
+2026-09-12 03:18:29,035 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (3 total recorded)
+2026-09-12 03:18:29,036 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 03:18:29,036 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 03:18:29,037 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T03:18:29.037054
+2026-09-12 03:18:29,037 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T03:18:29.037054
+2026-09-12 03:18:29,037 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (2 total recorded)
+2026-09-12 03:18:29,037 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (2 total recorded)
+2026-09-12 03:18:29,055 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 03:18:29,055 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 03:18:29,055 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T03:18:29.055943
+2026-09-12 03:18:29,055 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T03:18:29.055943
+2026-09-12 03:18:29,056 INFO     src.pipeline.watcher: [watch] No new content found
+2026-09-12 03:18:29,056 INFO     src.pipeline.watcher: [watch] No new content found
+2026-09-12 03:18:29,056 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (0 total recorded)
+2026-09-12 03:18:29,056 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (0 total recorded)
+2026-09-12 03:18:29,058 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 03:18:29,058 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 03:18:29,058 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T03:18:29.058425
+2026-09-12 03:18:29,058 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T03:18:29.058425
+2026-09-12 03:18:29,058 INFO     src.pipeline.watcher: [watch] No new content found
+2026-09-12 03:18:29,058 INFO     src.pipeline.watcher: [watch] No new content found
+2026-09-12 03:18:29,059 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (0 total recorded)
+2026-09-12 03:18:29,059 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (0 total recorded)
+2026-09-12 03:18:29,060 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 03:18:29,060 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 03:18:29,060 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T03:18:29.060873
+2026-09-12 03:18:29,060 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T03:18:29.060873
+2026-09-12 03:18:29,061 ERROR    src.pipeline.watcher: [watch] Cycle 1 failed: discovery exploded
+2026-09-12 03:18:29,061 ERROR    src.pipeline.watcher: [watch] Cycle 1 failed: discovery exploded
+2026-09-12 03:18:29,061 INFO     src.pipeline.watcher: [watch] Next cycle at 2026-09-13T03:18:29.061676
+2026-09-12 03:18:29,061 INFO     src.pipeline.watcher: [watch] Next cycle at 2026-09-13T03:18:29.061676
+2026-09-12 03:18:29,062 INFO     src.pipeline.watcher: [watch] Cycle 2 starting at 2026-09-12T03:18:29.062084
+2026-09-12 03:18:29,062 INFO     src.pipeline.watcher: [watch] Cycle 2 starting at 2026-09-12T03:18:29.062084
+2026-09-12 03:18:29,062 INFO     src.pipeline.watcher: [watch] No new content found
+2026-09-12 03:18:29,062 INFO     src.pipeline.watcher: [watch] No new content found
+2026-09-12 03:18:29,088 INFO     src.pipeline.watcher: [watch] Watcher stopped after 2 cycles (0 total recorded)
+2026-09-12 03:18:29,088 INFO     src.pipeline.watcher: [watch] Watcher stopped after 2 cycles (0 total recorded)
+2026-09-12 03:18:29,091 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 03:18:29,091 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=False)
+2026-09-12 03:18:29,092 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T03:18:29.092072
+2026-09-12 03:18:29,092 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T03:18:29.092072
+2026-09-12 03:18:29,092 ERROR    src.pipeline.watcher: [watch] Cycle 1 failed: pipeline exploded
+2026-09-12 03:18:29,092 ERROR    src.pipeline.watcher: [watch] Cycle 1 failed: pipeline exploded
+2026-09-12 03:18:29,093 INFO     src.pipeline.watcher: [watch] Next cycle at 2026-09-13T03:18:29.092921
+2026-09-12 03:18:29,093 INFO     src.pipeline.watcher: [watch] Next cycle at 2026-09-13T03:18:29.092921
+2026-09-12 03:18:29,093 INFO     src.pipeline.watcher: [watch] Cycle 2 starting at 2026-09-12T03:18:29.093346
+2026-09-12 03:18:29,093 INFO     src.pipeline.watcher: [watch] Cycle 2 starting at 2026-09-12T03:18:29.093346
+2026-09-12 03:18:29,093 INFO     src.pipeline.watcher: [watch] No new content found
+2026-09-12 03:18:29,093 INFO     src.pipeline.watcher: [watch] No new content found
+2026-09-12 03:18:29,094 INFO     src.pipeline.watcher: [watch] Watcher stopped after 2 cycles (0 total recorded)
+2026-09-12 03:18:29,094 INFO     src.pipeline.watcher: [watch] Watcher stopped after 2 cycles (0 total recorded)
+2026-09-12 03:18:29,095 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=True)
+2026-09-12 03:18:29,095 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=True)
+2026-09-12 03:18:29,096 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T03:18:29.096246
+2026-09-12 03:18:29,096 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T03:18:29.096246
+2026-09-12 03:18:29,096 INFO     src.pipeline.watcher: [watch] Dry-run: found 1 new video(s), skipping pipeline
+2026-09-12 03:18:29,096 INFO     src.pipeline.watcher: [watch] Dry-run: found 1 new video(s), skipping pipeline
+2026-09-12 03:18:29,097 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (0 total recorded)
+2026-09-12 03:18:29,097 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (0 total recorded)
+2026-09-12 03:18:29,098 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=True)
+2026-09-12 03:18:29,098 INFO     src.pipeline.watcher: [watch] Starting autonomous watcher (interval=24.0h, max_per_run=3, dry_run=True)
+2026-09-12 03:18:29,098 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T03:18:29.098629
+2026-09-12 03:18:29,098 INFO     src.pipeline.watcher: [watch] Cycle 1 starting at 2026-09-12T03:18:29.098629
+2026-09-12 03:18:29,098 INFO     src.pipeline.watcher: [watch] Dry-run: found 1 new video(s), skipping pipeline
+2026-09-12 03:18:29,098 INFO     src.pipeline.watcher: [watch] Dry-run: found 1 new video(s), skipping pipeline
+2026-09-12 03:18:29,099 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (0 total recorded)
+2026-09-12 03:18:29,099 INFO     src.pipeline.watcher: [watch] Watcher stopped after 1 cycles (0 total recorded)
+2026-09-12 03:18:29,101 INFO     src.pipeline.watcher: [watch] Found 1 new video(s)
+2026-09-12 03:18:29,101 INFO     src.pipeline.watcher: [watch] Found 1 new video(s)
+2026-09-12 03:18:29,106 INFO     src.transcribe.whisper_runner: SKIP done (already done)
+2026-09-12 03:18:29,106 INFO     src.transcribe.whisper_runner: SKIP done (already done)
+2026-09-12 03:18:29,107 INFO     src.transcribe.whisper_runner: DONE new (0.0m audio / 0.0m wall, 18309.9x)
+2026-09-12 03:18:29,107 INFO     src.transcribe.whisper_runner: DONE new (0.0m audio / 0.0m wall, 18309.9x)
+2026-09-12 03:18:29,108 INFO     src.transcribe.whisper_runner: DONE new (0.0m audio / 0.0m wall, 18743.0x)
+2026-09-12 03:18:29,108 INFO     src.transcribe.whisper_runner: DONE new (0.0m audio / 0.0m wall, 18743.0x)
+2026-09-12 03:18:29,123 ERROR    src.sources.youtube: yt-dlp failed: ERROR: Video not found
+2026-09-12 03:18:29,123 ERROR    src.sources.youtube: yt-dlp failed: ERROR: Video not found
+2026-09-12 03:18:29,125 ERROR    src.sources.youtube: yt-dlp catalog error: Command 'cmd' timed out after 60 seconds
+2026-09-12 03:18:29,125 ERROR    src.sources.youtube: yt-dlp catalog error: Command 'cmd' timed out after 60 seconds
+2026-09-12 03:18:29,136 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://youtube.com/watch?v=abc123 -o /tmp/ytdlp_test/my_video.%(ext)s --no-playlist
+2026-09-12 03:18:29,136 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://youtube.com/watch?v=abc123 -o /tmp/ytdlp_test/my_video.%(ext)s --no-playlist
+2026-09-12 03:18:29,138 ERROR    src.engines.ytdlp_engine: yt-dlp exited with code 1
+2026-09-12 03:18:29,138 ERROR    src.engines.ytdlp_engine: yt-dlp exited with code 1
+2026-09-12 03:18:29,140 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://example.com -o /tmp/pytest-of-tuna/pytest-242/test_output_path_templating0/lecture_01.%(ext)s --no-playlist
+2026-09-12 03:18:29,140 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://example.com -o /tmp/pytest-of-tuna/pytest-242/test_output_path_templating0/lecture_01.%(ext)s --no-playlist
+2026-09-12 03:18:29,141 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://example.com/video -o /tmp/ytdlp_test/video.%(ext)s --no-playlist
+2026-09-12 03:18:29,141 INFO     src.engines.ytdlp_engine: Starting yt-dlp: uvx yt-dlp https://example.com/video -o /tmp/ytdlp_test/video.%(ext)s --no-playlist

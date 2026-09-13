@@ -1,0 +1,154 @@
+syntax = "proto3";
+package agent;
+
+service AgentService {
+  // Start a pipeline run for specific posts with optional step filtering
+  rpc RunPipeline(PipelineRequest) returns (PipelineResponse);
+
+  // Start the autonomous content watcher loop
+  rpc StartWatcher(WatcherConfig) returns (WatcherResponse);
+
+  // Gracefully stop the watcher (finishes current video, then stops)
+  rpc StopWatcher(Empty) returns (WatcherResponse);
+
+  // Get combined status: pipeline state, watcher state, disk usage, OBS/Chrome health
+  rpc GetStatus(Empty) returns (AgentStatus);
+
+  // Health check: is the machine up, OBS running, Chrome available, disk OK
+  rpc HealthCheck(Empty) returns (HealthResponse);
+
+  // Run Patreon content discovery (fetch new posts)
+  rpc TriggerDiscovery(DiscoveryRequest) returns (DiscoveryResponse);
+
+  // Server-streaming: real-time pipeline events pushed to client
+  rpc StreamEvents(EventSubscription) returns (stream PipelineEvent);
+}
+
+message Empty {}
+
+// --- Pipeline ---
+message PipelineRequest {
+  repeated PostEntry posts = 1;      // posts to process
+  repeated string steps = 2;         // optional step filter (empty = all steps)
+  bool shuffle = 3;                  // randomize order (anti-detection)
+  bool enable_breaks = 4;            // human-like pauses between videos
+}
+
+message PostEntry {
+  string post_id = 1;
+  string url = 2;
+  string title = 3;
+  string filename = 4;
+  string post_type = 5;
+}
+
+message PipelineResponse {
+  bool started = 1;
+  string run_id = 2;                 // unique ID for this pipeline run
+  int32 queue_size = 3;
+  string error = 4;                  // non-empty if failed to start
+}
+
+// --- Watcher ---
+message WatcherConfig {
+  float interval_hours = 1;          // minimum 12h enforced server-side
+  repeated string steps = 2;         // pipeline steps to run per cycle
+  int32 max_per_run = 3;             // max videos per cycle
+  bool dry_run = 4;                  // discover but don't record
+}
+
+message WatcherResponse {
+  bool success = 1;
+  string message = 2;
+  WatcherState state = 3;
+}
+
+message WatcherState {
+  bool running = 1;
+  int32 pid = 2;
+  int32 cycle = 3;
+  float interval_hours = 4;
+  string last_run = 5;              // ISO timestamp
+  string next_run = 6;              // ISO timestamp
+  int32 new_found = 7;
+  int32 recorded = 8;
+  int32 failed = 9;
+  int32 total_recorded = 10;
+  string started_at = 11;
+}
+
+// --- Status ---
+message AgentStatus {
+  HealthResponse health = 1;
+  WatcherState watcher = 2;
+  PipelineState pipeline = 3;
+  DiskInfo disk = 4;
+}
+
+message PipelineState {
+  bool running = 1;
+  string run_id = 2;
+  int32 total = 3;
+  int32 completed = 4;
+  int32 failed = 5;
+  string current_post = 6;
+  string current_step = 7;
+}
+
+message DiskInfo {
+  int64 total_bytes = 1;
+  int64 free_bytes = 2;
+  string drive = 3;                 // e.g. "D:"
+}
+
+message HealthResponse {
+  bool healthy = 1;
+  bool obs_connected = 2;
+  bool chrome_available = 3;
+  bool disk_ok = 4;                 // >= 5GB free
+  string obs_version = 5;
+  string error = 6;
+}
+
+// --- Discovery ---
+message DiscoveryRequest {
+  bool full_catalog = 1;            // paginate through all posts (slow)
+  bool force = 2;                   // ignore cooldown timer
+  string campaign_id = 3;           // default: "5008493"
+}
+
+message DiscoveryResponse {
+  int32 total_found = 1;
+  int32 new_posts = 2;
+  int32 video_posts = 3;
+  repeated DiscoveredPostInfo new_post_list = 4;
+  string error = 5;
+}
+
+message DiscoveredPostInfo {
+  string post_id = 1;
+  string title = 2;
+  string url = 3;
+  string published_at = 4;
+  string post_type = 5;
+  bool has_video = 6;
+}
+
+// --- Streaming Events ---
+message EventSubscription {
+  repeated string event_types = 1;  // empty = all events
+}
+
+message PipelineEvent {
+  string type = 1;                  // step_started, step_completed, step_failed,
+                                    // watcher_cycle, discovery_complete, pipeline_complete
+  string run_id = 2;
+  string post_id = 3;
+  string step = 4;
+  string status = 5;
+  string error = 6;
+  string output_path = 7;
+  float duration_seconds = 8;
+  string timestamp = 9;            // ISO 8601
+  map<string, string> metadata = 10;
+}
