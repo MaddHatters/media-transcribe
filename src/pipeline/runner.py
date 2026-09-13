@@ -40,13 +40,17 @@ class PipelineResult:
 class Pipeline:
     def __init__(self, source, engine, output_dir: Path | None = None,
                  enable_breaks: bool = False, preflight=None,
-                 catalog: CatalogManager | None = None):
+                 catalog: CatalogManager | None = None,
+                 on_step_start=None, on_step_complete=None, on_step_fail=None):
         self._source = source
         self._engine = engine
         self._output_dir = output_dir or Path(".")
         self._enable_breaks = enable_breaks
         self._preflight = preflight
         self._catalog = catalog
+        self._on_step_start = on_step_start
+        self._on_step_complete = on_step_complete
+        self._on_step_fail = on_step_fail
 
     def _validate_steps(self, steps: list[str]) -> list[str]:
         for s in steps:
@@ -166,13 +170,19 @@ class Pipeline:
         )
 
         for step in steps:
+            if self._on_step_start:
+                self._on_step_start(post, step)
             try:
                 method = getattr(self, f"_step_{step}")
                 await method(post, result)
                 result.steps_completed.append(step)
+                if self._on_step_complete:
+                    self._on_step_complete(post, step, result)
             except Exception as exc:
                 log.error("Step '%s' failed for %s: %s", step, post.title, exc)
                 result.steps_failed[step] = str(exc)
+                if self._on_step_fail:
+                    self._on_step_fail(post, step, str(exc))
 
         return result
 

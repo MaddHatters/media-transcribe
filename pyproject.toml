@@ -51,7 +51,7 @@ asyncio_mode = "auto"
 pythonpath = ["."]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src", "web", "proto"]
+packages = ["src", "web", "proto", "agent"]
 
 [tool.uv]
 # Pin nothing exotic; CPU-only by default. See README for GPU/Mac notes.

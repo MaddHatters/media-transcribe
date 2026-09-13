@@ -379,3 +379,69 @@ def test_extract_post_id_slug():
 def test_extract_post_id_with_query():
     from src.catalog import extract_post_id
     assert extract_post_id("https://www.patreon.com/posts/12345?utm=foo") == "12345"
+
+
+# --- Pipeline callback hook tests ---
+
+
+@pytest.mark.asyncio
+async def test_callbacks_called_in_correct_order():
+    calls = []
+    pipeline = Pipeline(
+        source=MagicMock(), engine=MagicMock(),
+        on_step_start=lambda post, step: calls.append(("start", step)),
+        on_step_complete=lambda post, step, result: calls.append(("complete", step)),
+        on_step_fail=lambda post, step, error: calls.append(("fail", step)),
+    )
+    post = MagicMock(url="http://a", title="A")
+
+    with patch.object(pipeline, "_step_transcribe", new_callable=AsyncMock), \
+         patch.object(pipeline, "_step_correct", new_callable=AsyncMock, side_effect=RuntimeError("boom")):
+        result = await pipeline._process_one(post, ["transcribe", "correct"])
+
+    assert calls == [
+        ("start", "transcribe"),
+        ("complete", "transcribe"),
+        ("start", "correct"),
+        ("fail", "correct"),
+    ]
+
+
+@pytest.mark.asyncio
+async def test_callbacks_not_called_when_none():
+    pipeline = Pipeline(
+        source=MagicMock(), engine=MagicMock(),
+        on_step_start=None, on_step_complete=None, on_step_fail=None,
+    )
+    post = MagicMock(url="http://a", title="A")
+
+    with patch.object(pipeline, "_step_transcribe", new_callable=AsyncMock):
+        result = await pipeline._process_one(post, ["transcribe"])
+
+    assert "transcribe" in result.steps_completed
+    assert not result.steps_failed
+
+
+@pytest.mark.asyncio
+async def test_callback_arguments_are_correct():
+    start_args = []
+    complete_args = []
+    fail_args = []
+    pipeline = Pipeline(
+        source=MagicMock(), engine=MagicMock(),
+        on_step_start=lambda post, step: start_args.append((post, step)),
+        on_step_complete=lambda post, step, result: complete_args.append((post, step, result)),
+        on_step_fail=lambda post, step, error: fail_args.append((post, step, error)),
+    )
+    post = MagicMock(url="http://a", title="A")
+
+    with patch.object(pipeline, "_step_transcribe", new_callable=AsyncMock), \
+         patch.object(pipeline, "_step_correct", new_callable=AsyncMock, side_effect=ValueError("bad")):
+        result = await pipeline._process_one(post, ["transcribe", "correct"])
+
+    assert start_args[0] == (post, "transcribe")
+    assert start_args[1] == (post, "correct")
+    assert complete_args[0][0] is post
+    assert complete_args[0][1] == "transcribe"
+    assert isinstance(complete_args[0][2], PipelineResult)
+    assert fail_args[0] == (post, "correct", "bad")

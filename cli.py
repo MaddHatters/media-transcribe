@@ -31,7 +31,7 @@ from pathlib import Path
 from src.config import CATALOG_PATH
 from src.sources.base import title_to_filename
 
-LONG_RUNNING_COMMANDS = {"record", "transcribe", "analyze", "pipeline", "watch"}
+LONG_RUNNING_COMMANDS = {"record", "transcribe", "analyze", "pipeline", "watch", "serve"}
 
 
 def background_relaunch(args: argparse.Namespace, log_dir: Path) -> int:
@@ -366,6 +366,13 @@ def build_parser() -> argparse.ArgumentParser:
         help="Ignore cooldown timer")
     d.add_argument("--campaign-id", default="5008493",
         help="Patreon campaign ID (default: Mr. FIRED Up Wealth)")
+
+    # --- serve (agent gRPC server) ---
+    s = sub.add_parser("serve", help="Start the gRPC agent server")
+    s.add_argument("--port", type=int, default=8421,
+                   help="gRPC server port (default: 8421)")
+    s.add_argument("--foreground", action="store_true",
+                   help="Run in foreground instead of backgrounding")
 
     # --- watch ---
     w = sub.add_parser("watch", help="Autonomous content discovery + recording loop")
@@ -766,6 +773,11 @@ def main() -> int:
             print(f"\n  Queue written: {len(queue)} videos to {args.queue_new}")
 
         return 0
+
+    elif args.command == "serve":
+        import asyncio
+        from agent.server import run_server
+        asyncio.run(run_server(port=args.port))
 
     elif args.command == "watch":
         if args.status:
