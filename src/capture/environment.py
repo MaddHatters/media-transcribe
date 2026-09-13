@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import subprocess
+import sys
 import time
 import urllib.request
 from pathlib import Path
@@ -26,6 +27,11 @@ from src.config import (
 
 log = logging.getLogger(__name__)
 
+# Venv Python on the current machine — used for scheduled tasks so they
+# pick up the project's installed packages (obsws_python, etc.) instead
+# of the system Python 3.8 which lacks them.
+VENV_PYTHON = Path(sys.executable)
+
 
 def is_ssh_session() -> bool:
     if os.environ.get("SSH_CLIENT") or os.environ.get("SSH_CONNECTION"):
@@ -41,6 +47,133 @@ def is_ssh_session() -> bool:
         except Exception:
             pass
     return False
+
+
+def _ensure_console_session() -> bool:
+    """Reconnect any disconnected Windows session to the console.
+
+    When someone RDPs in and closes the window without logging out,
+    the session stays "Disconnected". OBS launched via schtasks /it
+    runs on the disconnected desktop and can't access the GPU or
+    respond to UI events. Reconnecting to console fixes this.
+
+    On Windows 10/11 (non-server), there's only one user session.
+    RDP hijacks the console session; disconnecting leaves it orphaned.
+    """
+    if not IS_WINDOWS:
+        return True
+
+    try:
+        result = subprocess.run(
+            ["query", "user"],
+            capture_output=True, text=True, timeout=10,
+        )
+        # Parse output: look for "Disc" state
+        for line in result.stdout.strip().splitlines()[1:]:  # skip header
+            parts = line.split()
+            # Format: USERNAME SESSIONNAME ID STATE IDLE_TIME LOGON_TIME
+            # When disconnected, SESSIONNAME is empty so columns shift
+            if "Disc" in line:
+                # Find the session ID (the number before "Disc")
+                for i, part in enumerate(parts):
+                    if part == "Disc" and i > 0:
+                        session_id = parts[i - 1]
+                        if session_id.isdigit():
+                            log.warning(
+                                "Disconnected session %s detected — reconnecting to console",
+                                session_id,
+                            )
+                            subprocess.run(
+                                ["tscon", session_id, "/dest:console"],
+                                capture_output=True, timeout=10,
+                            )
+                            time.sleep(2)  # Give the session a moment to activate
+                            log.info("Session %s reconnected to console", session_id)
+                            return True
+        log.info("Desktop session is active on console — no reconnect needed")
+        return True
+    except Exception as exc:
+        log.warning("Could not check/reconnect desktop session: %s", exc)
+        return False
+
+
+def _graceful_obs_shutdown(timeout: int = 15) -> bool:
+    """Shut down OBS gracefully to avoid the crash dialog on next launch.
+
+    Tries in order:
+    1. WebSocket — stop any active recording
+    2. CloseMainWindow() — sends WM_CLOSE (like clicking X)
+    3. taskkill without /f — sends WM_CLOSE via Windows
+    4. taskkill /f — force kill (last resort, causes crash dialog)
+
+    Returns True if OBS was stopped.
+    """
+    # 1. Try WebSocket — stop recording first
+    try:
+        client = _obs_connect()
+        try:
+            status = client.get_record_status()
+            if status.output_active:
+                client.stop_record()
+                log.info("Stopped active OBS recording before shutdown")
+                time.sleep(1)
+        finally:
+            client.base_client.ws.close()
+    except Exception:
+        pass  # WebSocket not available
+
+    # 2. Try CloseMainWindow (sends WM_CLOSE, like clicking X)
+    try:
+        subprocess.run(
+            ["powershell", "-Command",
+             "Get-Process obs64 -ErrorAction SilentlyContinue"
+             " | ForEach-Object { $_.CloseMainWindow() }"],
+            capture_output=True, text=True, timeout=10,
+        )
+        # Wait for graceful shutdown
+        for _ in range(timeout):
+            check = subprocess.run(
+                ["tasklist", "/fi", "IMAGENAME eq obs64.exe",
+                 "/fo", "csv", "/nh"],
+                capture_output=True, text=True, timeout=5,
+            )
+            if "obs64.exe" not in check.stdout:
+                log.info("OBS shut down gracefully via CloseMainWindow")
+                return True
+            time.sleep(1)
+    except Exception as exc:
+        log.warning("CloseMainWindow failed: %s", exc)
+
+    # 3. Try taskkill without /f (sends WM_CLOSE via Windows)
+    try:
+        subprocess.run(
+            ["taskkill", "/im", "obs64.exe"],
+            capture_output=True, text=True, timeout=10,
+        )
+        time.sleep(3)
+        check = subprocess.run(
+            ["tasklist", "/fi", "IMAGENAME eq obs64.exe",
+             "/fo", "csv", "/nh"],
+            capture_output=True, text=True, timeout=5,
+        )
+        if "obs64.exe" not in check.stdout:
+            log.info("OBS shut down via taskkill (graceful)")
+            return True
+    except Exception:
+        pass
+
+    # 4. Last resort — force kill (will cause crash dialog next launch)
+    log.warning("Graceful shutdown failed — force killing OBS (will cause crash dialog)")
+    try:
+        subprocess.run(
+            ["taskkill", "/f", "/im", "obs64.exe"],
+            capture_output=True, timeout=10,
+        )
+        log.info("OBS force-killed")
+        return True
+    except Exception as exc:
+        log.warning("OBS force-kill failed: %s", exc)
+        return False
 
 
 def _launch_via_scheduled_task(exe_path: str, args: list[str], task_name: str) -> bool:
@@ -150,14 +283,40 @@ def restart_chrome() -> bool:
 
     log.info("Restarting Chrome (clean slate)...")
 
+    # Try graceful shutdown first (CloseMainWindow), then force kill
     try:
         subprocess.run(
-            ["taskkill", "/f", "/im", "chrome.exe"],
-            capture_output=True, timeout=10,
+            ["powershell", "-Command",
+             "Get-Process chrome -ErrorAction SilentlyContinue"
+             " | ForEach-Object { $_.CloseMainWindow() }"],
+            capture_output=True, text=True, timeout=10,
         )
-        log.info("Chrome processes killed")
+        time.sleep(3)
+        # Check if Chrome is still running
+        check = subprocess.run(
+            ["tasklist", "/fi", "IMAGENAME eq chrome.exe",
+             "/fo", "csv", "/nh"],
+            capture_output=True, text=True, timeout=5,
+        )
+        if "chrome.exe" in check.stdout:
+            # Graceful didn't work — force kill
+            subprocess.run(
+                ["taskkill", "/f", "/im", "chrome.exe"],
+                capture_output=True, timeout=10,
+            )
+            log.info("Chrome force-killed (graceful close didn't finish)")
+        else:
+            log.info("Chrome shut down gracefully")
     except Exception as e:
-        log.warning("Chrome kill failed (may not be running): %s", e)
+        # Fallback: force kill
+        try:
+            subprocess.run(
+                ["taskkill", "/f", "/im", "chrome.exe"],
+                capture_output=True, timeout=10,
+            )
+            log.info("Chrome processes killed")
+        except Exception as e2:
+            log.warning("Chrome kill failed (may not be running): %s", e2)
 
     time.sleep(2)  # let processes fully exit
 
@@ -315,7 +474,7 @@ def _launch_obs_with_dialog_handler() -> bool:
     result = subprocess.run(
         [
             "schtasks", "/create", "/tn", task_name,
-            "/tr", f'py -3 "{launcher_path}" "{OBS_PATH}" {OBS_PORT}',
+            "/tr", f'"{VENV_PYTHON}" "{launcher_path}" "{OBS_PATH}" {OBS_PORT}',
             "/sc", "once", "/st", "00:00", "/f", "/it", "/ru", "Matt",
         ],
         capture_output=True, text=True,
@@ -363,6 +522,9 @@ def restart_obs() -> bool:
 
     log.info("Ensuring OBS clean state...")
 
+    # 0. Ensure we're on the console session (not a disconnected RDP)
+    _ensure_console_session()
+
     # 1. Try connecting to existing OBS — if WebSocket is alive, reset
     #    recording state and reuse the process.
     try:
@@ -377,17 +539,10 @@ def restart_obs() -> bool:
         log.info("OBS WebSocket responding — clean state ready")
         return True
     except Exception:
-        log.info("OBS WebSocket not responding — killing and restarting")
+        log.info("OBS WebSocket not responding — shutting down and restarting")
 
-    # 2. OBS not responding — kill and clean up crash markers
-    try:
-        subprocess.run(
-            ["taskkill", "/f", "/im", "obs64.exe"],
-            capture_output=True, timeout=10,
-        )
-        log.info("OBS processes killed")
-    except Exception as e:
-        log.warning("OBS kill failed (may not be running): %s", e)
+    # 2. OBS not responding — graceful shutdown, then clean crash markers
+    _graceful_obs_shutdown()
 
     time.sleep(2)
     _clean_obs_crash_markers()
@@ -696,14 +851,7 @@ class EnvironmentManager:
 
     def _close_obs(self) -> None:
         if IS_WINDOWS:
-            try:
-                subprocess.run(
-                    ["taskkill", "/im", "obs64.exe", "/f"],
-                    capture_output=True, text=True,
-                )
-                log.info("OBS killed via taskkill")
-            except Exception as exc:
-                log.warning("taskkill obs failed: %s", exc)
+            _graceful_obs_shutdown()
 
     def _cleanup_temp_files(self) -> None:
         _cleanup_scheduled_task(SCHTASK_NAME_CHROME)
