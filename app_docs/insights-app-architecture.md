@@ -84,8 +84,8 @@ Browser → Caddy (HTTPS :443) → FastAPI (:8420) → gRPC client → Agent Ser
 
 | Component | What | Where | Depends On |
 |-----------|------|-------|------------|
-| **Caddy** | TLS termination + reverse proxy `insights.tunalab.dev` → `localhost:8420` | `/etc/caddy/Caddyfile` | Cloudflare DNS A record, systemd |
-| **FastAPI** | REST API + WebSocket on `:8420`. Serves frontend static files in production | `web/app.py` | SQLite, ObsClient, uvicorn |
+| **Caddy** | TLS termination, serves frontend static files from `frontend/dist/`, proxies `/api/*` and `/ws/*` to FastAPI | `/etc/caddy/Caddyfile` | Cloudflare DNS A record, systemd |
+| **FastAPI** | REST API + WebSocket on `:8420`. API-only in production (Caddy serves static files) | `web/app.py` | SQLite, ObsClient, uvicorn |
 | **Vue 3 SPA** | Dashboard UI — catalog browser, queue manager, watcher dashboard, discovery feed | `frontend/` | FastAPI (API + WebSocket) |
 | **SQLite** | Primary data store: posts, per-step lifecycle, queue, discovery logs | `data/media_transcribe.db` | Migrated from JSON on first run |
 | **ObsClient** | Async gRPC client connecting to obs-machine agent server | `web/services/obs_client.py` | gRPC channel to `100.66.194.100:8421`, `AGENT_TOKEN` |
@@ -309,48 +309,78 @@ AGENT_PORT=8421
 
 ### devbox-01: systemd
 
-**Service:** `media-transcribe-web.service`
-**Unit file:** `deploy/media-transcribe-web.service`
-**Installed at:** `/etc/systemd/system/media-transcribe-web.service`
+**Service:** `insights-backend.service` (user service)
+**Unit file:** `deploy/insights-backend.service`
+**Installed at:** `~/.config/systemd/user/insights-backend.service`
 
 ```ini
 [Unit]
-Description=Media Transcribe Pipeline Dashboard
-After=network.target
+Description=Insights - Media Transcribe Pipeline Dashboard
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=simple
-User=tuna
 WorkingDirectory=/home/tuna/repos/media-transcribe
-ExecStart=/home/tuna/.local/bin/uv run cli.py web --host 127.0.0.1 --port 8420
+Environment=PATH=/home/tuna/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=HOME=/home/tuna
+EnvironmentFile=%h/repos/media-transcribe/.env
+ExecStart=/home/tuna/.local/bin/uv run cli.py web --host 127.0.0.1 --port 8420 --foreground
 Restart=on-failure
 RestartSec=5
-Environment=PATH=/home/tuna/.local/bin:/usr/local/bin:/usr/bin:/bin
+StandardOutput=journal
+StandardError=journal
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 ```
 
-`--host 127.0.0.1` binds to localhost only — Caddy handles external access.
+`--host 127.0.0.1` binds to localhost only — Caddy handles external access. `--foreground` prevents the CLI auto-backgrounding logic from re-spawning. `EnvironmentFile` loads `.env` since `web/config.py` uses raw `os.getenv()` without `load_dotenv()`.
 
 ```bash
-sudo systemctl enable --now media-transcribe-web.service   # enable + start
-sudo systemctl status media-transcribe-web.service         # check
-sudo systemctl restart media-transcribe-web.service        # restart
-journalctl -u media-transcribe-web.service -f              # tail logs
+systemctl --user enable --now insights-backend.service   # enable + start
+systemctl --user status insights-backend.service         # check
+systemctl --user restart insights-backend.service        # restart
+journalctl --user -u insights-backend.service -f         # tail logs
 ```
 
 ### devbox-01: Caddy
 
 **Vhost:** `deploy/caddy-insights.conf`
 
+Caddy serves the Vue SPA directly from `frontend/dist/` and only proxies `/api/*` and `/ws/*` to FastAPI. This avoids modifying `web/app.py` and matches the devbox-01 convention (life-tracker, orchestrator).
+
 ```
 insights.tunalab.dev {
-    reverse_proxy localhost:8420
+    bind 100.126.202.43
+
+    handle /api/* {
+        reverse_proxy localhost:8420
+    }
+
+    handle /ws/* {
+        reverse_proxy localhost:8420
+    }
+
+    handle {
+        root * /home/tuna/repos/media-transcribe/frontend/dist
+        try_files {path} /index.html
+        file_server
+
+        @assets path /assets/*
+        header @assets Cache-Control "public, max-age=31536000, immutable"
+
+        @html path / /index.html
+        header @html Cache-Control "no-cache"
+    }
+
+    tls {
+        dns cloudflare {file./etc/caddy/cloudflare-api-token}
+    }
 }
 ```
 
-Applied via `sudo caddy-vhost /home/tuna/repos/media-transcribe/deploy/caddy-insights.conf`. Caddy auto-handles WebSocket upgrade and TLS via ACME/DNS challenge.
+Applied via `sudo caddy-vhost /home/tuna/repos/media-transcribe/deploy/caddy-insights.conf`. TLS via Cloudflare DNS-01 challenge. SPA fallback via `try_files`. Hashed assets cached immutably; `index.html` served as no-cache for instant deploys.
 
 ### devbox-01: Cloudflare DNS
 
@@ -405,13 +435,13 @@ Logs to `C:\Users\Matt\agent-control\logs\agent_server.log`.
 | `/home/tuna/repos/media-transcribe/` | Source repo root |
 | `data/media_transcribe.db` | SQLite database (lifecycle, queue, stats) |
 | `data/patreon_full_catalog.json` | JSON catalog (1,640+ posts, legacy) |
-| `frontend/dist/` | Built Vue SPA (served by FastAPI) |
+| `frontend/dist/` | Built Vue SPA (served by Caddy in production) |
 | `web/` | FastAPI backend package |
 | `agent/` | gRPC agent server package (runs on obs-machine, developed here) |
 | `proto/agent.proto` | gRPC service definition |
 | `proto/agent_pb2.py`, `proto/agent_pb2_grpc.py` | Generated protobuf stubs |
 | `deploy/caddy-insights.conf` | Caddy vhost snippet |
-| `deploy/media-transcribe-web.service` | systemd unit file |
+| `deploy/insights-backend.service` | systemd user service unit file |
 | `.env` | `AGENT_TOKEN`, `AGENT_HOST`, `AGENT_PORT` (gitignored) |
 | `/mnt/secondary/media/patreon/FIRE Investing Masterclass/` | Recordings + transcripts storage |
 

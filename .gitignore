@@ -22,3 +22,5 @@ catalog_*.json
 data/patreon_full_catalog.json
 # App review reports (generated, not source)
 app_review/
+# Environment variables (secrets)
+.env

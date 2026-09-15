@@ -379,6 +379,8 @@ def build_parser() -> argparse.ArgumentParser:
     w.add_argument("--host", default="0.0.0.0")
     w.add_argument("--port", type=int, default=8420)
     w.add_argument("--dev", action="store_true", help="Enable auto-reload for development")
+    w.add_argument("--foreground", action="store_true",
+                   help="Run in foreground instead of backgrounding")
 
     # --- watch ---
     w = sub.add_parser("watch", help="Autonomous content discovery + recording loop")
