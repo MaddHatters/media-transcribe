@@ -1,0 +1,19 @@
+[Unit]
+Description=Insights - Media Transcribe Pipeline Dashboard
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/tuna/repos/media-transcribe
+Environment=PATH=/home/tuna/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=HOME=/home/tuna
+EnvironmentFile=%h/repos/media-transcribe/.env
+ExecStart=/home/tuna/.local/bin/uv run cli.py web --host 127.0.0.1 --port 8420 --foreground
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

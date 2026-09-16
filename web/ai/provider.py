@@ -1,0 +1,9 @@
+from __future__ import annotations
+
+from typing import AsyncIterator, Protocol
+
+
+class AIProvider(Protocol):
+    async def complete(self, messages: list[dict], **kwargs) -> str: ...
+    async def embed(self, texts: list[str]) -> list[list[float]]: ...
+    async def stream(self, messages: list[dict], **kwargs) -> AsyncIterator[str]: ...

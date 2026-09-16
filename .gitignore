@@ -20,7 +20,14 @@ test_assets/test_video.mp4
 catalog_*.json
 *_queue.json
 data/patreon_full_catalog.json
+# SQLite runtime database files
+data/*.db
+data/*.db-shm
+data/*.db-wal
 # App review reports (generated, not source)
 app_review/
 # Environment variables (secrets)
 .env
+# Insights frontend build artifacts (also ignored via frontend/.gitignore)
+frontend/node_modules/
+frontend/dist/
