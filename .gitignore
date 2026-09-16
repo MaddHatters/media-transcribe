@@ -31,3 +31,5 @@ app_review/
 # Insights frontend build artifacts (also ignored via frontend/.gitignore)
 frontend/node_modules/
 frontend/dist/
+# Windows agent-control logs (accidentally committed)
+C\:\\Users\\*
